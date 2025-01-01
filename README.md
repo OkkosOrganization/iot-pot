@@ -16,6 +16,9 @@ Let´s try to use feature branches: create a new branch for each new feature.
 3. When you are done, push the branch to Gitlab
 4. Log into Gitlab and create a Merge Request to merge your branch "feature/my-new-feature" into the "main" branch. 
 
+## Secrets
+Do not commit secrets, passwords, API keys etc into Git. Create a file called secrets.h in /include, this file should contain all secrets and the file is ignored by git. See the file [secrets.h.template](./include/secrets.h.template) for a template.
+
 
 ## Authors
 Okko Ojala  
