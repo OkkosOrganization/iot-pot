@@ -4,7 +4,7 @@
 Course project repository for "TIES4571 IoT-projekti".
 
 ## Development
-Use Visual Studio Code and the Platform IO [extension](https://docs.platformio.org/en/stable/integration/ide/vscode.html).
+Use Visual Studio Code and the [Platform IO extension](https://docs.platformio.org/en/stable/integration/ide/vscode.html).
 
 ## Branches
 No direct pushes to "main" branch. 
@@ -18,8 +18,8 @@ Let´s try to use feature branches: create a new branch for each new feature.
 
 
 ## Authors
-Okko Ojala
-Susan Paloranta
-Bella Lerch
-Antti Leppänen
-Katja Hellsten
+Okko Ojala  
+Susan Paloranta  
+Bella Lerch  
+Antti Leppänen  
+Katja Hellsten  
