@@ -2,11 +2,13 @@
 #include "secrets.h"
 #include <WebServer.h>
 #include <WiFi.h>
+#include <ArduinoJson.h>
 #include "html/index.h"
 
 // FUNCTION PROTOTYPES
 void initWifi();
 void handleGetIndex();
+void handleGetInternetStatus();
 
 // WIFI ACCESS POINT AND LOCAL WEB SERVER IP
 IPAddress local_IP(192,168,0,1);
@@ -47,6 +49,7 @@ void initWifi(){
   
   // SETUP ROUTES
   server->on("/", HTTP_GET, handleGetIndex);
+  server->on("/internet-status", HTTP_GET, handleGetInternetStatus);
 
   // START SERVER
   server->begin();
@@ -64,8 +67,19 @@ void initWifi(){
   Serial.println(WiFi.localIP());
 }
 
+// WEB SERVER ROUTES
 void handleGetIndex() {
   Serial.println("GET /");
   server->sendHeader("Content-Type", "text/html");
   server->send(200, "text/html", indexHtml);
+}
+void handleGetInternetStatus() {
+  Serial.println("GET /internet-status");
+  JsonDocument jsonDoc;
+  String jsonString;  
+  jsonDoc["internet-status"] = WiFi.status();
+  jsonDoc["ip"] = WiFi.localIP();
+  serializeJson(jsonDoc, jsonString);
+  server->sendHeader("Content-Type", "application/json");
+  server->send(200, "application/json", jsonString);
 }
