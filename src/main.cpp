@@ -4,11 +4,17 @@
 #include <WiFi.h>
 #include <ArduinoJson.h>
 #include "html/index.h"
+#include <inttypes.h>
 
 // FUNCTION PROTOTYPES
 void initWifi();
 void handleGetIndex();
 void handleGetInternetStatus();
+void handleGetDeviceId();
+
+// UNIQUE DEVICE ID
+uint64_t deviceId;
+String deviceIdHex;
 
 // WIFI ACCESS POINT AND LOCAL WEB SERVER IP
 IPAddress local_IP(192,168,0,1);
@@ -25,6 +31,10 @@ void setup() {
     Serial.println("..."); 
   }  
   initWifi();
+
+  // GET UNIQUE DEVICE ID
+  deviceId = ESP.getEfuseMac();
+  deviceIdHex = String((uint32_t)(deviceId >> 32), HEX) + String((uint32_t)deviceId, HEX);
 }
 
 // LOOP
@@ -50,6 +60,7 @@ void initWifi(){
   // SETUP ROUTES
   server->on("/", HTTP_GET, handleGetIndex);
   server->on("/internet-status", HTTP_GET, handleGetInternetStatus);
+  server->on("/device-id", HTTP_GET, handleGetDeviceId);
 
   // START SERVER
   server->begin();
@@ -79,6 +90,15 @@ void handleGetInternetStatus() {
   String jsonString;  
   jsonDoc["internet-status"] = WiFi.status();
   jsonDoc["ip"] = WiFi.localIP();
+  serializeJson(jsonDoc, jsonString);
+  server->sendHeader("Content-Type", "application/json");
+  server->send(200, "application/json", jsonString);
+}
+void handleGetDeviceId() {
+  Serial.println("GET /device-id");
+  JsonDocument jsonDoc;
+  String jsonString;  
+  jsonDoc["device-id"] = deviceIdHex;  
   serializeJson(jsonDoc, jsonString);
   server->sendHeader("Content-Type", "application/json");
   server->send(200, "application/json", jsonString);
