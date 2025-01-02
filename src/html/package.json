@@ -1,0 +1,27 @@
+{
+  "name": "webpack-inline-project",
+  "version": "1.0.0",
+  "description": "A project with Webpack configuration to inline HTML, CSS, JS, and fonts",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack --mode production",
+    "dev": "webpack serve --mode development",
+    "build-and-convert": "npm run build && node html-to-progmem.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "css-loader": "^6.8.1",
+    "css-minimizer-webpack-plugin": "^5.0.0",
+    "html-inline-css-webpack-plugin": "^1.4.0",
+    "html-webpack-plugin": "^5.5.0",
+    "mini-css-extract-plugin": "^2.7.6",
+    "terser-webpack-plugin": "^5.3.8",
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "html-inline-script-webpack-plugin": "^3.2.1",
+    "webpack-dev-server": "^5.2.0"
+  }
+}
