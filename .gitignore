@@ -29,3 +29,9 @@ __pycache__/
 # Secrets
 include/secrets.h
 
+# node_modules
+src/html/node_modules
+
+# webpack generated files
+src/html/dist
+
