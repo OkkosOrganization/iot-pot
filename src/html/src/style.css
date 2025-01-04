@@ -101,12 +101,20 @@ body {
   line-height: 1.5;
   color: var(--black);
   background-color: var(--lightGrey);
+  padding: 1.25rem;
 }
 .container {
   margin: 0 auto;
   width: 100%;
+  min-height: 100%;
   padding: 1.25rem;
+  background-color: #fff;
+  border-radius: 2.5rem;
 }
+
+/***********/
+/* HEADER */
+/*********/
 .logoContainer,
 #logo {
   width: 80px;
@@ -121,8 +129,23 @@ body {
 }
 .deviceIdContainer {
   margin-left: 1.25rem;
+  font-family: var(--robotoLight);
+  text-transform: uppercase;
+}
+.deviceIdContainer h2 {
+  font-size: 1.25rem;
+  line-height: 1.125rem;
+}
+.deviceIdContainer span {
+  display: block;
+}
+#deviceId {
+  font-family: var(--robotoLight);
 }
 
+/*************/
+/* TAB MENU */
+/***********/
 .tabSelector {
   margin: 0 auto;
   max-width: 400px;
@@ -148,6 +171,9 @@ body {
   color: var(--black);
 }
 
+/*********/
+/* TABS */
+/*******/
 .tabs {
   max-width: 680px;
   margin: 2rem auto 0 auto;
@@ -159,9 +185,14 @@ body {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  gap: 2rem;
 }
 .tab:not(.active) {
   display: none;
+}
+.tab div:first-child,
+.tab div:last-child {
+  width: 50%;
 }
 
 /*******************/
