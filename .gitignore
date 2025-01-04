@@ -34,4 +34,5 @@ src/html/node_modules
 
 # webpack generated files
 src/html/dist
+src/html/tmp
 

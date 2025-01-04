@@ -1,20 +1,24 @@
 import './style.css';
 
 const init = () => {
-  console.log('Configuration app init');
+  console.log('Configuration app init!');
   let statusInterval = 0;
   let statusIntervalTime = 5000;
-  const internetStatusP = document.getElementById('internetStatusCode');
-  const deviceIdSpan = document.getElementById('deviceId');
-  const postForm = document.getElementById('postForm');
-  const tabLinks = document.querySelectorAll('.tabSelector a');
+  const internetStatusP = document.getElementById('internetStatusCode')!;
+  const deviceIdSpan = document.getElementById('deviceId')!;
+  const postForm = document.getElementById('postForm')! as HTMLFormElement;
+  const tabLinks = document.querySelectorAll('.tabSelector a')!;
 
   const addEventListeners = () => {
     postForm.addEventListener('submit', async function (event) {
       event.preventDefault();
-      const ssid = document.getElementById('ssid').value;
-      const pwd = document.getElementById('pwd').value;
-      const responseP = document.getElementById('response');
+      const ssidInputEl = document.getElementById('ssid') as HTMLInputElement;
+      const ssid = ssidInputEl.value;
+      const pwdInputEl = document.getElementById('pwd') as HTMLInputElement;
+      const pwd = pwdInputEl.value as string;
+      const responseP = document.getElementById(
+        'response',
+      ) as HTMLParagraphElement;
       try {
         const response = await fetch('/data', {
           method: 'POST',
@@ -36,31 +40,42 @@ const init = () => {
           responseP.innerHTML = `Virhe tietojen lähetyksessä: ${response.status}`;
         }
       } catch (error) {
-        responseP.innerHTML = `<pre>Tapahtui virhe: ${error.message}</pre>`;
+        if (error instanceof Error)
+          responseP.innerHTML = `<pre>Tapahtui virhe: ${error?.message}</pre>`;
       }
       responseP.classList.remove('hidden');
       postForm.reset();
     });
-
     tabLinks.forEach((a) => {
       a.addEventListener('click', (e) => {
         e.preventDefault();
-        const el = e.target;
+        const el = e.target as HTMLAnchorElement;
         const id = el.href.split('#')[1];
         const tabToShow = document.getElementById(id);
         const activeTab = document.querySelector('.tab.active');
+        const activeMenuItem = document.querySelector(
+          '.tabSelector a.active',
+        ) as HTMLAnchorElement;
 
         if (activeTab && tabToShow) {
+          // SWITCH TAB
           activeTab.classList.remove('active');
           tabToShow.classList.add('active');
+
+          // UPDATE MENU
+          activeMenuItem.classList.remove('active');
+          el.classList.add('active');
         }
       });
     });
   };
 
-  const internetStatus = async () => {
+  const getInternetStatus = async () => {
     if (!statusInterval)
-      statusInterval = setInterval(internetStatus, statusIntervalTime);
+      statusInterval = window.setInterval(
+        getInternetStatus,
+        statusIntervalTime,
+      );
 
     clearInterval(statusInterval);
     try {
@@ -71,7 +86,7 @@ const init = () => {
         const result = await response.json();
         const statusCode = parseInt(result['internet-status']);
         const ip = result['ip'];
-        internetStatusP.innerHTML = statusCode;
+        internetStatusP.innerHTML = statusCode.toString();
         switch (statusCode) {
           case 3:
             console.log('Online', result, statusCode, ip);
@@ -95,12 +110,12 @@ const init = () => {
             break;
         }
       } else {
-        internetStatusP.innerHTML = statusCode;
+        internetStatusP.innerHTML = '?';
       }
     } catch (error) {
       internetStatusP.innerHTML = '?';
     }
-    statusInterval = setInterval(internetStatus, statusIntervalTime);
+    statusInterval = window.setInterval(getInternetStatus, statusIntervalTime);
   };
 
   const getDeviceId = async () => {
@@ -109,20 +124,19 @@ const init = () => {
         method: 'GET',
       });
       if (response.ok) {
-        const result = await response.json(); // Parse JSON response
+        const result = await response.json();
         const res = result['device-id'];
         deviceIdSpan.innerHTML = res;
       } else {
-        deviceIdSpan.innerHTML = '';
+        deviceIdSpan.innerHTML = '...';
       }
     } catch (error) {
-      deviceIdSpan.innerHTML = '?';
+      deviceIdSpan.innerHTML = '...';
     }
   };
 
   addEventListeners();
   getDeviceId();
-  internetStatus();
+  getInternetStatus();
 };
-console.log('Configuration appsss, jeess');
 document.addEventListener('DOMContentLoaded', init);
