@@ -360,7 +360,7 @@ button:hover {
 /******************/
 /* MEDIA QUERIES */
 /****************/
-@media screen and (min-width: 480px) {
+@media screen and (min-width: 600px) {
   body {
     padding: 1.25rem;
   }
