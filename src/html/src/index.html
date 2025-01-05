@@ -37,7 +37,7 @@
           </svg>
         </div>
         <div class="deviceIdContainer">
-          <h2><span>Device-ID:</span><span id="deviceId">...</span></h2>
+          <h1><span>Device-ID:</span><span id="deviceId">...</span></h1>
         </div>
       </div>
       <div class="tabSelector">
@@ -47,33 +47,42 @@
       </div>
       <div class="tabs">
         <div class="tab active" id="connection">
-          <div id="internetStatus">
-            <h2 class="fontPoppins">Internet connection</h2>
-            <p id="internetStatusCode"></p>
-          </div>
-
-          <div class="formContainer">
-            <h2 class="fontPoppins">Connection settings:</h2>
-            <form action="#" method="post" id="postForm">
-              <label for="ssid">SSID</label>
-              <input
-                type="text"
-                id="ssid"
-                name="ssid"
-                placeholder="Network SSID"
-                required
-              />
-              <label for="pwd">Password</label>
-              <input
-                type="password"
-                id="pwd"
-                name="pwd"
-                placeholder="Network password"
-                required
-              />
-              <button type="submit">Submit</button>
-              <p id="response" class="hidden"></p>
-            </form>
+          <h2 class="tabHeading poppins">Connection settings</h2>
+          <div class="content">
+            <div id="internetStatus" class="side">
+              <h3 class="connectionStatus">
+                <span class="circle redBg" id="connectionStatusCircle"></span>
+                <span id="connectionStatusSpan">Not connected</span>
+              </h3>
+              <p>IP Address:</p>
+              <p id="ipAddress">-</p>
+              <p>Gateway:</p>
+              <p id="gateway">-</p>
+              <p id="internetStatusCode"></p>
+            </div>
+            <div class="formContainer side">
+              <form action="#" method="post" id="postForm">
+                <h3 class="robotoLight uppercase">Set router credentials:</h3>
+                <label for="ssid">SSID</label>
+                <input
+                  type="text"
+                  id="ssid"
+                  name="ssid"
+                  placeholder="Network SSID"
+                  required
+                />
+                <label for="pwd">Password</label>
+                <input
+                  type="password"
+                  id="pwd"
+                  name="pwd"
+                  placeholder="Network password"
+                  required
+                />
+                <button type="submit">Submit</button>
+                <p id="response" class="hidden"></p>
+              </form>
+            </div>
           </div>
         </div>
         <div class="tab" id="watering">
