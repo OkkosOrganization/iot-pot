@@ -241,10 +241,11 @@ form {
   border-radius: 1.875rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
-form h2 {
+form h3 {
   text-decoration: uppercase;
-  font-size: 1rem;
+  font-size: 1.125rem;
   line-height: 1rem;
+  margin-bottom: 1rem;
 }
 label {
   display: block;
