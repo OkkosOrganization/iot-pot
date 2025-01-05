@@ -4,7 +4,12 @@ const init = () => {
   console.log('Configuration app init!');
   let statusInterval = 0;
   let statusIntervalTime = 5000;
-  const internetStatusP = document.getElementById('internetStatusCode')!;
+  const connectionStatusCircle = document.getElementById(
+    'connectionStatusCircle',
+  )!;
+  const connectionStatusSpan = document.getElementById('connectionStatusSpan')!;
+  const ipAddressP = document.getElementById('ipAddress')!;
+  const gatewayP = document.getElementById('gateway')!;
   const deviceIdSpan = document.getElementById('deviceId')!;
   const postForm = document.getElementById('postForm')! as HTMLFormElement;
   const tabLinks = document.querySelectorAll('.tabSelector a')!;
@@ -70,10 +75,10 @@ const init = () => {
     });
   };
 
-  const getInternetStatus = async () => {
+  const getConnectionStatus = async () => {
     if (!statusInterval)
       statusInterval = window.setInterval(
-        getInternetStatus,
+        getConnectionStatus,
         statusIntervalTime,
       );
 
@@ -86,36 +91,56 @@ const init = () => {
         const result = await response.json();
         const statusCode = parseInt(result['internet-status']);
         const ip = result['ip'];
-        internetStatusP.innerHTML = statusCode.toString();
+        const gateway = result['gateway'];
         switch (statusCode) {
           case 3:
             console.log('Online', result, statusCode, ip);
-            internetStatusP.classList.add('green');
-            internetStatusP.classList.remove('yellow');
-            internetStatusP.classList.remove('red');
-            internetStatusP.innerHTML = 'Online</br>IP: ' + ip;
+            connectionStatusCircle.classList.add('greenBg');
+            connectionStatusCircle.classList.remove('yellowBg');
+            connectionStatusCircle.classList.remove('redBg');
+            connectionStatusSpan.innerHTML = 'Connected';
+            ipAddressP.innerHTML = ip;
+            gatewayP.innerHTML = gateway;
             break;
           case 2:
             console.log('Scanning', result, statusCode, ip);
-            internetStatusP.classList.add('yellow');
-            internetStatusP.classList.remove('green');
-            internetStatusP.classList.remove('red');
-            internetStatusP.innerHTML = 'Connecting..';
+            connectionStatusCircle.classList.remove('greenBg');
+            connectionStatusCircle.classList.add('yellowBg');
+            connectionStatusCircle.classList.remove('redBg');
+            connectionStatusSpan.innerHTML = 'Connecting';
+            ipAddressP.innerHTML = '...';
+            gatewayP.innerHTML = '...';
             break;
           default:
-            internetStatusP.classList.add('red');
-            internetStatusP.classList.remove('yellow');
-            internetStatusP.classList.remove('green');
-            internetStatusP.innerHTML = 'Offline:' + statusCode;
+            console.log('Offline', result, statusCode, ip);
+            connectionStatusCircle.classList.remove('greenBg');
+            connectionStatusCircle.classList.add('yellowBg');
+            connectionStatusCircle.classList.remove('redBg');
+            connectionStatusSpan.innerHTML = 'Offline';
+            ipAddressP.innerHTML = '-';
+            gatewayP.innerHTML = '-';
             break;
         }
       } else {
-        internetStatusP.innerHTML = '?';
+        connectionStatusCircle.classList.remove('greenBg');
+        connectionStatusCircle.classList.remove('yellowBg');
+        connectionStatusCircle.classList.add('redBg');
+        connectionStatusSpan.innerHTML = 'Offline';
+        ipAddressP.innerHTML = '-';
+        gatewayP.innerHTML = '-';
       }
     } catch (error) {
-      internetStatusP.innerHTML = '?';
+      connectionStatusCircle.classList.remove('greenBg');
+      connectionStatusCircle.classList.remove('yellowBg');
+      connectionStatusCircle.classList.add('redBg');
+      connectionStatusSpan.innerHTML = 'Offline';
+      ipAddressP.innerHTML = '-';
+      gatewayP.innerHTML = '-';
     }
-    statusInterval = window.setInterval(getInternetStatus, statusIntervalTime);
+    statusInterval = window.setInterval(
+      getConnectionStatus,
+      statusIntervalTime,
+    );
   };
 
   const getDeviceId = async () => {
@@ -137,6 +162,6 @@ const init = () => {
 
   addEventListeners();
   getDeviceId();
-  getInternetStatus();
+  getConnectionStatus();
 };
 document.addEventListener('DOMContentLoaded', init);
