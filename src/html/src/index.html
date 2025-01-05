@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fi">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -89,10 +89,46 @@
           </div>
         </div>
         <div class="tab" id="watering">
-          <h2 class="fontPoppins">Watering settings</h2>
+          <h2 class="tabHeading fontPoppins">Watering settings</h2>
+          <div class="content">
+            <div class="side">
+              <h3 class="robotoLight uppercase">SET SOIL MOISTURE THRESHOLD</h3>
+              <div class="sliderInputContainer">
+                <label for="wateringThreshold" class="tl">0</label>
+                <label for="wateringThreshold" class="tr">100</label>
+                <label for="wateringThreshold" class="bl">DRY</label>
+                <label for="wateringThreshold" class="br">WET</label>
+                <input type="range" id="wateringThreshold" min="0" max="100" />
+              </div>
+              <div>
+                <span id="wateringThresholdValue" class="sliderValue poppins"
+                  >50</span
+                >
+              </div>
+              <button type="submit">SUBMIT</button>
+            </div>
+            <div class="side">
+              <h3 class="robotoLight uppercase">SET WATERING AMOUNT</h3>
+              <div class="sliderInputContainer">
+                <label for="wateringAmount" class="tl">1</label>
+                <label for="wateringAmount" class="tr">100</label>
+                <input type="range" id="wateringAmount" min="1" max="100" />
+              </div>
+              <div>
+                <span id="wateringAmountValue" class="sliderValue poppins"
+                  >50</span
+                >
+              </div>
+              <button type="submit">SUBMIT</button>
+            </div>
+          </div>
         </div>
         <div class="tab" id="notifications">
           <h2 class="fontPoppins">Notification settings</h2>
+          <div class="content">
+            <div class="side"></div>
+            <div class="side"></div>
+          </div>
         </div>
       </div>
     </div>

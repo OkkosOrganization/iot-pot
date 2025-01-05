@@ -13,6 +13,7 @@ const init = () => {
   const deviceIdSpan = document.getElementById('deviceId')!;
   const postForm = document.getElementById('postForm')! as HTMLFormElement;
   const tabLinks = document.querySelectorAll('.tabSelector a')!;
+  const rangeInputs = document.querySelectorAll("input[type='range']")!;
 
   const addEventListeners = () => {
     postForm.addEventListener('submit', async function (event) {
@@ -71,6 +72,17 @@ const init = () => {
           activeMenuItem.classList.remove('active');
           el.classList.add('active');
         }
+      });
+    });
+    rangeInputs.forEach((i) => {
+      i.addEventListener('input', (e) => {
+        const el = e.target as HTMLInputElement;
+        const elId = el.id;
+        const valueEl = document.querySelector(
+          `#${el.id}Value`,
+        ) as HTMLSpanElement;
+        console.log(el.value);
+        valueEl.innerHTML = el.value;
       });
     });
   };
