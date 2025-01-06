@@ -37,13 +37,13 @@ const init = () => {
         if (response.ok) {
           const result = await response.json(); // Parse JSON response
           if (result.success === '1') {
-            responseP.innerHTML =
+            responseP.textContent =
               'Tiedot tallennettu, käynnistä laite uudelleen.';
           } else {
-            responseP.innerHTML = 'Tietojen tallennus epäonnistui';
+            responseP.textContent = 'Tietojen tallennus epäonnistui';
           }
         } else {
-          responseP.innerHTML = `Virhe tietojen lähetyksessä: ${response.status}`;
+          responseP.textContent = `Virhe tietojen lähetyksessä: ${response.status}`;
         }
       } catch (error) {
         if (error instanceof Error)
@@ -82,7 +82,7 @@ const init = () => {
           `#${el.id}Value`,
         ) as HTMLSpanElement;
         console.log(el.value);
-        valueEl.innerHTML = el.value;
+        valueEl.textContent = el.value;
       });
     });
   };
@@ -110,44 +110,44 @@ const init = () => {
             connectionStatusCircle.classList.add('greenBg');
             connectionStatusCircle.classList.remove('yellowBg');
             connectionStatusCircle.classList.remove('redBg');
-            connectionStatusSpan.innerHTML = 'Connected';
-            ipAddressP.innerHTML = ip;
-            gatewayP.innerHTML = gateway;
+            connectionStatusSpan.textContent = 'Connected';
+            ipAddressP.textContent = ip;
+            gatewayP.textContent = gateway;
             break;
           case 2:
             console.log('Scanning', result, statusCode, ip);
             connectionStatusCircle.classList.remove('greenBg');
             connectionStatusCircle.classList.add('yellowBg');
             connectionStatusCircle.classList.remove('redBg');
-            connectionStatusSpan.innerHTML = 'Connecting';
-            ipAddressP.innerHTML = '...';
-            gatewayP.innerHTML = '...';
+            connectionStatusSpan.textContent = 'Connecting';
+            ipAddressP.textContent = '...';
+            gatewayP.textContent = '...';
             break;
           default:
             console.log('Offline', result, statusCode, ip);
             connectionStatusCircle.classList.remove('greenBg');
             connectionStatusCircle.classList.add('yellowBg');
             connectionStatusCircle.classList.remove('redBg');
-            connectionStatusSpan.innerHTML = 'Offline';
-            ipAddressP.innerHTML = '-';
-            gatewayP.innerHTML = '-';
+            connectionStatusSpan.textContent = 'Offline';
+            ipAddressP.textContent = '-';
+            gatewayP.textContent = '-';
             break;
         }
       } else {
         connectionStatusCircle.classList.remove('greenBg');
         connectionStatusCircle.classList.remove('yellowBg');
         connectionStatusCircle.classList.add('redBg');
-        connectionStatusSpan.innerHTML = 'Offline';
-        ipAddressP.innerHTML = '-';
-        gatewayP.innerHTML = '-';
+        connectionStatusSpan.textContent = 'Offline';
+        ipAddressP.textContent = '-';
+        gatewayP.textContent = '-';
       }
     } catch (error) {
       connectionStatusCircle.classList.remove('greenBg');
       connectionStatusCircle.classList.remove('yellowBg');
       connectionStatusCircle.classList.add('redBg');
-      connectionStatusSpan.innerHTML = 'Offline';
-      ipAddressP.innerHTML = '-';
-      gatewayP.innerHTML = '-';
+      connectionStatusSpan.textContent = 'Offline';
+      ipAddressP.textContent = '-';
+      gatewayP.textContent = '-';
     }
     statusInterval = window.setInterval(
       getConnectionStatus,
@@ -163,12 +163,12 @@ const init = () => {
       if (response.ok) {
         const result = await response.json();
         const res = result['device-id'];
-        deviceIdSpan.innerHTML = res;
+        deviceIdSpan.textContent = res;
       } else {
-        deviceIdSpan.innerHTML = '...';
+        deviceIdSpan.textContent = '...';
       }
     } catch (error) {
-      deviceIdSpan.innerHTML = '...';
+      deviceIdSpan.textContent = '...';
     }
   };
 
