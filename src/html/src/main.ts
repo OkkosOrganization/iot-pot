@@ -26,7 +26,7 @@ const init = () => {
         'response',
       ) as HTMLParagraphElement;
       try {
-        const response = await fetch('/data', {
+        const response = await fetch('/router-credentials', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -37,8 +37,7 @@ const init = () => {
         if (response.ok) {
           const result = await response.json(); // Parse JSON response
           if (result.success === '1') {
-            responseP.textContent =
-              'Tiedot tallennettu, käynnistä laite uudelleen.';
+            responseP.textContent = 'Tiedot tallennettu';
           } else {
             responseP.textContent = 'Tietojen tallennus epäonnistui';
           }
