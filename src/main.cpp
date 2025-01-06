@@ -5,12 +5,18 @@
 #include <ArduinoJson.h>
 #include "html/index.h"
 #include <inttypes.h>
+#include <Preferences.h>
 
 // FUNCTION PROTOTYPES
 void initWifi();
+void initWifiClient();
 void handleGetIndex();
 void handleGetInternetStatus();
 void handleGetDeviceId();
+void handlePostRouterCredentials();
+
+// PREFERENCES
+Preferences preferences;
 
 // UNIQUE DEVICE ID
 uint64_t deviceId;
@@ -30,7 +36,14 @@ void setup() {
   while (!Serial){ 
     Serial.println("..."); 
   }  
+
+  if (!preferences.begin("iot-pot", false)) {
+    Serial.println("Failed to initialize preferences");
+    return;
+  }
+
   initWifi();
+  initWifiClient();
 
   // GET UNIQUE DEVICE ID
   deviceId = ESP.getEfuseMac();
@@ -61,21 +74,46 @@ void initWifi(){
   server->on("/", HTTP_GET, handleGetIndex);
   server->on("/internet-status", HTTP_GET, handleGetInternetStatus);
   server->on("/device-id", HTTP_GET, handleGetDeviceId);
-
+  server->on("/router-credentials", HTTP_POST, handlePostRouterCredentials);
+  
   // START SERVER
   server->begin();
   Serial.println("Web server started");
+}
 
-  // WIFI CLIENT
-  WiFi.begin(ssid, pwd);      
-  while (WiFi.status() != WL_CONNECTED)
+// WIFI CLIENT
+void initWifiClient(){
+  Serial.println("Trying to connect to router");
+  if (preferences.isKey("ssid") && preferences.isKey("pwd"))
   {
-    Serial.println("Connecting to WiFi..");
-    delay(500);
-  }
     
-  Serial.print("ESP32 IP on the WiFi network: ");
-  Serial.println(WiFi.localIP());
+    String ssid = preferences.getString("ssid");
+    String pwd = preferences.getString("pwd");
+    WiFi.begin(ssid, pwd);  
+    int reconnectTries = 0;
+    int maxReconnectTries = 10;    
+    while (WiFi.status() != WL_CONNECTED)
+    {
+      if(reconnectTries < maxReconnectTries)
+      {      
+        Serial.println("Connecting to WiFi..");
+        reconnectTries +=1;
+        delay(250);
+      }
+      else
+      {
+        Serial.println("Could not connect to WiFi");        
+        return;
+      }
+    }
+      
+    Serial.print("ESP32 IP on the WiFi network: ");
+    Serial.println(WiFi.localIP());
+  }  
+  else
+  {
+    Serial.println("No SSID or password");
+  }
 }
 
 // WEB SERVER ROUTES
@@ -90,6 +128,7 @@ void handleGetInternetStatus() {
   String jsonString;  
   jsonDoc["internet-status"] = WiFi.status();
   jsonDoc["ip"] = WiFi.localIP();
+  jsonDoc["gateway"] = WiFi.gatewayIP();
   serializeJson(jsonDoc, jsonString);
   server->sendHeader("Content-Type", "application/json");
   server->send(200, "application/json", jsonString);
@@ -99,6 +138,32 @@ void handleGetDeviceId() {
   JsonDocument jsonDoc;
   String jsonString;  
   jsonDoc["device-id"] = deviceIdHex;  
+  serializeJson(jsonDoc, jsonString);
+  server->sendHeader("Content-Type", "application/json");
+  server->send(200, "application/json", jsonString);
+}
+void handlePostRouterCredentials() {
+  Serial.println("POST /router-credentials");
+  JsonDocument jsonDoc;
+  String jsonString;  
+  if (server->hasArg("ssid") && server->hasArg("pwd")) {
+    String ssid = server->arg("ssid");
+    String pwd = server->arg("pwd");
+    Serial.print("POST** ssid:");
+    Serial.println(ssid);
+    Serial.print("POST** pwd:");
+    Serial.println(pwd);    
+    preferences.putString("ssid", ssid);
+    preferences.putString("pwd", pwd);
+    jsonDoc["success"] = "1";
+
+    delay(500);
+    initWifiClient();
+  }
+  else {
+    jsonDoc["success"] = "0";
+  }
+
   serializeJson(jsonDoc, jsonString);
   server->sendHeader("Content-Type", "application/json");
   server->send(200, "application/json", jsonString);
