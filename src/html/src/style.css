@@ -140,6 +140,7 @@ body {
 }
 #deviceId {
   font-family: var(--robotoLight);
+  color: var(--purple);
 }
 
 /*************/
@@ -273,6 +274,13 @@ input[type='range']::-webkit-slider-runnable-track {
   border-radius: 0.5rem;
   border: 1px solid var(--black);
 }
+input[type='range']::-moz-range-track {
+  width: 100%;
+  height: 0.5rem;
+  background: var(--black);
+  border-radius: 0.5rem;
+  border: 1px solid var(--black);
+}
 /* HANDLE */
 input[type='range']::-webkit-slider-thumb {
   position: relative;
@@ -287,7 +295,24 @@ input[type='range']::-webkit-slider-thumb {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   border: 2px solid var(--black);
 }
+input[type='range']::-moz-range-thumb {
+  position: relative;
+  top: -0.4rem;
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 100%;
+  background: var(--purple);
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  border: 2px solid var(--black);
+}
+/* HANDLE HOVER */
 input[type='range']::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+input[type='range']::-moz-range-thumb:hover {
   transform: scale(1.2);
 }
 .sliderValue {
@@ -315,7 +340,6 @@ input[type='range']::-webkit-slider-thumb:hover {
   gap: 0.5rem;
   margin-bottom: 1rem;
 }
-
 form {
   width: 100%;
   min-height: 250px;
@@ -381,7 +405,6 @@ input[type='checkbox']::after {
   display: block;
   opacity: 0;
 }
-/* Change styles when checked */
 input[type='checkbox']:checked::after {
   opacity: 1;
 }
@@ -410,13 +433,6 @@ button {
 button:hover {
   opacity: 1;
 }
-.hidden {
-  display: none;
-}
-
-#deviceId {
-  color: var(--purple);
-}
 
 /******************/
 /* MEDIA QUERIES */
@@ -442,6 +458,9 @@ button:hover {
 /*******************/
 /* HELPER CLASSES */
 /*****************/
+.hidden {
+  display: none;
+}
 .poppins {
   font-family: var(--poppins);
 }
