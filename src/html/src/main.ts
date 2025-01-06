@@ -172,8 +172,68 @@ const init = () => {
     }
   };
 
+  const getWateringAmount = async () => {
+    try {
+      const response = await fetch('/watering-amount', {
+        method: 'GET',
+      });
+      if (response.ok) {
+        const result = await response.json();
+        const res = result['watering-amount'];
+        console.log(res);
+      } else {
+      }
+    } catch (error) {}
+  };
+
+  const getWateringThreshold = async () => {
+    try {
+      const response = await fetch('/watering-threshold', {
+        method: 'GET',
+      });
+      if (response.ok) {
+        const result = await response.json();
+        const res = result['watering-threshold'];
+        console.log(res);
+      } else {
+      }
+    } catch (error) {}
+  };
+
+  const getEmailAddress = async () => {
+    try {
+      const response = await fetch('/email-address', {
+        method: 'GET',
+      });
+      if (response.ok) {
+        const result = await response.json();
+        const res = result['email-address'];
+        console.log(res);
+      } else {
+      }
+    } catch (error) {}
+  };
+
+  const getNotificationTriggers = async () => {
+    try {
+      const response = await fetch('/notification-triggers', {
+        method: 'GET',
+      });
+      if (response.ok) {
+        const result = await response.json();
+        const res = result['notification-triggers'];
+        console.log(res);
+      } else {
+      }
+    } catch (error) {}
+  };
+
   addEventListeners();
   getDeviceId();
   getConnectionStatus();
+  getWateringAmount();
+  getWateringThreshold();
+  getEmailAddress();
+  getNotificationTriggers();
 };
 document.addEventListener('DOMContentLoaded', init);
