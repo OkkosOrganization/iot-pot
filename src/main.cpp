@@ -8,7 +8,8 @@
 #include <Preferences.h>
 
 // FUNCTION PROTOTYPES
-void initWifiApAndWebServer();
+void initWiFiAp();
+void initWebServer();
 void initWifiClient();
 void handleGetIndex();
 void handleGetInternetStatus();
@@ -35,6 +36,7 @@ IPAddress subnet(255,255,255,0);
 const char *soft_ap_ssid = "IoT-pot";
 const char *soft_ap_password = "TIES4571";
 WebServer* server;
+IPAddress apIP;
 
 // SETUP
 void setup() {
@@ -47,9 +49,13 @@ void setup() {
     Serial.println("Failed to initialize preferences");
     return;
   }
-
-  initWifiApAndWebServer();
+  
+  // INITIALIZES THE WIFI IN ACCESS POINT AND CLIENT MODE
+  WiFi.mode(WIFI_MODE_APSTA);
   initWifiClient();
+  initWiFiAp();
+  initWebServer();
+  
 
   // GET UNIQUE DEVICE ID
   deviceId = ESP.getEfuseMac();
@@ -61,17 +67,20 @@ void loop() {
   server->handleClient();    
 }
 
-// INITIALIZES THE WIFI AS BOTH ACCESS POINT AND CLIENT
-void initWifiApAndWebServer(){
-  WiFi.mode(WIFI_MODE_APSTA);
+// INITIALIZES WIFI AP
+void initWiFiAp(){
   WiFi.softAPConfig(local_IP, gateway, subnet);
   WiFi.softAP(soft_ap_ssid, soft_ap_password);
 
   Serial.print("IoT-pot access point IP: ");
-  IPAddress apIP = WiFi.softAPIP();
+  apIP = WiFi.softAPIP();
   Serial.println(apIP);
   Serial.print("Access point SSID: ");
   Serial.println(WiFi.softAPSSID()); 
+}
+
+// STARTS THE WEB SERVER
+void initWebServer(){
 
   // BIND SERVER TO AP-IP ONLY
   server = new WebServer(apIP);
@@ -110,17 +119,20 @@ void initWifiClient(){
       {      
         Serial.println("Connecting to WiFi..");
         reconnectTries +=1;
-        delay(250);
+        delay(500);
       }
       else
       {
         Serial.println("Could not connect to WiFi");        
-        return;
+        break;
       }
     }
       
-    Serial.print("ESP32 IP on the WiFi network: ");
-    Serial.println(WiFi.localIP());
+    if (WiFi.status() == WL_CONNECTED)
+    {
+      Serial.print("ESP32 IP on the WiFi network: ");
+      Serial.println(WiFi.localIP());
+    }
   }  
   else
   {
@@ -219,7 +231,7 @@ void handlePostWateringAmount() {
     char wa[4];
     String waString = server->arg("watering-amount");
     waString.toCharArray(wa, sizeof(wa));
-    int waInt = atoi(wa);    
+    int32_t waInt = atoi(wa);    
     Serial.print("POST** watering-amount:");
     Serial.println(wa);  
     preferences.putInt("watering-amount", waInt);
@@ -250,12 +262,16 @@ void handlePostWateringThreshold() {
   String jsonString;  
   if (server->hasArg("watering-threshold")) {
     char wt[4];
-    String waString = server->arg("watering-threshold");
-    waString.toCharArray(wt, sizeof(wt));
-    int waInt = atoi(wt);    
-    Serial.print("POST** watering-amount:");
-    Serial.println(wt);  
-    preferences.putInt("watering-amount", waInt);
+    String wtString = server->arg("watering-threshold");
+    wtString.toCharArray(wt, sizeof(wt));
+    int32_t wtInt = atoi(wt);    
+    Serial.print("POST** watering-threshold current:");
+    Serial.println(preferences.getInt("threshold"));  
+    
+    Serial.print("POST** watering-threshold new:");
+    Serial.println(wtInt);  
+    preferences.putInt("threshold", wtInt);
+
     jsonDoc["success"] = "1";
   }
   else {
@@ -270,9 +286,9 @@ void handleGetWateringThreshold() {
   JsonDocument jsonDoc;
   String jsonString; 
   String wt = "";
-  if (preferences.isKey("watering-threshold"))
-    wt = preferences.getInt("watering-threshold");
-  jsonDoc["watering-amount"] = wt;  
+  if (preferences.isKey("threshold"))
+    wt = preferences.getInt("threshold");
+  jsonDoc["watering-threshold"] = wt;  
   serializeJson(jsonDoc, jsonString);
   server->sendHeader("Content-Type", "application/json");
   server->send(200, "application/json", jsonString);
