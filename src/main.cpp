@@ -16,6 +16,8 @@ void handleGetDeviceId();
 void handleGetEmail();
 void handlePostRouterCredentials();
 void handlePostEmail();
+void handleGetWateringAmount();
+void handlePostWateringAmount();
 
 // PREFERENCES
 Preferences preferences;
@@ -79,6 +81,8 @@ void initWifiApAndWebServer(){
   server->on("/router-credentials", HTTP_POST, handlePostRouterCredentials);
   server->on("/email-address", HTTP_POST, handlePostEmail);
   server->on("/email-address", HTTP_GET, handleGetEmail);
+  server->on("/watering-amount", HTTP_GET, handleGetWateringAmount);
+  server->on("/watering-amount", HTTP_POST, handlePostWateringAmount);  
   
   // START SERVER
   server->begin();
@@ -200,6 +204,39 @@ void handlePostEmail() {
     jsonDoc["success"] = "0";
   }
     serializeJson(jsonDoc, jsonString);
+  server->sendHeader("Content-Type", "application/json");
+  server->send(200, "application/json", jsonString);
+}
+void handlePostWateringAmount() {
+  Serial.println("POST /watering-amount");
+  JsonDocument jsonDoc;
+  String jsonString;  
+  if (server->hasArg("watering-amount")) {
+    char wa[4];
+    String waString = server->arg("watering-amount");
+    waString.toCharArray(wa, sizeof(wa));
+    int waInt = atoi(wa);    
+    Serial.print("POST** watering-amount:");
+    Serial.println(wa);  
+    preferences.putInt("watering-amount", waInt);
+    jsonDoc["success"] = "1";
+  }
+    else {
+    jsonDoc["success"] = "0";
+  }
+    serializeJson(jsonDoc, jsonString);
+  server->sendHeader("Content-Type", "application/json");
+  server->send(200, "application/json", jsonString);
+}
+void handleGetWateringAmount() {
+  Serial.println("GET /watering-amount");
+  JsonDocument jsonDoc;
+  String jsonString; 
+  String wa = "";
+  if (preferences.isKey("watering-amount"))
+    wa = preferences.getString("watering-amount");
+  jsonDoc["watering-amount"] = wa;  
+  serializeJson(jsonDoc, jsonString);
   server->sendHeader("Content-Type", "application/json");
   server->send(200, "application/json", jsonString);
 }
