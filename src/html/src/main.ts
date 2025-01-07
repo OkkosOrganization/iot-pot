@@ -62,16 +62,16 @@ const init = () => {
         if (response.ok) {
           const result = await response.json(); // Parse JSON response
           if (result.success === '1') {
-            responseP.textContent = 'Tiedot tallennettu';
+            responseP.textContent = 'Saved';
           } else {
-            responseP.textContent = 'Tietojen tallennus epäonnistui';
+            responseP.textContent = 'Failed';
           }
         } else {
-          responseP.textContent = `Virhe tietojen lähetyksessä: ${response.status}`;
+          responseP.textContent = `Error: ${response.status}`;
         }
       } catch (error) {
         if (error instanceof Error)
-          responseP.innerHTML = `<pre>Tapahtui virhe: ${error?.message}</pre>`;
+          responseP.innerHTML = `<pre>Error: ${error?.message}</pre>`;
       }
       responseP.classList.remove('hidden');
       connectionForm.reset();
@@ -96,16 +96,16 @@ const init = () => {
         if (response.ok) {
           const result = await response.json();
           if (result.success === '1') {
-            responseP.textContent = 'Tiedot tallennettu';
+            responseP.textContent = 'Saved';
           } else {
-            responseP.textContent = 'Tietojen tallennus epäonnistui';
+            responseP.textContent = 'Failed';
           }
         } else {
-          responseP.textContent = `Virhe tietojen lähetyksessä: ${response.status}`;
+          responseP.textContent = `Error: ${response.status}`;
         }
       } catch (error) {
         if (error instanceof Error)
-          responseP.innerHTML = `<pre>Tapahtui virhe: ${error?.message}</pre>`;
+          responseP.innerHTML = `<pre>Error: ${error?.message}</pre>`;
       }
       responseP.classList.remove('hidden');
       contactInfoForm.reset();
