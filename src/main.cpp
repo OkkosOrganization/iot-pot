@@ -14,10 +14,12 @@ void handleGetIndex();
 void handleGetInternetStatus();
 void handleGetDeviceId();
 void handleGetEmail();
-void handlePostRouterCredentials();
 void handlePostEmail();
+void handlePostRouterCredentials();
 void handleGetWateringAmount();
 void handlePostWateringAmount();
+void handleGetWateringThreshold();
+void handlePostWateringThreshold();
 
 // PREFERENCES
 Preferences preferences;
@@ -83,6 +85,8 @@ void initWifiApAndWebServer(){
   server->on("/email-address", HTTP_GET, handleGetEmail);
   server->on("/watering-amount", HTTP_GET, handleGetWateringAmount);
   server->on("/watering-amount", HTTP_POST, handlePostWateringAmount);  
+  server->on("/watering-threshold", HTTP_GET, handleGetWateringThreshold);
+  server->on("/watering-threshold", HTTP_POST, handlePostWateringThreshold);   
   
   // START SERVER
   server->begin();
@@ -221,10 +225,10 @@ void handlePostWateringAmount() {
     preferences.putInt("watering-amount", waInt);
     jsonDoc["success"] = "1";
   }
-    else {
+  else {
     jsonDoc["success"] = "0";
   }
-    serializeJson(jsonDoc, jsonString);
+  serializeJson(jsonDoc, jsonString);
   server->sendHeader("Content-Type", "application/json");
   server->send(200, "application/json", jsonString);
 }
@@ -234,8 +238,41 @@ void handleGetWateringAmount() {
   String jsonString; 
   String wa = "";
   if (preferences.isKey("watering-amount"))
-    wa = preferences.getString("watering-amount");
+    wa = preferences.getInt("watering-amount");
   jsonDoc["watering-amount"] = wa;  
+  serializeJson(jsonDoc, jsonString);
+  server->sendHeader("Content-Type", "application/json");
+  server->send(200, "application/json", jsonString);
+}
+void handlePostWateringThreshold() {
+  Serial.println("POST /watering-threshold");
+  JsonDocument jsonDoc;
+  String jsonString;  
+  if (server->hasArg("watering-threshold")) {
+    char wt[4];
+    String waString = server->arg("watering-threshold");
+    waString.toCharArray(wt, sizeof(wt));
+    int waInt = atoi(wt);    
+    Serial.print("POST** watering-amount:");
+    Serial.println(wt);  
+    preferences.putInt("watering-amount", waInt);
+    jsonDoc["success"] = "1";
+  }
+  else {
+    jsonDoc["success"] = "0";
+  }
+  serializeJson(jsonDoc, jsonString);
+  server->sendHeader("Content-Type", "application/json");
+  server->send(200, "application/json", jsonString);
+}
+void handleGetWateringThreshold() {
+  Serial.println("GET /watering-threshold");
+  JsonDocument jsonDoc;
+  String jsonString; 
+  String wt = "";
+  if (preferences.isKey("watering-threshold"))
+    wt = preferences.getInt("watering-threshold");
+  jsonDoc["watering-amount"] = wt;  
   serializeJson(jsonDoc, jsonString);
   server->sendHeader("Content-Type", "application/json");
   server->send(200, "application/json", jsonString);
