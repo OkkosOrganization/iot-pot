@@ -125,6 +125,7 @@ body {
   justify-content: flex-start;
   align-items: center;
   text-transform: uppercase;
+  margin-bottom: 1rem;
 }
 .deviceIdContainer {
   margin-left: 1.25rem;
@@ -226,8 +227,13 @@ body {
   border: 1px solid var(--black);
   overflow: hidden;
 }
-.connectionStatus p {
-  margin: 1rem 0 0 0;
+
+.connectionStatus p:nth-child(even) {
+  margin: 0;
+  text-transform: uppercase;
+}
+.connectionStatus p:nth-child(odd) {
+  margin: 0 0 1rem 0;
 }
 
 /*****************/
@@ -341,7 +347,7 @@ input[type='range']::-moz-range-thumb:hover {
 }
 form {
   width: 100%;
-  min-height: 250px;
+  min-height: 275px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -431,6 +437,10 @@ button {
 }
 button:hover {
   opacity: 1;
+}
+.formResponse {
+  margin-top: 1rem;
+  width: 100%;
 }
 
 /******************/
