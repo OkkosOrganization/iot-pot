@@ -34,7 +34,7 @@ const init = () => {
     'wateringThreshold',
   )! as HTMLInputElement;
   const wateringThresholdSpan = document.getElementById(
-    'wateringThreshold',
+    'wateringThresholdValue',
   )! as HTMLSpanElement;
 
   const wateringAmountInput = document.getElementById(
@@ -49,7 +49,9 @@ const init = () => {
   const addEventListeners = () => {
     connectionForm.addEventListener('submit', async function (event) {
       event.preventDefault();
-      const ssidInputEl = document.getElementById('ssid') as HTMLInputElement;
+      const ssidInputEl = document.getElementById(
+        'ssidInput',
+      ) as HTMLInputElement;
       const ssid = ssidInputEl.value;
       const pwdInputEl = document.getElementById('pwd') as HTMLInputElement;
       const pwd = pwdInputEl.value as string;
@@ -114,17 +116,15 @@ const init = () => {
           responseP.innerHTML = `<pre>Error: ${error?.message}</pre>`;
       }
       responseP.classList.remove('hidden');
-      contactInfoForm.reset();
     });
     wateringThresholdForm.addEventListener('submit', async function (event) {
       event.preventDefault();
       const wateringThresholdInputEl = document.getElementById(
-        'email',
+        'wateringThreshold',
       ) as HTMLInputElement;
       const wt = wateringThresholdInputEl.value;
-
       const responseP = document.getElementById(
-        'emailResponse',
+        'wateringThresholdFormResponse',
       ) as HTMLParagraphElement;
       try {
         const response = await fetch('/watering-threshold', {
@@ -132,7 +132,7 @@ const init = () => {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
           },
-          body: new URLSearchParams({ wt }),
+          body: new URLSearchParams({ 'watering-threshold': wt }),
         });
 
         if (response.ok) {
@@ -150,25 +150,24 @@ const init = () => {
           responseP.innerHTML = `<pre>Error: ${error?.message}</pre>`;
       }
       responseP.classList.remove('hidden');
-      wateringThresholdForm.reset();
     });
     wateringAmountForm.addEventListener('submit', async function (event) {
       event.preventDefault();
       const wateringAmountInputEl = document.getElementById(
-        'email',
+        'wateringAmount',
       ) as HTMLInputElement;
       const wa = wateringAmountInputEl.value;
 
       const responseP = document.getElementById(
-        'emailResponse',
+        'wateringAmountFormResponse',
       ) as HTMLParagraphElement;
       try {
-        const response = await fetch('/watering-threshold', {
+        const response = await fetch('/watering-amount', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
           },
-          body: new URLSearchParams({ wa }),
+          body: new URLSearchParams({ 'watering-amount': wa }),
         });
 
         if (response.ok) {
@@ -186,7 +185,6 @@ const init = () => {
           responseP.innerHTML = `<pre>Error: ${error?.message}</pre>`;
       }
       responseP.classList.remove('hidden');
-      wateringAmountForm.reset();
     });
     tabLinks.forEach((a) => {
       a.addEventListener('click', (e) => {
@@ -265,8 +263,8 @@ const init = () => {
           default:
             console.log('Offline', result, statusCode, ip);
             connectionStatusCircle.classList.remove('greenBg');
-            connectionStatusCircle.classList.add('yellowBg');
-            connectionStatusCircle.classList.remove('redBg');
+            connectionStatusCircle.classList.remove('yellowBg');
+            connectionStatusCircle.classList.add('redBg');
             connectionStatusSpan.textContent = 'Offline';
             ipAddressP.textContent = '-';
             gatewayP.textContent = '-';
@@ -323,8 +321,15 @@ const init = () => {
         const result = await response.json();
         const res = result['watering-amount'];
         console.log(res);
-        wateringAmountInput.value = res;
-        wateringAmountSpan.textContent = res;
+        if (res === 'undefined' || res === '') {
+          const defaultValue =
+            wateringAmountInput.getAttribute('data-default')!;
+          wateringAmountInput.value = defaultValue;
+          wateringAmountSpan.textContent = defaultValue;
+        } else {
+          wateringAmountInput.value = res;
+          wateringAmountSpan.textContent = res;
+        }
       } else {
       }
     } catch (error) {}
@@ -339,8 +344,15 @@ const init = () => {
         const result = await response.json();
         const res = result['watering-threshold'];
         console.log(res);
-        wateringThresholdInput.value = res;
-        wateringThresholdSpan.textContent = res;
+        if (res === 'undefined' || res === '') {
+          const defaultValue =
+            wateringThresholdInput.getAttribute('data-default')!;
+          wateringThresholdInput.value = defaultValue;
+          wateringThresholdSpan.textContent = defaultValue;
+        } else {
+          wateringThresholdInput.value = res;
+          wateringThresholdSpan.textContent = res;
+        }
       } else {
       }
     } catch (error) {}
