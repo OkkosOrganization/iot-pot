@@ -57,14 +57,15 @@
                 ></span>
                 <span id="connectionStatusSpan">Connecting</span>
               </h3>
+              <p>SSID:</p>
+              <p id="ssid">-</p>
               <p>IP Address:</p>
               <p id="ipAddress">-</p>
               <p>Gateway:</p>
               <p id="gateway">-</p>
-              <p id="internetStatusCode"></p>
             </div>
             <div class="formContainer side">
-              <form action="#" method="post" id="postForm">
+              <form action="#" method="post" id="connectionForm">
                 <h3 class="robotoLight uppercase">Set router credentials:</h3>
                 <label for="ssid">SSID</label>
                 <input
@@ -85,7 +86,7 @@
                 <div class="submitContainer">
                   <button type="submit">Submit</button>
                 </div>
-                <p id="response" class="hidden"></p>
+                <p id="connectionFormResponse" class="hidden formResponse"></p>
               </form>
             </div>
           </div>
@@ -118,6 +119,10 @@
                 <div class="submitContainer">
                   <button type="submit">SUBMIT</button>
                 </div>
+                <p
+                  id="soilMoistureThresholdFormResponse"
+                  class="hidden formResponse"
+                ></p>
               </form>
             </div>
             <div class="formContainer side">
@@ -136,6 +141,10 @@
                 <div class="submitContainer">
                   <button type="submit">SUBMIT</button>
                 </div>
+                <p
+                  id="wateringAmountFormResponse"
+                  class="hidden formResponse"
+                ></p>
               </form>
             </div>
           </div>
@@ -157,6 +166,7 @@
                 <div class="submitContainer">
                   <button type="submit">SUBMIT</button>
                 </div>
+                <p id="emailResponse" class="hidden formResponse"></p>
               </form>
             </div>
             <div class="formContainer side">
@@ -193,6 +203,10 @@
                 <div class="submitContainer">
                   <button type="submit">SUBMIT</button>
                 </div>
+                <p
+                  id="notificationTriggersResponse"
+                  class="hidden formResponse"
+                ></p>
               </form>
             </div>
           </div>
