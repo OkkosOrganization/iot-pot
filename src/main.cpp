@@ -8,12 +8,14 @@
 #include <Preferences.h>
 
 // FUNCTION PROTOTYPES
-void initWifi();
+void initWifiApAndWebServer();
 void initWifiClient();
 void handleGetIndex();
 void handleGetInternetStatus();
 void handleGetDeviceId();
+void handleGetEmail();
 void handlePostRouterCredentials();
+void handlePostEmail();
 
 // PREFERENCES
 Preferences preferences;
@@ -42,7 +44,7 @@ void setup() {
     return;
   }
 
-  initWifi();
+  initWifiApAndWebServer();
   initWifiClient();
 
   // GET UNIQUE DEVICE ID
@@ -56,7 +58,7 @@ void loop() {
 }
 
 // INITIALIZES THE WIFI AS BOTH ACCESS POINT AND CLIENT
-void initWifi(){
+void initWifiApAndWebServer(){
   WiFi.mode(WIFI_MODE_APSTA);
   WiFi.softAPConfig(local_IP, gateway, subnet);
   WiFi.softAP(soft_ap_ssid, soft_ap_password);
@@ -75,6 +77,8 @@ void initWifi(){
   server->on("/internet-status", HTTP_GET, handleGetInternetStatus);
   server->on("/device-id", HTTP_GET, handleGetDeviceId);
   server->on("/router-credentials", HTTP_POST, handlePostRouterCredentials);
+  server->on("/email-address", HTTP_POST, handlePostEmail);
+  server->on("/email-address", HTTP_GET, handleGetEmail);
   
   // START SERVER
   server->begin();
@@ -129,6 +133,7 @@ void handleGetInternetStatus() {
   jsonDoc["internet-status"] = WiFi.status();
   jsonDoc["ip"] = WiFi.localIP();
   jsonDoc["gateway"] = WiFi.gatewayIP();
+  jsonDoc["ssid"] = WiFi.SSID();
   serializeJson(jsonDoc, jsonString);
   server->sendHeader("Content-Type", "application/json");
   server->send(200, "application/json", jsonString);
@@ -138,6 +143,18 @@ void handleGetDeviceId() {
   JsonDocument jsonDoc;
   String jsonString;  
   jsonDoc["device-id"] = deviceIdHex;  
+  serializeJson(jsonDoc, jsonString);
+  server->sendHeader("Content-Type", "application/json");
+  server->send(200, "application/json", jsonString);
+}
+void handleGetEmail() {
+  Serial.println("GET /email-address");
+  JsonDocument jsonDoc;
+  String jsonString; 
+  String email = "";
+  if (preferences.isKey("email"))
+    email = preferences.getString("email");
+  jsonDoc["email"] = email;  
   serializeJson(jsonDoc, jsonString);
   server->sendHeader("Content-Type", "application/json");
   server->send(200, "application/json", jsonString);
@@ -165,6 +182,24 @@ void handlePostRouterCredentials() {
   }
 
   serializeJson(jsonDoc, jsonString);
+  server->sendHeader("Content-Type", "application/json");
+  server->send(200, "application/json", jsonString);
+}
+void handlePostEmail() {
+  Serial.println("POST /email-address");
+  JsonDocument jsonDoc;
+  String jsonString;  
+  if (server->hasArg("email")) {
+    String email = server->arg("email");    
+    Serial.print("POST** email:");
+    Serial.println(email);  
+    preferences.putString("email", email);
+    jsonDoc["success"] = "1";
+  }
+    else {
+    jsonDoc["success"] = "0";
+  }
+    serializeJson(jsonDoc, jsonString);
   server->sendHeader("Content-Type", "application/json");
   server->send(200, "application/json", jsonString);
 }
