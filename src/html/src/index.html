@@ -67,10 +67,10 @@
             <div class="formContainer side">
               <form action="#" method="post" id="connectionForm">
                 <h3 class="robotoLight uppercase">Set router credentials:</h3>
-                <label for="ssid">SSID</label>
+                <label for="ssidInput">SSID</label>
                 <input
                   type="text"
-                  id="ssid"
+                  id="ssidInput"
                   name="ssid"
                   placeholder="Network SSID"
                   required
@@ -95,7 +95,7 @@
           <h2 class="tabHeading poppins">Watering settings</h2>
           <div class="content">
             <div class="formContainer side">
-              <form action="#" method="post" id="soilMoistureThresholdForm">
+              <form action="#" method="post" id="wateringThresholdForm">
                 <h3 class="robotoLight uppercase">
                   SET SOIL MOISTURE THRESHOLD
                 </h3>
@@ -109,6 +109,7 @@
                     id="wateringThreshold"
                     min="0"
                     max="100"
+                    data-default="50"
                   />
                 </div>
                 <div>
@@ -120,7 +121,7 @@
                   <button type="submit">SUBMIT</button>
                 </div>
                 <p
-                  id="soilMoistureThresholdFormResponse"
+                  id="wateringThresholdFormResponse"
                   class="hidden formResponse"
                 ></p>
               </form>
@@ -131,7 +132,13 @@
                 <div class="sliderInputContainer">
                   <label for="wateringAmount" class="tl">1</label>
                   <label for="wateringAmount" class="tr">100</label>
-                  <input type="range" id="wateringAmount" min="1" max="100" />
+                  <input
+                    type="range"
+                    id="wateringAmount"
+                    min="1"
+                    max="100"
+                    data-default="50"
+                  />
                 </div>
                 <div>
                   <span id="wateringAmountValue" class="sliderValue poppins"
