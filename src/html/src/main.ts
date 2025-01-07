@@ -6,24 +6,49 @@ const init = () => {
   let statusIntervalTime = 5000;
   const connectionStatusCircle = document.getElementById(
     'connectionStatusCircle',
-  )!;
-  const connectionStatusSpan = document.getElementById('connectionStatusSpan')!;
-  const ipAddressP = document.getElementById('ipAddress')!;
-  const gatewayP = document.getElementById('gateway')!;
+  )! as HTMLSpanElement;
+  const connectionStatusSpan = document.getElementById(
+    'connectionStatusSpan',
+  )! as HTMLSpanElement;
+  const ipAddressP = document.getElementById(
+    'ipAddress',
+  )! as HTMLParagraphElement;
+  const gatewayP = document.getElementById('gateway')! as HTMLParagraphElement;
+  const ssidP = document.getElementById('ssid')! as HTMLParagraphElement;
   const deviceIdSpan = document.getElementById('deviceId')!;
-  const postForm = document.getElementById('postForm')! as HTMLFormElement;
+  const connectionForm = document.getElementById(
+    'connectionForm',
+  )! as HTMLFormElement;
+  const contactInfoForm = document.getElementById(
+    'contactInfoForm',
+  )! as HTMLFormElement;
   const tabLinks = document.querySelectorAll('.tabSelector a')!;
   const rangeInputs = document.querySelectorAll("input[type='range']")!;
+  const wateringThresholdInput = document.getElementById(
+    'wateringThreshold',
+  )! as HTMLInputElement;
+  const wateringThresholdSpan = document.getElementById(
+    'wateringThreshold',
+  )! as HTMLSpanElement;
+
+  const wateringAmountdInput = document.getElementById(
+    'wateringAmount',
+  )! as HTMLInputElement;
+  const wateringAmountdSpan = document.getElementById(
+    'wateringAmountValue',
+  )! as HTMLSpanElement;
+
+  const emailInput = document.getElementById('email')! as HTMLInputElement;
 
   const addEventListeners = () => {
-    postForm.addEventListener('submit', async function (event) {
+    connectionForm.addEventListener('submit', async function (event) {
       event.preventDefault();
       const ssidInputEl = document.getElementById('ssid') as HTMLInputElement;
       const ssid = ssidInputEl.value;
       const pwdInputEl = document.getElementById('pwd') as HTMLInputElement;
       const pwd = pwdInputEl.value as string;
       const responseP = document.getElementById(
-        'response',
+        'connectionFormResponse',
       ) as HTMLParagraphElement;
       try {
         const response = await fetch('/router-credentials', {
@@ -49,7 +74,41 @@ const init = () => {
           responseP.innerHTML = `<pre>Tapahtui virhe: ${error?.message}</pre>`;
       }
       responseP.classList.remove('hidden');
-      postForm.reset();
+      connectionForm.reset();
+    });
+    contactInfoForm.addEventListener('submit', async function (event) {
+      event.preventDefault();
+      const emailInputEl = document.getElementById('email') as HTMLInputElement;
+      const email = emailInputEl.value;
+
+      const responseP = document.getElementById(
+        'emailResponse',
+      ) as HTMLParagraphElement;
+      try {
+        const response = await fetch('/email-address', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({ email }),
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success === '1') {
+            responseP.textContent = 'Tiedot tallennettu';
+          } else {
+            responseP.textContent = 'Tietojen tallennus epäonnistui';
+          }
+        } else {
+          responseP.textContent = `Virhe tietojen lähetyksessä: ${response.status}`;
+        }
+      } catch (error) {
+        if (error instanceof Error)
+          responseP.innerHTML = `<pre>Tapahtui virhe: ${error?.message}</pre>`;
+      }
+      responseP.classList.remove('hidden');
+      contactInfoForm.reset();
     });
     tabLinks.forEach((a) => {
       a.addEventListener('click', (e) => {
@@ -103,6 +162,7 @@ const init = () => {
         const statusCode = parseInt(result['internet-status']);
         const ip = result['ip'];
         const gateway = result['gateway'];
+        const ssid = result['ssid'];
         switch (statusCode) {
           case 3:
             console.log('Online', result, statusCode, ip);
@@ -112,6 +172,7 @@ const init = () => {
             connectionStatusSpan.textContent = 'Connected';
             ipAddressP.textContent = ip;
             gatewayP.textContent = gateway;
+            ssidP.textContent = ssid;
             break;
           case 2:
             console.log('Scanning', result, statusCode, ip);
@@ -121,6 +182,7 @@ const init = () => {
             connectionStatusSpan.textContent = 'Connecting';
             ipAddressP.textContent = '...';
             gatewayP.textContent = '...';
+            ssidP.textContent = '...';
             break;
           default:
             console.log('Offline', result, statusCode, ip);
@@ -130,6 +192,7 @@ const init = () => {
             connectionStatusSpan.textContent = 'Offline';
             ipAddressP.textContent = '-';
             gatewayP.textContent = '-';
+            ssidP.textContent = '-';
             break;
         }
       } else {
@@ -139,6 +202,7 @@ const init = () => {
         connectionStatusSpan.textContent = 'Offline';
         ipAddressP.textContent = '-';
         gatewayP.textContent = '-';
+        ssidP.textContent = '-';
       }
     } catch (error) {
       connectionStatusCircle.classList.remove('greenBg');
@@ -147,6 +211,7 @@ const init = () => {
       connectionStatusSpan.textContent = 'Offline';
       ipAddressP.textContent = '-';
       gatewayP.textContent = '-';
+      ssidP.textContent = '-';
     }
     statusInterval = window.setInterval(
       getConnectionStatus,
@@ -180,6 +245,8 @@ const init = () => {
         const result = await response.json();
         const res = result['watering-amount'];
         console.log(res);
+        wateringAmountdInput.value = res;
+        wateringAmountdSpan.textContent = res;
       } else {
       }
     } catch (error) {}
@@ -194,6 +261,8 @@ const init = () => {
         const result = await response.json();
         const res = result['watering-threshold'];
         console.log(res);
+        wateringThresholdInput.value = res;
+        wateringThresholdSpan.textContent = res;
       } else {
       }
     } catch (error) {}
@@ -206,8 +275,9 @@ const init = () => {
       });
       if (response.ok) {
         const result = await response.json();
-        const res = result['email-address'];
+        const res = result['email'];
         console.log(res);
+        emailInput.value = res;
       } else {
       }
     } catch (error) {}
