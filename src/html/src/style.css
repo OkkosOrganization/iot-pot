@@ -231,6 +231,7 @@ body {
 .connectionStatus p:nth-child(even) {
   margin: 0;
   text-transform: uppercase;
+  font-family: var(--robotoLight);
 }
 .connectionStatus p:nth-child(odd) {
   margin: 0 0 1rem 0;
