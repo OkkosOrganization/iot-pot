@@ -15,12 +15,18 @@ const init = () => {
   )! as HTMLParagraphElement;
   const gatewayP = document.getElementById('gateway')! as HTMLParagraphElement;
   const ssidP = document.getElementById('ssid')! as HTMLParagraphElement;
-  const deviceIdSpan = document.getElementById('deviceId')!;
+  const deviceIdSpan = document.getElementById('deviceId')! as HTMLSpanElement;
   const connectionForm = document.getElementById(
     'connectionForm',
   )! as HTMLFormElement;
   const contactInfoForm = document.getElementById(
     'contactInfoForm',
+  )! as HTMLFormElement;
+  const wateringAmountForm = document.getElementById(
+    'wateringAmountForm',
+  )! as HTMLFormElement;
+  const wateringThresholdForm = document.getElementById(
+    'wateringThresholdForm',
   )! as HTMLFormElement;
   const tabLinks = document.querySelectorAll('.tabSelector a')!;
   const rangeInputs = document.querySelectorAll("input[type='range']")!;
@@ -31,10 +37,10 @@ const init = () => {
     'wateringThreshold',
   )! as HTMLSpanElement;
 
-  const wateringAmountdInput = document.getElementById(
+  const wateringAmountInput = document.getElementById(
     'wateringAmount',
   )! as HTMLInputElement;
-  const wateringAmountdSpan = document.getElementById(
+  const wateringAmountSpan = document.getElementById(
     'wateringAmountValue',
   )! as HTMLSpanElement;
 
@@ -109,6 +115,78 @@ const init = () => {
       }
       responseP.classList.remove('hidden');
       contactInfoForm.reset();
+    });
+    wateringThresholdForm.addEventListener('submit', async function (event) {
+      event.preventDefault();
+      const wateringThresholdInputEl = document.getElementById(
+        'email',
+      ) as HTMLInputElement;
+      const wt = wateringThresholdInputEl.value;
+
+      const responseP = document.getElementById(
+        'emailResponse',
+      ) as HTMLParagraphElement;
+      try {
+        const response = await fetch('/watering-threshold', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({ wt }),
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success === '1') {
+            responseP.textContent = 'Saved';
+          } else {
+            responseP.textContent = 'Failed';
+          }
+        } else {
+          responseP.textContent = `Error: ${response.status}`;
+        }
+      } catch (error) {
+        if (error instanceof Error)
+          responseP.innerHTML = `<pre>Error: ${error?.message}</pre>`;
+      }
+      responseP.classList.remove('hidden');
+      wateringThresholdForm.reset();
+    });
+    wateringAmountForm.addEventListener('submit', async function (event) {
+      event.preventDefault();
+      const wateringAmountInputEl = document.getElementById(
+        'email',
+      ) as HTMLInputElement;
+      const wa = wateringAmountInputEl.value;
+
+      const responseP = document.getElementById(
+        'emailResponse',
+      ) as HTMLParagraphElement;
+      try {
+        const response = await fetch('/watering-threshold', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({ wa }),
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success === '1') {
+            responseP.textContent = 'Saved';
+          } else {
+            responseP.textContent = 'Failed';
+          }
+        } else {
+          responseP.textContent = `Error: ${response.status}`;
+        }
+      } catch (error) {
+        if (error instanceof Error)
+          responseP.innerHTML = `<pre>Error: ${error?.message}</pre>`;
+      }
+      responseP.classList.remove('hidden');
+      wateringAmountForm.reset();
     });
     tabLinks.forEach((a) => {
       a.addEventListener('click', (e) => {
@@ -245,8 +323,8 @@ const init = () => {
         const result = await response.json();
         const res = result['watering-amount'];
         console.log(res);
-        wateringAmountdInput.value = res;
-        wateringAmountdSpan.textContent = res;
+        wateringAmountInput.value = res;
+        wateringAmountSpan.textContent = res;
       } else {
       }
     } catch (error) {}
