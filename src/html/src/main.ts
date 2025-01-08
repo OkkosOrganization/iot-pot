@@ -28,6 +28,9 @@ const init = () => {
   const wateringThresholdForm = document.getElementById(
     'wateringThresholdForm',
   )! as HTMLFormElement;
+  const notificationTriggersForm = document.getElementById(
+    'notificationTriggersForm',
+  )! as HTMLFormElement;
   const tabLinks = document.querySelectorAll('.tabSelector a')!;
   const rangeInputs = document.querySelectorAll("input[type='range']")!;
   const wateringThresholdInput = document.getElementById(
@@ -36,13 +39,21 @@ const init = () => {
   const wateringThresholdSpan = document.getElementById(
     'wateringThresholdValue',
   )! as HTMLSpanElement;
-
   const wateringAmountInput = document.getElementById(
     'wateringAmount',
   )! as HTMLInputElement;
   const wateringAmountSpan = document.getElementById(
     'wateringAmountValue',
   )! as HTMLSpanElement;
+  const soilMoistureCheckbox = document.getElementById(
+    'notification-soil-moisture-threshold',
+  ) as HTMLInputElement;
+  const waterTankCheckbox = document.getElementById(
+    'notification-water-tank-empty',
+  ) as HTMLInputElement;
+  const waterOverflowCheckbox = document.getElementById(
+    'notification-water-overflow',
+  ) as HTMLInputElement;
 
   const emailInput = document.getElementById('email')! as HTMLInputElement;
 
@@ -89,7 +100,6 @@ const init = () => {
       event.preventDefault();
       const emailInputEl = document.getElementById('email') as HTMLInputElement;
       const email = emailInputEl.value;
-
       const responseP = document.getElementById(
         'emailResponse',
       ) as HTMLParagraphElement;
@@ -102,6 +112,53 @@ const init = () => {
           body: new URLSearchParams({ email }),
         });
 
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success === '1') {
+            responseP.textContent = 'Saved';
+          } else {
+            responseP.textContent = 'Failed';
+          }
+        } else {
+          responseP.textContent = `Error: ${response.status}`;
+        }
+      } catch (error) {
+        if (error instanceof Error)
+          responseP.innerHTML = `<pre>Error: ${error?.message}</pre>`;
+      }
+      responseP.classList.remove('hidden');
+    });
+    notificationTriggersForm.addEventListener('submit', async function (event) {
+      event.preventDefault();
+
+      const responseP = document.getElementById(
+        'notificationTriggersResponse',
+      ) as HTMLParagraphElement;
+
+      console.log(
+        soilMoistureCheckbox.checked,
+        waterTankCheckbox.checked,
+        waterOverflowCheckbox.checked,
+      );
+      try {
+        const response = await fetch('/notification-triggers', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            'notification-soil-moisture-threshold': soilMoistureCheckbox.checked
+              ? 'true'
+              : 'false',
+            'notification-water-tank-empty': waterTankCheckbox.checked
+              ? 'true'
+              : 'false',
+            'notification-water-overflow': waterOverflowCheckbox.checked
+              ? 'true'
+              : 'false',
+          }),
+        });
+        console.log(response);
         if (response.ok) {
           const result = await response.json();
           if (result.success === '1') {
@@ -371,7 +428,9 @@ const init = () => {
     if (response.ok) {
       const result: EmailAddressResponse = await response.json();
       const email = result['email'];
-      if (email === 'undefined' || email === '') emailInput.value = email;
+      if (email !== 'undefined' && email !== '') emailInput.value = email;
+      else emailInput.value = '';
+      console.log(email, emailInput);
     } else {
       console.log('Fetch failed', url);
     }
@@ -389,11 +448,20 @@ const init = () => {
     });
     if (response.ok) {
       const result: NotificationTriggersResponse = await response.json();
-      const soilMoistureThreshold = Boolean(
+      const soilMoistureThresholdTrigger = Boolean(
         result['notification-soil-moisture-threshold'],
       );
-      const waterTankEmpty = Boolean(result['notification-water-tank-empty']);
-      const waterOverflow = Boolean(result['notification-water-overflow']);
+      const waterTankEmptyTrigger = Boolean(
+        result['notification-water-tank-empty'],
+      );
+      const waterOverflowTrigger = Boolean(
+        result['notification-water-overflow'],
+      );
+
+      soilMoistureCheckbox.checked = soilMoistureThresholdTrigger;
+      waterTankCheckbox.checked = waterTankEmptyTrigger;
+      waterOverflowCheckbox.checked = waterOverflowTrigger;
+
       console.log(result);
     } else {
       console.log('Fetch failed', url);
