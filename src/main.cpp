@@ -305,12 +305,12 @@ void handleGetNotificationTriggers() {
   bool smt = false;
   bool wte = false;
   bool wo = false;
-  if (preferences.isKey("notification-soil-moisture-threshold"))
-    smt = preferences.getBool("notification-soil-moisture-threshold");
-  if (preferences.isKey("notification-water-tank-empty"))
-    smt = preferences.getBool("notification-water-tank-empty");
-  if (preferences.isKey("notification-water-overflow"))
-    smt = preferences.getBool("notification-water-overflow");        
+  if (preferences.isKey("soil-moisture"))
+    smt = preferences.getBool("soil-moisture");
+  if (preferences.isKey("tank-empty"))
+    wte = preferences.getBool("tank-empty");
+  if (preferences.isKey("overflow"))
+    wo = preferences.getBool("overflow");        
   jsonDoc["notification-soil-moisture-threshold"] = smt;
   jsonDoc["notification-water-tank-empty"] = wte;
   jsonDoc["notification-water-overflow"] = wo;  
@@ -322,26 +322,28 @@ void handlePostNotificationTriggers() {
   Serial.println("POST /notification-triggers");
   JsonDocument jsonDoc;
   String jsonString;  
-  /*
-  if (server->hasArg("watering-threshold")) {
-    char wt[4];
-    String wtString = server->arg("watering-threshold");
-    wtString.toCharArray(wt, sizeof(wt));
-    int32_t wtInt = atoi(wt);    
-    Serial.print("POST** watering-threshold current:");
-    Serial.println(preferences.getInt("threshold"));  
+
+  if (server->hasArg("notification-soil-moisture-threshold") && server->hasArg("notification-water-tank-empty") && server->hasArg("notification-water-overflow")) {
+    String smt = server->arg("notification-soil-moisture-threshold");
+    String wte = server->arg("notification-water-tank-empty");
+    String wo = server->arg("notification-water-overflow");
+    bool smtBool = (smt == "true") ? true : false;
+    bool wteBool = (wte == "true") ? true : false;
+    bool woBool = (wo == "true") ? true : false;
+    Serial.println("POST** notification-triggers:");
+    Serial.println(smtBool);  
+    Serial.println(wteBool);  
+    Serial.println(woBool);  
     
-    Serial.print("POST** watering-threshold new:");
-    Serial.println(wtInt);  
-    preferences.putInt("threshold", wtInt);
+    preferences.putBool("soil-moisture", smtBool);
+    preferences.putBool("tank-empty", wteBool);
+    preferences.putBool("overflow", woBool);
 
     jsonDoc["success"] = "1";
   }
-  else {
+  else
     jsonDoc["success"] = "0";
-  }
-  */
-  jsonDoc["success"] = 1;
+
   serializeJson(jsonDoc, jsonString);
   server->sendHeader("Content-Type", "application/json");
   server->send(200, "application/json", jsonString);  
