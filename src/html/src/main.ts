@@ -2,49 +2,57 @@ import './style.css';
 
 const init = () => {
   console.log('Configuration app init!');
+
+  // CONNECTION STATUS INTERVAL
   let statusInterval = 0;
   let statusIntervalTime = 10000;
+
+  // GET REFERENCES TO DOM ELEMENTS
   const connectionStatusCircle = document.getElementById(
     'connectionStatusCircle',
-  )! as HTMLSpanElement;
+  ) as HTMLSpanElement;
   const connectionStatusSpan = document.getElementById(
     'connectionStatusSpan',
-  )! as HTMLSpanElement;
+  ) as HTMLSpanElement;
   const ipAddressP = document.getElementById(
     'ipAddress',
-  )! as HTMLParagraphElement;
+  ) as HTMLParagraphElement;
   const gatewayP = document.getElementById('gateway')! as HTMLParagraphElement;
   const ssidP = document.getElementById('ssid')! as HTMLParagraphElement;
   const deviceIdSpan = document.getElementById('deviceId')! as HTMLSpanElement;
   const connectionForm = document.getElementById(
     'connectionForm',
-  )! as HTMLFormElement;
+  ) as HTMLFormElement;
   const contactInfoForm = document.getElementById(
     'contactInfoForm',
-  )! as HTMLFormElement;
+  ) as HTMLFormElement;
   const wateringAmountForm = document.getElementById(
     'wateringAmountForm',
-  )! as HTMLFormElement;
+  ) as HTMLFormElement;
   const wateringThresholdForm = document.getElementById(
     'wateringThresholdForm',
-  )! as HTMLFormElement;
+  ) as HTMLFormElement;
   const notificationTriggersForm = document.getElementById(
     'notificationTriggersForm',
-  )! as HTMLFormElement;
-  const tabLinks = document.querySelectorAll('.tabSelector a')!;
-  const rangeInputs = document.querySelectorAll("input[type='range']")!;
+  ) as HTMLFormElement;
+  const tabLinks = document.querySelectorAll(
+    '.tabSelector a',
+  ) as NodeListOf<HTMLAnchorElement>;
+  const rangeInputs = document.querySelectorAll(
+    "input[type='range']",
+  ) as NodeListOf<HTMLInputElement>;
   const wateringThresholdInput = document.getElementById(
     'wateringThreshold',
-  )! as HTMLInputElement;
+  ) as HTMLInputElement;
   const wateringThresholdSpan = document.getElementById(
     'wateringThresholdValue',
-  )! as HTMLSpanElement;
+  ) as HTMLSpanElement;
   const wateringAmountInput = document.getElementById(
     'wateringAmount',
-  )! as HTMLInputElement;
+  ) as HTMLInputElement;
   const wateringAmountSpan = document.getElementById(
     'wateringAmountValue',
-  )! as HTMLSpanElement;
+  ) as HTMLSpanElement;
   const soilMoistureCheckbox = document.getElementById(
     'notification-soil-moisture-threshold',
   ) as HTMLInputElement;
@@ -54,11 +62,11 @@ const init = () => {
   const waterOverflowCheckbox = document.getElementById(
     'notification-water-overflow',
   ) as HTMLInputElement;
-
   const emailInput = document.getElementById('email')! as HTMLInputElement;
 
   // SETS UP ALL EVENT LISTENERS
   const addEventListeners = () => {
+    // CONNECTION FORM
     connectionForm.addEventListener('submit', async function (event) {
       event.preventDefault();
       const ssidInputEl = document.getElementById(
@@ -96,6 +104,8 @@ const init = () => {
       responseP.classList.remove('hidden');
       connectionForm.reset();
     });
+
+    // CONTACT INFO FORM
     contactInfoForm.addEventListener('submit', async function (event) {
       event.preventDefault();
       const emailInputEl = document.getElementById('email') as HTMLInputElement;
@@ -128,6 +138,8 @@ const init = () => {
       }
       responseP.classList.remove('hidden');
     });
+
+    // NOTIFICATION TRIGGERS FORM
     notificationTriggersForm.addEventListener('submit', async function (event) {
       event.preventDefault();
 
@@ -175,6 +187,8 @@ const init = () => {
       }
       responseP.classList.remove('hidden');
     });
+
+    // WATERING THRESHOLD FORM
     wateringThresholdForm.addEventListener('submit', async function (event) {
       event.preventDefault();
       const wateringThresholdInputEl = document.getElementById(
@@ -209,6 +223,8 @@ const init = () => {
       }
       responseP.classList.remove('hidden');
     });
+
+    // WATERING AMOUNT FORM
     wateringAmountForm.addEventListener('submit', async function (event) {
       event.preventDefault();
       const wateringAmountInputEl = document.getElementById(
@@ -244,6 +260,8 @@ const init = () => {
       }
       responseP.classList.remove('hidden');
     });
+
+    // TAB MENU LINKS
     tabLinks.forEach((a) => {
       a.addEventListener('click', (e) => {
         e.preventDefault();
@@ -266,6 +284,8 @@ const init = () => {
         }
       });
     });
+
+    // RANGE INPUTS
     rangeInputs.forEach((i) => {
       i.addEventListener('input', (e) => {
         const el = e.target as HTMLInputElement;
@@ -486,4 +506,6 @@ const init = () => {
   addEventListeners();
   getInitialValues();
 };
+
+// CALL INIT WHEN DOCUMENT HAS FINISHED LOADING
 document.addEventListener('DOMContentLoaded', init);
