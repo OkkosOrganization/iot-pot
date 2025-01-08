@@ -135,12 +135,12 @@ body {
 }
 .deviceIdContainer {
   margin-left: 1.25rem;
-  font-family: var(--robotoLight);
-  text-transform: uppercase;
 }
 .deviceIdContainer h1 {
   font-size: 1.125rem;
   line-height: 1.125rem;
+  font-family: var(--roboto);
+  text-transform: uppercase;
 }
 .deviceIdContainer span {
   display: block;
