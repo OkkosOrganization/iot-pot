@@ -3,15 +3,21 @@
 /********/
 @font-face {
   font-family: 'RobotoCondensed';
-  src: url('./RobotoCondensed-Regular.ttf') format('truetype');
+  src: url('./RobotoCondensed-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
 }
 @font-face {
   font-family: 'RobotoCondensedLight';
-  src: url('./RobotoCondensed-Light.ttf') format('truetype');
+  src: url('./RobotoCondensed-Light.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
 }
 @font-face {
   font-family: 'PoppinsBold';
-  src: url('./Poppins-Bold.ttf') format('truetype');
+  src: url('./Poppins-Bold.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
 }
 
 /**************/
@@ -429,7 +435,7 @@ button {
   border-radius: 1.25rem;
   cursor: pointer;
   width: max-content;
-  font-size: 0.675rem;
+  font-size: 0.6875rem;
   line-height: 1rem;
   text-transform: uppercase;
   font-family: var(--poppins);
