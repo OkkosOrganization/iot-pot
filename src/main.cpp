@@ -12,7 +12,7 @@ void initWiFiAp();
 void initWebServer();
 void initWifiClient();
 void handleGetIndex();
-void handleGetInternetStatus();
+void handleGetConnectionStatus();
 void handleGetDeviceId();
 void handleGetEmail();
 void handlePostEmail();
@@ -21,6 +21,8 @@ void handleGetWateringAmount();
 void handlePostWateringAmount();
 void handleGetWateringThreshold();
 void handlePostWateringThreshold();
+void handleGetNotificationTriggers();
+void handlePostNotificationTriggers();
 
 // PREFERENCES
 Preferences preferences;
@@ -87,7 +89,7 @@ void initWebServer(){
   
   // SETUP ROUTES
   server->on("/", HTTP_GET, handleGetIndex);
-  server->on("/internet-status", HTTP_GET, handleGetInternetStatus);
+  server->on("/connection-status", HTTP_GET, handleGetConnectionStatus);
   server->on("/device-id", HTTP_GET, handleGetDeviceId);
   server->on("/router-credentials", HTTP_POST, handlePostRouterCredentials);
   server->on("/email-address", HTTP_POST, handlePostEmail);
@@ -96,6 +98,8 @@ void initWebServer(){
   server->on("/watering-amount", HTTP_POST, handlePostWateringAmount);  
   server->on("/watering-threshold", HTTP_GET, handleGetWateringThreshold);
   server->on("/watering-threshold", HTTP_POST, handlePostWateringThreshold);   
+  server->on("/notification-triggers", HTTP_GET, handleGetNotificationTriggers);
+  server->on("/notification-triggers", HTTP_POST, handlePostNotificationTriggers);     
   
   // START SERVER
   server->begin();
@@ -143,14 +147,15 @@ void initWifiClient(){
 // WEB SERVER ROUTES
 void handleGetIndex() {
   Serial.println("GET /");
-  server->sendHeader("Content-Type", "text/html");
-  server->send(200, "text/html", indexHtml);
+  //Serial.println(indexHtmlLen);
+  server->sendHeader("Content-Encoding", "gzip");
+  server->send_P(200, "text/html", (const char*)indexHtml, indexHtmlLen);
 }
-void handleGetInternetStatus() {
-  Serial.println("GET /internet-status");
+void handleGetConnectionStatus() {
+  Serial.println("GET /connection-status");
   JsonDocument jsonDoc;
   String jsonString;  
-  jsonDoc["internet-status"] = WiFi.status();
+  jsonDoc["connection-status"] = WiFi.status();
   jsonDoc["ip"] = WiFi.localIP();
   jsonDoc["gateway"] = WiFi.gatewayIP();
   jsonDoc["ssid"] = WiFi.SSID();
@@ -292,4 +297,52 @@ void handleGetWateringThreshold() {
   serializeJson(jsonDoc, jsonString);
   server->sendHeader("Content-Type", "application/json");
   server->send(200, "application/json", jsonString);
+}
+void handleGetNotificationTriggers() {
+  Serial.println("GET /notification-triggers");
+  JsonDocument jsonDoc;
+  String jsonString; 
+  bool smt = false;
+  bool wte = false;
+  bool wo = false;
+  if (preferences.isKey("notification-soil-moisture-threshold"))
+    smt = preferences.getBool("notification-soil-moisture-threshold");
+  if (preferences.isKey("notification-water-tank-empty"))
+    smt = preferences.getBool("notification-water-tank-empty");
+  if (preferences.isKey("notification-water-overflow"))
+    smt = preferences.getBool("notification-water-overflow");        
+  jsonDoc["notification-soil-moisture-threshold"] = smt;
+  jsonDoc["notification-water-tank-empty"] = wte;
+  jsonDoc["notification-water-overflow"] = wo;  
+  serializeJson(jsonDoc, jsonString);
+  server->sendHeader("Content-Type", "application/json");
+  server->send(200, "application/json", jsonString);
+}
+void handlePostNotificationTriggers() {
+  Serial.println("POST /notification-triggers");
+  JsonDocument jsonDoc;
+  String jsonString;  
+  /*
+  if (server->hasArg("watering-threshold")) {
+    char wt[4];
+    String wtString = server->arg("watering-threshold");
+    wtString.toCharArray(wt, sizeof(wt));
+    int32_t wtInt = atoi(wt);    
+    Serial.print("POST** watering-threshold current:");
+    Serial.println(preferences.getInt("threshold"));  
+    
+    Serial.print("POST** watering-threshold new:");
+    Serial.println(wtInt);  
+    preferences.putInt("threshold", wtInt);
+
+    jsonDoc["success"] = "1";
+  }
+  else {
+    jsonDoc["success"] = "0";
+  }
+  */
+  jsonDoc["success"] = 1;
+  serializeJson(jsonDoc, jsonString);
+  server->sendHeader("Content-Type", "application/json");
+  server->send(200, "application/json", jsonString);  
 }
