@@ -57,19 +57,20 @@
                 ></span>
                 <span id="connectionStatusSpan">Connecting</span>
               </h3>
+              <p>SSID:</p>
+              <p id="ssid">-</p>
               <p>IP Address:</p>
               <p id="ipAddress">-</p>
               <p>Gateway:</p>
               <p id="gateway">-</p>
-              <p id="internetStatusCode"></p>
             </div>
             <div class="formContainer side">
-              <form action="#" method="post" id="postForm">
+              <form action="#" method="post" id="connectionForm">
                 <h3 class="robotoLight uppercase">Set router credentials:</h3>
-                <label for="ssid">SSID</label>
+                <label for="ssidInput">SSID</label>
                 <input
                   type="text"
-                  id="ssid"
+                  id="ssidInput"
                   name="ssid"
                   placeholder="Network SSID"
                   required
@@ -85,7 +86,7 @@
                 <div class="submitContainer">
                   <button type="submit">Submit</button>
                 </div>
-                <p id="response" class="hidden"></p>
+                <p id="connectionFormResponse" class="hidden formResponse"></p>
               </form>
             </div>
           </div>
@@ -94,7 +95,7 @@
           <h2 class="tabHeading poppins">Watering settings</h2>
           <div class="content">
             <div class="formContainer side">
-              <form action="#" method="post" id="soilMoistureThresholdForm">
+              <form action="#" method="post" id="wateringThresholdForm">
                 <h3 class="robotoLight uppercase">
                   SET SOIL MOISTURE THRESHOLD
                 </h3>
@@ -108,6 +109,7 @@
                     id="wateringThreshold"
                     min="0"
                     max="100"
+                    data-default="50"
                   />
                 </div>
                 <div>
@@ -118,6 +120,10 @@
                 <div class="submitContainer">
                   <button type="submit">SUBMIT</button>
                 </div>
+                <p
+                  id="wateringThresholdFormResponse"
+                  class="hidden formResponse"
+                ></p>
               </form>
             </div>
             <div class="formContainer side">
@@ -126,7 +132,13 @@
                 <div class="sliderInputContainer">
                   <label for="wateringAmount" class="tl">1</label>
                   <label for="wateringAmount" class="tr">100</label>
-                  <input type="range" id="wateringAmount" min="1" max="100" />
+                  <input
+                    type="range"
+                    id="wateringAmount"
+                    min="1"
+                    max="100"
+                    data-default="50"
+                  />
                 </div>
                 <div>
                   <span id="wateringAmountValue" class="sliderValue poppins"
@@ -136,6 +148,10 @@
                 <div class="submitContainer">
                   <button type="submit">SUBMIT</button>
                 </div>
+                <p
+                  id="wateringAmountFormResponse"
+                  class="hidden formResponse"
+                ></p>
               </form>
             </div>
           </div>
@@ -157,6 +173,7 @@
                 <div class="submitContainer">
                   <button type="submit">SUBMIT</button>
                 </div>
+                <p id="emailResponse" class="hidden formResponse"></p>
               </form>
             </div>
             <div class="formContainer side">
@@ -166,33 +183,43 @@
                 </h3>
                 <div class="checkboxes">
                   <div class="checkBoxContainer">
-                    <label for="email">Soil moisture below threshold</label>
+                    <label for="notification-soil-moisture-threshold"
+                      >Soil moisture below threshold</label
+                    >
                     <input
                       type="checkbox"
-                      id="soil_moisture_trigger"
-                      name="soil_moisture_trigger"
+                      id="notification-soil-moisture-threshold"
+                      name="notification-soil-moisture-threshold"
                     />
                   </div>
                   <div class="checkBoxContainer">
-                    <label for="email">Water tank empty</label>
+                    <label for="notification-water-tank-empty"
+                      >Water tank empty</label
+                    >
                     <input
                       type="checkbox"
-                      id="water_tank_trigger"
-                      name="water_tank_trigger"
+                      id="notification-water-tank-empty"
+                      name="notification-water-tank-empty"
                     />
                   </div>
                   <div class="checkBoxContainer">
-                    <label for="email">Water overflow</label>
+                    <label for="notification-water-overflow"
+                      >Water overflow</label
+                    >
                     <input
                       type="checkbox"
-                      id="water_overflow"
-                      name="water_overflow"
+                      id="notification-water-overflow"
+                      name="notification-water-overflow"
                     />
                   </div>
                 </div>
                 <div class="submitContainer">
                   <button type="submit">SUBMIT</button>
                 </div>
+                <p
+                  id="notificationTriggersResponse"
+                  class="hidden formResponse"
+                ></p>
               </form>
             </div>
           </div>
