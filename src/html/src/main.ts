@@ -3,7 +3,7 @@ import './style.css';
 const init = () => {
   console.log('Configuration app init!');
   let statusInterval = 0;
-  let statusIntervalTime = 5000;
+  let statusIntervalTime = 10000;
   const connectionStatusCircle = document.getElementById(
     'connectionStatusCircle',
   )! as HTMLSpanElement;
@@ -46,6 +46,7 @@ const init = () => {
 
   const emailInput = document.getElementById('email')! as HTMLInputElement;
 
+  // SETS UP ALL EVENT LISTENERS
   const addEventListeners = () => {
     connectionForm.addEventListener('submit', async function (event) {
       event.preventDefault();
@@ -221,66 +222,62 @@ const init = () => {
     });
   };
 
-  const getConnectionStatus = async () => {
+  // API CALLS
+  type ConnectionStatusResponse = {
+    'connection-status': string;
+    ip: string;
+    gateway: string;
+    ssid: string;
+  };
+  const getConnectionStatus = async (): Promise<void> => {
     if (!statusInterval)
       statusInterval = window.setInterval(
         getConnectionStatus,
         statusIntervalTime,
       );
-
     clearInterval(statusInterval);
-    try {
-      const response = await fetch('/internet-status', {
-        method: 'GET',
-      });
-      if (response.ok) {
-        const result = await response.json();
-        const statusCode = parseInt(result['internet-status']);
-        const ip = result['ip'];
-        const gateway = result['gateway'];
-        const ssid = result['ssid'];
-        switch (statusCode) {
-          case 3:
-            console.log('Online', result, statusCode, ip);
-            connectionStatusCircle.classList.add('greenBg');
-            connectionStatusCircle.classList.remove('yellowBg');
-            connectionStatusCircle.classList.remove('redBg');
-            connectionStatusSpan.textContent = 'Connected';
-            ipAddressP.textContent = ip;
-            gatewayP.textContent = gateway;
-            ssidP.textContent = ssid;
-            break;
-          case 2:
-            console.log('Scanning', result, statusCode, ip);
-            connectionStatusCircle.classList.remove('greenBg');
-            connectionStatusCircle.classList.add('yellowBg');
-            connectionStatusCircle.classList.remove('redBg');
-            connectionStatusSpan.textContent = 'Connecting';
-            ipAddressP.textContent = '...';
-            gatewayP.textContent = '...';
-            ssidP.textContent = '...';
-            break;
-          default:
-            console.log('Offline', result, statusCode, ip);
-            connectionStatusCircle.classList.remove('greenBg');
-            connectionStatusCircle.classList.remove('yellowBg');
-            connectionStatusCircle.classList.add('redBg');
-            connectionStatusSpan.textContent = 'Offline';
-            ipAddressP.textContent = '-';
-            gatewayP.textContent = '-';
-            ssidP.textContent = '-';
-            break;
-        }
-      } else {
-        connectionStatusCircle.classList.remove('greenBg');
-        connectionStatusCircle.classList.remove('yellowBg');
-        connectionStatusCircle.classList.add('redBg');
-        connectionStatusSpan.textContent = 'Offline';
-        ipAddressP.textContent = '-';
-        gatewayP.textContent = '-';
-        ssidP.textContent = '-';
+    const response = await fetch('/connection-status', {
+      method: 'GET',
+    });
+    if (response.ok) {
+      const result: ConnectionStatusResponse = await response.json();
+      const statusCode = parseInt(result['connection-status']);
+      const ip = result['ip'];
+      const gateway = result['gateway'];
+      const ssid = result['ssid'];
+      switch (statusCode) {
+        case 3:
+          console.log('Online', result, statusCode, ip);
+          connectionStatusCircle.classList.add('greenBg');
+          connectionStatusCircle.classList.remove('yellowBg');
+          connectionStatusCircle.classList.remove('redBg');
+          connectionStatusSpan.textContent = 'Connected';
+          ipAddressP.textContent = ip;
+          gatewayP.textContent = gateway;
+          ssidP.textContent = ssid;
+          break;
+        case 2:
+          console.log('Scanning', result, statusCode, ip);
+          connectionStatusCircle.classList.remove('greenBg');
+          connectionStatusCircle.classList.add('yellowBg');
+          connectionStatusCircle.classList.remove('redBg');
+          connectionStatusSpan.textContent = 'Connecting';
+          ipAddressP.textContent = '...';
+          gatewayP.textContent = '...';
+          ssidP.textContent = '...';
+          break;
+        default:
+          console.log('Offline', result, statusCode, ip);
+          connectionStatusCircle.classList.remove('greenBg');
+          connectionStatusCircle.classList.remove('yellowBg');
+          connectionStatusCircle.classList.add('redBg');
+          connectionStatusSpan.textContent = 'Offline';
+          ipAddressP.textContent = '-';
+          gatewayP.textContent = '-';
+          ssidP.textContent = '-';
+          break;
       }
-    } catch (error) {
+    } else {
       connectionStatusCircle.classList.remove('greenBg');
       connectionStatusCircle.classList.remove('yellowBg');
       connectionStatusCircle.classList.add('redBg');
@@ -289,110 +286,136 @@ const init = () => {
       gatewayP.textContent = '-';
       ssidP.textContent = '-';
     }
+
     statusInterval = window.setInterval(
       getConnectionStatus,
       statusIntervalTime,
     );
   };
 
-  const getDeviceId = async () => {
-    try {
-      const response = await fetch('/device-id', {
-        method: 'GET',
-      });
-      if (response.ok) {
-        const result = await response.json();
-        const res = result['device-id'];
-        deviceIdSpan.textContent = res;
-      } else {
-        deviceIdSpan.textContent = '...';
-      }
-    } catch (error) {
+  type DeviceIdResponse = {
+    'device-id': string;
+  };
+  const getDeviceId = async (): Promise<void> => {
+    const response = await fetch('/device-id', {
+      method: 'GET',
+    });
+    if (response.ok) {
+      const result: DeviceIdResponse = await response.json();
+      const res = result['device-id'];
+      deviceIdSpan.textContent = res;
+    } else {
       deviceIdSpan.textContent = '...';
+      throw new Error(`HTTP error! Status: ${response.status}`);
     }
   };
 
-  const getWateringAmount = async () => {
-    try {
-      const response = await fetch('/watering-amount', {
-        method: 'GET',
-      });
-      if (response.ok) {
-        const result = await response.json();
-        const res = result['watering-amount'];
-        console.log(res);
-        if (res === 'undefined' || res === '') {
-          const defaultValue =
-            wateringAmountInput.getAttribute('data-default')!;
-          wateringAmountInput.value = defaultValue;
-          wateringAmountSpan.textContent = defaultValue;
-        } else {
-          wateringAmountInput.value = res;
-          wateringAmountSpan.textContent = res;
-        }
+  type WateringAmountResponse = {
+    'watering-amount': string;
+  };
+  const getWateringAmount = async (): Promise<void> => {
+    const url = '/watering-amount';
+    const response = await fetch(url, {
+      method: 'GET',
+    });
+    if (response.ok) {
+      const result: WateringAmountResponse = await response.json();
+      const wa = result['watering-amount'];
+      console.log('watering-amount:', wa);
+      if (wa === 'undefined' || wa === '') {
+        const defaultValue = wateringAmountInput.getAttribute('data-default')!;
+        wateringAmountInput.value = defaultValue;
+        wateringAmountSpan.textContent = defaultValue;
       } else {
+        wateringAmountInput.value = wa;
+        wateringAmountSpan.textContent = wa;
       }
-    } catch (error) {}
+    } else {
+      console.log('Fetch failed', url);
+    }
   };
 
-  const getWateringThreshold = async () => {
-    try {
-      const response = await fetch('/watering-threshold', {
-        method: 'GET',
-      });
-      if (response.ok) {
-        const result = await response.json();
-        const res = result['watering-threshold'];
-        console.log(res);
-        if (res === 'undefined' || res === '') {
-          const defaultValue =
-            wateringThresholdInput.getAttribute('data-default')!;
-          wateringThresholdInput.value = defaultValue;
-          wateringThresholdSpan.textContent = defaultValue;
-        } else {
-          wateringThresholdInput.value = res;
-          wateringThresholdSpan.textContent = res;
-        }
+  type WateringThresholdResponse = {
+    'watering-threshold': string;
+  };
+  const getWateringThreshold = async (): Promise<void> => {
+    const response = await fetch('/watering-threshold', {
+      method: 'GET',
+    });
+    if (response.ok) {
+      const result: WateringThresholdResponse = await response.json();
+      const wt = result['watering-threshold'];
+
+      console.log('watering-threshold:', wt);
+      if (wt === 'undefined' || wt === '') {
+        const defaultValue =
+          wateringThresholdInput.getAttribute('data-default')!;
+        wateringThresholdInput.value = defaultValue;
+        wateringThresholdSpan.textContent = defaultValue;
       } else {
+        wateringThresholdInput.value = wt;
+        wateringThresholdSpan.textContent = wt;
       }
-    } catch (error) {}
+    } else {
+    }
   };
 
-  const getEmailAddress = async () => {
-    try {
-      const response = await fetch('/email-address', {
-        method: 'GET',
-      });
-      if (response.ok) {
-        const result = await response.json();
-        const res = result['email'];
-        console.log(res);
-        emailInput.value = res;
-      } else {
-      }
-    } catch (error) {}
+  type EmailAddressResponse = {
+    email: string;
+  };
+  const getEmailAddress = async (): Promise<void> => {
+    const url = '/email-address';
+    const response = await fetch(url, {
+      method: 'GET',
+    });
+    if (response.ok) {
+      const result: EmailAddressResponse = await response.json();
+      const email = result['email'];
+      if (email === 'undefined' || email === '') emailInput.value = email;
+    } else {
+      console.log('Fetch failed', url);
+    }
   };
 
-  const getNotificationTriggers = async () => {
-    try {
-      const response = await fetch('/notification-triggers', {
-        method: 'GET',
-      });
-      if (response.ok) {
-        const result = await response.json();
-        const res = result['notification-triggers'];
-        console.log(res);
-      } else {
-      }
-    } catch (error) {}
+  type NotificationTriggersResponse = {
+    'notification-soil-moisture-threshold': string;
+    'notification-water-tank-empty': string;
+    'notification-water-overflow': string;
+  };
+  const getNotificationTriggers = async (): Promise<void> => {
+    const url = '/notification-triggers';
+    const response = await fetch(url, {
+      method: 'GET',
+    });
+    if (response.ok) {
+      const result: NotificationTriggersResponse = await response.json();
+      const soilMoistureThreshold = Boolean(
+        result['notification-soil-moisture-threshold'],
+      );
+      const waterTankEmpty = Boolean(result['notification-water-tank-empty']);
+      const waterOverflow = Boolean(result['notification-water-overflow']);
+      console.log(result);
+    } else {
+      console.log('Fetch failed', url);
+    }
   };
 
+  // GETS THE INITIAL VALUES FROM SERVER
+  const getInitialValues = async () => {
+    try {
+      await getDeviceId();
+      await getWateringAmount();
+      await getWateringThreshold();
+      await getEmailAddress();
+      await getNotificationTriggers();
+      await getConnectionStatus();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // START
   addEventListeners();
-  getDeviceId();
-  getConnectionStatus();
-  getWateringAmount();
-  getWateringThreshold();
-  getEmailAddress();
-  getNotificationTriggers();
+  getInitialValues();
 };
 document.addEventListener('DOMContentLoaded', init);
