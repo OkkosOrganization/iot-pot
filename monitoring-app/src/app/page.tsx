@@ -32,6 +32,7 @@ export default function Home() {
         </svg>
       </div>
       <h1>IoT-Pot monitoring app</h1>
+      <p>Hello World!</p>
     </div>
   );
 }
