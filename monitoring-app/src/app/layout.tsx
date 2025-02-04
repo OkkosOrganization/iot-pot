@@ -5,6 +5,7 @@ import "./globals.css";
 const FontPoppins = Poppins({
   variable: "--poppins",
   weight: ["600"],
+  subsets: ["latin"],
 });
 
 const FontRoboto_Condensed = Roboto_Condensed({
