@@ -24,6 +24,10 @@ Let´s use feature branches: create a new branch for each new feature.
 
 Do not commit secrets, passwords, API keys etc into Git. Create a file called secrets.h in /include, this file should contain all secrets and the file is ignored by git. See the file [secrets.h.template](./include/secrets.h.template) for a template.
 
+## Monitoring-app
+
+See [/monitoring-app](./monitoring-app)
+
 ## Authors
 
 Okko Ojala  
