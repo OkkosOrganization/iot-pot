@@ -9,7 +9,9 @@ deploy_preview:
   except:
     - main
   before_script:
-    - export PATH="/usr/local/bin:$PATH"
+    - export NVM_DIR="$HOME/.nvm"
+    - source "$NVM_DIR/nvm.sh"
+    - nvm use node
     - node -v
     - npm -v
   script:
@@ -26,7 +28,10 @@ deploy_production:
   only:
     - main
   before_script:
-    - export PATH="/usr/local/bin:$PATH"
+  before_script:
+    - export NVM_DIR="$HOME/.nvm"
+    - source "$NVM_DIR/nvm.sh"
+    - nvm use node
     - node -v
     - npm -v
   script:
