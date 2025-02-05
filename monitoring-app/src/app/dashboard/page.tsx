@@ -1,4 +1,5 @@
 import { getSession } from "@auth0/nextjs-auth0";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 export default async function DashBoardPage() {
@@ -7,7 +8,7 @@ export default async function DashBoardPage() {
     return (
       <div>
         <h1>Welcome {session.user.name}</h1>
-        <a href="/api/auth/logout">LOGOUT</a>
+        <Link href="/api/auth/logout">LOGOUT</Link>
         <pre>{JSON.stringify(session, null, 5)}</pre>
       </div>
     );
