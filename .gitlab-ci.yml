@@ -3,20 +3,30 @@ default:
 
 deploy_preview:
   stage: deploy
+  tags:
+    - vercel
+    - macos
   except:
     - main
   script:
-    - npm install --global vercel
+    - node -v
+    - npm -v
+    - npx vercel
     - vercel pull --yes --environment=preview --token=$VERCEL_TOKEN ./monitoring-app
     - vercel build --token=$VERCEL_TOKEN ./monitoring-app
     - vercel deploy --prebuilt  --token=$VERCEL_TOKEN ./monitoring-app
 
 deploy_production:
   stage: deploy
+  tags:
+    - vercel
+    - macos
   only:
     - main
   script:
-    - npm install --global vercel
+    - node -v
+    - npm -v
+    - npx vercel
     - vercel pull --yes --environment=production --token=$VERCEL_TOKEN ./monitoring-app
     - vercel build --prod --token=$VERCEL_TOKEN ./monitoring-app
     - vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN ./monitoring-app
