@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
-  console.log(request.url);
-  const jsonData = await request.json();
-  const auth0Id = jsonData.id as string;
-  const email = jsonData.email as string;
-  const greeting = "Hello user: " + auth0Id + ", email: " + email;
+  const { id, email } = await request.json();
+  console.log(id, email);
+  const greeting = "Hello user: " + id + ", email: " + email;
   const json = {
     greeting,
   };
