@@ -9,14 +9,12 @@ export async function POST(request: NextRequest) {
   if (!id) return NextResponse.json({ success: 0, error: "No auth0 id" });
 
   try {
-    const rowId = await db
-      .insert(users)
-      .values({
-        auth0Id: id,
-        email: email,
-      })
-      .returning({ dbId: users.id });
-    return NextResponse.json({ success: 1, rowId });
+    const rowId = await db.insert(users).values({
+      auth0Id: id,
+      email: email,
+    });
+    //.returning({ dbId: users.id });
+    return NextResponse.json({ success: 1 });
   } catch (e) {
     return NextResponse.json({ success: 0, error: e });
   }
