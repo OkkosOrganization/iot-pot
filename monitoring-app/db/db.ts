@@ -12,11 +12,14 @@ export const getUser = async (userAuth0Id: string) => {
     .where(eq(schema.users.auth0Id, userAuth0Id))
     .leftJoin(schema.devices, eq(schema.users.id, schema.devices.userId));
 
-  console.log(dbData);
   if (dbData.length) {
-    const devices = dbData.filter((d) => {
-      d.devices !== null ? d.devices : false;
-    });
+    const devices = dbData
+      .filter((d) => {
+        return d.devices === null ? false : true;
+      })
+      .map((d) => {
+        return d.devices;
+      });
 
     const userWithDevices = {
       ...dbData[0].users,
