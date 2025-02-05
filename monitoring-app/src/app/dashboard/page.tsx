@@ -1,18 +1,21 @@
-import { withPageAuthRequired } from "@auth0/nextjs-auth0";
-import { UserProvider } from "@auth0/nextjs-auth0/client";
-import { UserInfo } from "../components/UserInfo";
+import { getSession } from "@auth0/nextjs-auth0";
+import { redirect } from "next/navigation";
 import { LogoutButton } from "../components/LogoutButton";
+import { UserInfo } from "../components/UserInfo";
+import { UserProvider } from "@auth0/nextjs-auth0/client";
 
-export default withPageAuthRequired(
-  async function DashBoardPage() {
+export default async function DashBoardPage() {
+  const session = await getSession();
+  if (session?.user) {
     return (
-      <UserProvider>
-        <div>
-          <LogoutButton />
-          <UserInfo />
-        </div>
-      </UserProvider>
+      <div>
+        <UserProvider>
+          <div>
+            <LogoutButton />
+            <UserInfo />
+          </div>
+        </UserProvider>
+      </div>
     );
-  },
-  { returnTo: "/" }
-);
+  } else return redirect("/");
+}
