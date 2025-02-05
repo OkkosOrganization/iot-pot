@@ -15,8 +15,8 @@ deploy_preview:
     - node -v
     - npm -v
   script:
-    - npx vercel
     - cd ./monitoring-app
+    - npx vercel
     - vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
     - vercel build --token=$VERCEL_TOKEN
     - vercel deploy --prebuilt  --token=$VERCEL_TOKEN
@@ -29,15 +29,14 @@ deploy_production:
   only:
     - main
   before_script:
-  before_script:
     - export NVM_DIR="$HOME/.nvm"
     - source "$NVM_DIR/nvm.sh"
     - nvm use 20
     - node -v
     - npm -v
   script:
-    - npx vercel
     - cd ./monitoring-app
+    - npx vercel
     - vercel pull --yes --environment=production --token=$VERCEL_TOKEN
     - vercel build --prod --token=$VERCEL_TOKEN
     - vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
