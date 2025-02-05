@@ -1,7 +1,7 @@
 "use client";
 import { useUser } from "@auth0/nextjs-auth0/client";
 export const UserInfo = () => {
-  const { user, error, isLoading } = useUser();
+  const { user } = useUser();
 
   return (
     <div>
