@@ -1,0 +1,10 @@
+.loginBtn {
+  background: var(--purple);
+  font-family: var(--poppins);
+  color: #fff;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  margin: 0 auto;
+  padding: 0.5rem 1rem;
+  border-radius: 2.25rem;
+}
