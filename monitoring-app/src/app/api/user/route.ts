@@ -16,9 +16,8 @@ export async function POST(request: NextRequest) {
         email: email,
       })
       .returning({ dbId: users.id });
-    return NextResponse.json({ success: 1, data: rowId });
+    return NextResponse.json({ success: 1, rowId });
   } catch (e) {
-    console.log(e);
     return NextResponse.json({ success: 0, error: e });
   }
 }
