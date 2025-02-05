@@ -15,11 +15,10 @@ deploy_preview:
     - node -v
     - npm -v
   script:
-    - cd ./monitoring-app
     - npx vercel
-    - vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
-    - vercel build --token=$VERCEL_TOKEN
-    - vercel deploy --prebuilt  --token=$VERCEL_TOKEN
+    - vercel pull --yes --environment=preview --token=$VERCEL_TOKEN ./monitoring-app
+    - vercel build --token=$VERCEL_TOKEN ./monitoring-app
+    - vercel deploy --prebuilt  --token=$VERCEL_TOKEN ./monitoring-app
 
 deploy_production:
   stage: deploy
@@ -35,8 +34,7 @@ deploy_production:
     - node -v
     - npm -v
   script:
-    - cd ./monitoring-app
     - npx vercel
-    - vercel pull --yes --environment=production --token=$VERCEL_TOKEN
-    - vercel build --prod --token=$VERCEL_TOKEN
-    - vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
+    - vercel pull --yes --environment=production --token=$VERCEL_TOKEN ./monitoring-app
+    - vercel build --prod --token=$VERCEL_TOKEN ./monitoring-app
+    - vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN ./monitoring-app
