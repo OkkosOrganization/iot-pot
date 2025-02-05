@@ -8,9 +8,11 @@ export const getUser = async (userAuth0Id: string) => {
   const dbData = await db
     .select()
     .from(schema.users)
-    .where(eq(schema.users.auth0Id, userAuth0Id))
-    .leftJoin(schema.devices, eq(schema.users.id, schema.devices.userId));
-
+    .where(eq(schema.users.auth0Id, userAuth0Id));
+  //.leftJoin(schema.devices, eq(schema.users.id, schema.devices.userId));
+  return dbData;
+  /*
+  console.log(userAuth0Id);
   if (dbData) {
     const devices = dbData.map((d) => {
       return d.devices;
@@ -22,6 +24,7 @@ export const getUser = async (userAuth0Id: string) => {
     };
     return userWithDevices;
   }
+  */
 
   return null;
 };
