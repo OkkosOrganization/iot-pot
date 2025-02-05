@@ -11,7 +11,7 @@ deploy_preview:
   before_script:
     - export NVM_DIR="$HOME/.nvm"
     - source "$NVM_DIR/nvm.sh"
-    - nvm use node
+    - nvm use 20
     - node -v
     - npm -v
   script:
@@ -32,7 +32,7 @@ deploy_production:
   before_script:
     - export NVM_DIR="$HOME/.nvm"
     - source "$NVM_DIR/nvm.sh"
-    - nvm use node
+    - nvm use 20
     - node -v
     - npm -v
   script:
