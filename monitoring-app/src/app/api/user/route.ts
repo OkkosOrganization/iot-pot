@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
   if (!id) return NextResponse.json({ success: 0, error: "No auth0 id" });
 
   try {
-    const rowId = await db.insert(users).values({
+    await db.insert(users).values({
       auth0Id: id,
       email: email,
     });
