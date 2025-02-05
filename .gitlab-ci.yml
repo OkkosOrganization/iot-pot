@@ -35,6 +35,6 @@ deploy_production:
     - npm -v
     - npm install -g vercel
   script:
-    - vercel pull --yes --environment=production --token=$VERCEL_TOKEN ./monitoring-app
-    - vercel build --prod --token=$VERCEL_TOKEN ./monitoring-app
-    - vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN ./monitoring-app
+    # - vercel pull --yes --environment=production --token=$VERCEL_TOKEN ./monitoring-app
+    # - vercel build --prod --token=$VERCEL_TOKEN ./monitoring-app
+    - vercel deploy --prod --token=$VERCEL_TOKEN ./monitoring-app
