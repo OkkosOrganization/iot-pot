@@ -30,7 +30,12 @@ export const Navi = () => {
         {u?.db.devices.map((d, i) => {
           return (
             <li key={`deviceMenuItem_${i}`} className={styles.deviceNaviItem}>
-              <Link href={`/dashboard/device/${d.deviceId}`}>{d.title}</Link>
+              <Link
+                href={`/dashboard/device/${d.deviceId}`}
+                className={styles.deviceNaviItemLink}
+              >
+                {d.title}
+              </Link>
             </li>
           );
         })}

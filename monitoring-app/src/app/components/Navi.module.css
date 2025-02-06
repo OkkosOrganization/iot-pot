@@ -30,13 +30,13 @@
   color: var(--lime);
 
   border-radius: 100%;
+}
 
-  a {
-    color: var(--black);
-    padding-left: 3rem;
-    line-height: 100%;
-    text-transform: uppercase;
-    font-family: var(--robotoCondensed);
-    font-size: 0.6875rem;
-  }
+.deviceNaviItemLink {
+  color: var(--black);
+  padding-left: 3rem;
+  line-height: 100%;
+  text-transform: uppercase;
+  font-family: var(--robotoCondensed);
+  font-size: 0.6875rem;
 }
