@@ -1,10 +1,12 @@
 import {
+  AppRouteHandlerFnContext,
   getSession,
   handleAuth,
   handleCallback,
   Session,
 } from "@auth0/nextjs-auth0";
 import { addUser, getUser } from "../../../../../db/db";
+import { NextRequest, NextResponse } from "next/server";
 
 const afterCallback = async (req: Request, session: Session) => {
   const { user } = session;
@@ -22,9 +24,13 @@ const afterCallback = async (req: Request, session: Session) => {
 };
 
 export const GET = handleAuth({
-  callback: async (req: any, res: any) => {
+  callback: async (
+    req: NextRequest,
+    res: NextResponse,
+    ctx: AppRouteHandlerFnContext
+  ) => {
     try {
-      const response = await handleCallback(req, res, { afterCallback });
+      const response = await handleCallback(req, ctx, { afterCallback });
       const session = await getSession(req, res);
       if (session?.user.email_verified === true)
         response.headers.set("location", "/dashboard");
