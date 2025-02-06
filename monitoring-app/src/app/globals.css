@@ -87,6 +87,10 @@ body {
   background-color: var(--lightGrey);
   padding: 0;
 }
+#logo {
+  position: relative;
+  z-index: 2;
+}
 .container {
   margin: 0 auto;
   width: 100%;
