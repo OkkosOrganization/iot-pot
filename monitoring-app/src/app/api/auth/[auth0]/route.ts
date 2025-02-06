@@ -6,7 +6,7 @@ const afterCallback = async (req: Request, session: Session) => {
   console.log(dbUser);
   if (dbUser) user.db = dbUser;
   else {
-    const newUser = await addUser(session.user.sub, session.user.email);
+    const newUser = await addUser(session.user.sub);
     user.db = newUser;
   }
 

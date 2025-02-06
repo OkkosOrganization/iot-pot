@@ -40,12 +40,12 @@ export const getLatestMeasurements = (deviceId: number) => {
     .limit(1);
 };
 
-export const addUser = (auth0Id: string, email: string) => {
+export const addUser = (auth0Id: string) => {
   return db
     .insert(schema.users)
     .values({
       auth0Id: auth0Id,
-      email: email,
     })
+    .onConflictDoNothing()
     .returning();
 };

@@ -13,11 +13,8 @@ export const measurements = pgTable("measurements", {
 export const users = pgTable("users", {
 	id: serial().primaryKey().notNull(),
 	auth0Id: varchar("auth0_id", { length: 255 }).notNull(),
-	title: varchar({ length: 255 }),
-	email: varchar({ length: 255 }).notNull(),
 }, (table) => [
 	unique("users_auth0_id_key").on(table.auth0Id),
-	unique("users_email_key").on(table.email),
 ]);
 
 export const devices = pgTable("devices", {
@@ -33,7 +30,7 @@ export const devices = pgTable("devices", {
 	unique("devices_device_id_key").on(table.deviceId),
 ]);
 
-export const diaries = pgTable("diaries", {
+export const notes = pgTable("notes", {
 	id: serial().primaryKey().notNull(),
 	date: date().default(sql`CURRENT_DATE`).notNull(),
 	content: text(),
