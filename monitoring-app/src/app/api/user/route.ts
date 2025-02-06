@@ -11,7 +11,6 @@ export async function POST(request: NextRequest) {
   try {
     await db.insert(users).values({
       auth0Id: id,
-      email: email,
     });
     //.returning({ dbId: users.id });
     return NextResponse.json({ success: 1 });

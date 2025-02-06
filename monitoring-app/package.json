@@ -6,22 +6,24 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "drizzle-kit-pull": "npx drizzle-kit pull"
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^3.6.0",
     "@neondatabase/serverless": "^0.10.4",
+    "drizzle-kit": "^0.30.4",
     "drizzle-orm": "^0.39.1",
     "next": "15.1.6",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "drizzle-kit": "^0.30.4"
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^16.4.7",
     "eslint": "^9",
     "eslint-config-next": "15.1.6",
     "eslint-config-prettier": "^10.0.1",

@@ -1,0 +1,14 @@
+.dashboard {
+  display: flex;
+  flex-direction: column;
+}
+
+/******************/
+/* MEDIA QUERIES */
+/****************/
+@media screen and (min-width: 37.5rem) {
+  .dashboard {
+    flex-direction: row;
+    flex-grow: 1;
+  }
+}
