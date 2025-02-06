@@ -1,0 +1,42 @@
+.navi {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+.deviceNavi {
+  position: relative;
+  top: -1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 0.25rem 1rem 0.25rem;
+  width: 3rem;
+  background-color: var(--grey);
+  border-bottom-right-radius: 3rem;
+  border-bottom-left-radius: 3rem;
+  z-index: 1;
+}
+
+.deviceNaviItem {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background: var(--darkGrey);
+  color: var(--lime);
+
+  border-radius: 100%;
+
+  a {
+    color: var(--black);
+    padding-left: 3rem;
+    line-height: 100%;
+    text-transform: uppercase;
+    font-family: var(--robotoCondensed);
+    font-size: 0.6875rem;
+  }
+}
