@@ -22,7 +22,6 @@ type User = UserProfile & UserWithDb;
 export const Navi = () => {
   const { user } = useUser();
   const u = user as User;
-  console.log(user);
   return (
     <nav className={styles.navi}>
       <Logo />
