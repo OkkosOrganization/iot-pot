@@ -24,14 +24,10 @@ const afterCallback = async (req: Request, session: Session) => {
 };
 
 export const GET = handleAuth({
-  callback: async (
-    req: NextRequest,
-    res: NextResponse,
-    ctx: AppRouteHandlerFnContext
-  ) => {
+  callback: async (req: NextRequest, ctx: AppRouteHandlerFnContext) => {
     try {
       const response = await handleCallback(req, ctx, { afterCallback });
-      const session = await getSession(req, res);
+      const session = await getSession(req, response as NextResponse);
       if (session?.user.email_verified === true)
         response.headers.set("location", "/dashboard");
       else response.headers.set("location", "/?not_verified");
