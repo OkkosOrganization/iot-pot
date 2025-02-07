@@ -7,9 +7,9 @@ import Link from "next/link";
 import { PlantIcon } from "./PlantIcon";
 import { usePathname } from "next/navigation";
 import { PlusIcon } from "./PlusIcon";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AddDeviceDialog } from "./AddDeviceDialog";
-type Device = {
+export type Device = {
   id: number;
   deviceId: string;
   userId: number;
@@ -26,15 +26,26 @@ type UserWithDb = {
 type User = UserProfile & UserWithDb;
 export const Navi = () => {
   const [showDialog, setShowDialog] = useState<boolean>(false);
+  const [devices, setDevices] = useState<Device[]>([]);
   const { user } = useUser();
-  const pathname = usePathname();
   const u = user as User;
+  const pathname = usePathname();
+
+  useEffect(() => {
+    setDevices(u?.db.devices);
+  }, [u]);
+
   return (
     <>
       <nav className={styles.navi}>
-        <Logo />
+        <div className={styles.logoContainer}>
+          <Link href="/dashboard">
+            <Logo />
+          </Link>
+          <h2 className={styles.userName}>{u?.name}</h2>
+        </div>
         <ul className={styles.deviceNavi}>
-          {u?.db.devices.map((d, i) => {
+          {devices?.map((d, i) => {
             const isActiveItem = pathname.includes(
               `/dashboard/device/${d.deviceId}`
             );
@@ -67,7 +78,12 @@ export const Navi = () => {
         </ul>
         <LogoutButton />
       </nav>
-      <AddDeviceDialog showDialog={showDialog} setShowDialog={setShowDialog} />
+      <AddDeviceDialog
+        showDialog={showDialog}
+        setShowDialog={setShowDialog}
+        setDevices={setDevices}
+        userId={u?.db.id}
+      />
     </>
   );
 };
