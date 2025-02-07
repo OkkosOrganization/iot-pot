@@ -9,7 +9,7 @@ const FontPoppins = Poppins({
 });
 
 const FontRoboto_Condensed = Roboto_Condensed({
-  variable: "--robotoCondensed",
+  variable: "--roboto",
   subsets: ["latin"],
 });
 
