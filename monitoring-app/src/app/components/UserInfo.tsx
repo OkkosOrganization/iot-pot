@@ -1,12 +1,12 @@
 "use client";
 import { useUser } from "@auth0/nextjs-auth0/client";
+import styles from "./UserInfo.module.css";
 export const UserInfo = () => {
   const { user } = useUser();
 
   return (
-    <div>
-      <h1>Welcome {user?.name}</h1>
-      <pre>{JSON.stringify(user, null, 5)}</pre>
+    <div className={styles.container}>
+      <p>{JSON.stringify(user, null, 5)}</p>
     </div>
   );
 };
