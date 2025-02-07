@@ -14,7 +14,7 @@ export default async function DashboardLayout({
     <UserProvider>
       <div className={styles.dashboard}>
         <Navi />
-        <section>{children}</section>;
+        <section className={styles.pageContainer}>{children}</section>
       </div>
     </UserProvider>
   );

@@ -1,6 +1,11 @@
 .dashboard {
+  flex: 0 0 100%;
   display: flex;
   flex-direction: column;
+}
+.pageContainer {
+  width: 100%;
+  padding: 5rem;
 }
 
 /******************/
