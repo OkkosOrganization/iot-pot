@@ -10,33 +10,84 @@
   top: -1rem;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 2rem 0.25rem 1rem 0.25rem;
-  width: 3rem;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 2rem 0 1rem 0;
+  width: 2.5rem;
   background-color: var(--grey);
   border-bottom-right-radius: 3rem;
   border-bottom-left-radius: 3rem;
   z-index: 1;
 }
-
-.deviceNaviItem {
-  width: 2rem;
-  height: 2rem;
+.deviceNaviItem,
+.addDeviceBtn {
+  color: var(--darkGrey);
+  height: 1.875rem;
+  width: 1.875rem;
   display: flex;
   flex-direction: row;
   align-items: center;
-  background: var(--darkGrey);
-  color: var(--lime);
-
-  border-radius: 100%;
+  justify-content: flex-start;
+  background: var(--grey);
+  border-radius: 4rem;
+  overflow: hidden;
+  position: relative;
+  left: 0.3125rem;
 }
-
+.active.deviceNaviItem {
+  width: auto;
+  color: var(--lime);
+  background: var(--darkGrey);
+}
+.deviceNaviItem:hover {
+  width: auto;
+  color: var(--lime);
+  background: var(--darkGrey);
+}
+.deviceNaviItem:hover .naviItemTitle {
+  display: block;
+}
 .deviceNaviItemLink {
-  color: var(--black);
-  padding-left: 3rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  height: 2rem;
+  position: relative;
+  color: currentColor;
+}
+.naviItemIcon {
+  width: 0.875rem;
+  height: 1.05rem;
+  display: block;
+  margin-left: 0.6rem;
+  top: -0.125rem;
+  position: relative;
+  fill: currentColor;
+}
+.naviItemTitle {
+  display: none;
   line-height: 100%;
   text-transform: uppercase;
-  font-family: var(--robotoCondensed);
+  font-family: var(--poppins);
   font-size: 0.6875rem;
+  font-weight: 600;
+  padding-right: 1rem;
+  color: currentColor;
+}
+.active .naviItemTitle {
+  display: block;
+}
+.addDeviceBtn {
+  margin-top: 1rem;
+  top: 0.5rem;
+  justify-content: center;
+  background-color: var(--grey);
+  cursor: pointer;
+}
+.addDeviceBtn:hover {
+  background: var(--darkGrey);
+  color: var(--lime);
 }
