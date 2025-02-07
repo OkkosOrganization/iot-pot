@@ -3,7 +3,6 @@ import { drizzle } from "drizzle-orm/neon-http";
 import * as schema from "../drizzle/schema";
 export const db = drizzle(process.env.DATABASE_URL!, { schema: schema });
 import { eq, desc } from "drizzle-orm";
-import { authUid } from "drizzle-orm/neon";
 
 export const getUser = async (userAuth0Id: string) => {
   const dbData = await db
@@ -29,6 +28,26 @@ export const getUser = async (userAuth0Id: string) => {
   }
 
   return null;
+};
+
+export const getDevice = async (deviceId: string) => {
+  const dbData = await db
+    .select()
+    .from(schema.devices)
+    .where(eq(schema.devices.deviceId, deviceId));
+  return dbData;
+};
+
+export const addDevice = async (
+  deviceId: string,
+  title: string,
+  userId: number
+) => {
+  const newDevice = await db
+    .insert(schema.devices)
+    .values({ deviceId: deviceId, title: title, userId: userId })
+    .returning();
+  return newDevice;
 };
 
 export const getLatestMeasurements = (deviceId: number) => {
