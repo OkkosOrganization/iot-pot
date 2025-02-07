@@ -3,7 +3,7 @@ import { getSession, updateSession } from "@auth0/nextjs-auth0";
 import { addDevice, getDevice } from "../../../db/db";
 import { Device } from "./Navi";
 
-export async function AddDevice(previousState: any, formData: FormData) {
+export async function AddDevice(previousState: unknown, formData: FormData) {
   const title = formData.get("title") as string;
   const deviceId = formData.get("deviceId") as string;
   const session = await getSession();

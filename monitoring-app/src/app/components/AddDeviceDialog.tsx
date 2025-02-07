@@ -16,10 +16,6 @@ type AddDeviceDialogProps = {
   userId: number;
   setDevices: Dispatch<SetStateAction<Device[]>>;
 };
-type State = {
-  device: Device[];
-  error: null | string;
-};
 const initialState = {
   device: [],
   error: null,
