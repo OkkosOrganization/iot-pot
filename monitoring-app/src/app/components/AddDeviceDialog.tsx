@@ -9,6 +9,7 @@ import styles from "./AddDeviceDialog.module.css";
 import { AddDevice } from "./actions";
 import { Device } from "./Navi";
 import { Xicon } from "./xicon";
+import { Spinner } from "./Spinner";
 
 type AddDeviceDialogProps = {
   showDialog: boolean;
@@ -26,7 +27,10 @@ export const AddDeviceDialog = ({
   setShowDialog,
   setDevices,
 }: AddDeviceDialogProps) => {
-  const [state, formAction] = useActionState(AddDevice, initialState);
+  const [state, formAction, isPending] = useActionState(
+    AddDevice,
+    initialState
+  );
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   useEffect(() => {
     if (state?.device?.length) {
@@ -37,6 +41,8 @@ export const AddDeviceDialog = ({
         );
         return updatedDevices;
       });
+      dialogRef.current?.close();
+      setShowDialog(false);
     }
   }, [state?.device, setDevices]);
   return (
@@ -77,6 +83,11 @@ export const AddDeviceDialog = ({
             ADD DEVICE
           </button>
         </form>
+        {isPending ? (
+          <div className={styles.spinnerContainer}>
+            <Spinner />
+          </div>
+        ) : null}
       </div>
     </dialog>
   );
