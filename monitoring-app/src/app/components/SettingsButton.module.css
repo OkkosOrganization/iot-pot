@@ -1,0 +1,15 @@
+.settingsBtn {
+  background: var(--grey);
+  font-family: var(--poppins);
+  color: #fff;
+  padding: 0.25rem 0 0 0;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 4rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.settingsBtn * {
+  color: var(--darkGrey);
+}
