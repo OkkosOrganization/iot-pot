@@ -6,7 +6,6 @@ import { SearchParams } from "next/dist/server/request/search-params";
 export default async function Home({
   searchParams,
 }: {
-  params: { slug: string };
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
   const sp = (await searchParams) as SearchParams;

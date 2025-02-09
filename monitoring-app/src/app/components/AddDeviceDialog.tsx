@@ -44,7 +44,7 @@ export const AddDeviceDialog = ({
       dialogRef.current?.close();
       setShowDialog(false);
     }
-  }, [state?.device, setDevices]);
+  }, [state?.device, setDevices, setShowDialog]);
   return (
     <dialog open={showDialog} className={styles.dialog} ref={dialogRef}>
       <div className={styles.container}>
