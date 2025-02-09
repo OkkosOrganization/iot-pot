@@ -1,8 +1,7 @@
-.logoutBtn {
+.settingsBtn {
   background: var(--grey);
   font-family: var(--poppins);
   color: #fff;
-  margin-top: auto;
   padding: 0.25rem 0 0 0;
   width: 2rem;
   height: 2rem;
@@ -10,4 +9,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+.settingsBtn * {
+  color: var(--darkGrey);
 }

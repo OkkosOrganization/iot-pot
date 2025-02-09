@@ -9,6 +9,7 @@ import { usePathname } from "next/navigation";
 import { PlusIcon } from "./PlusIcon";
 import { useEffect, useState } from "react";
 import { AddDeviceDialog } from "./AddDeviceDialog";
+import { SettingsButton } from "./SettingsButton";
 export type Device = {
   id: number;
   deviceId: string;
@@ -76,7 +77,10 @@ export const Navi = () => {
             <PlusIcon />
           </li>
         </ul>
-        <LogoutButton />
+        <div className={styles.footer}>
+          <SettingsButton />
+          <LogoutButton />
+        </div>
       </nav>
       <AddDeviceDialog
         showDialog={showDialog}
