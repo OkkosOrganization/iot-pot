@@ -30,7 +30,7 @@ export const GET = handleAuth({
       const session = await getSession(req, response as NextResponse);
       if (session?.user.email_verified === true)
         response.headers.set("location", "/dashboard");
-      else response.headers.set("location", "/?not_verified");
+      else response.headers.set("location", "/?email-not-verified");
       return response;
     } catch (error) {
       console.error(error);
