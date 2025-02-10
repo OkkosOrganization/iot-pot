@@ -1,3 +1,10 @@
+import { UserInfo } from "@/app/components/UserInfo";
+
 export default async function SettingsPage() {
-  return <h2>Settings / User info</h2>;
+  return (
+    <div>
+      <h2>Settings / User info</h2>
+      <UserInfo />
+    </div>
+  );
 }
