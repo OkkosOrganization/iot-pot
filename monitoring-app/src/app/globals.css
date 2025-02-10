@@ -103,6 +103,18 @@ h3 {
   font-family: var(--poppins);
 }
 
+.btn {
+  background: var(--purple);
+  font-family: var(--poppins);
+  color: #fff;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  margin: 0 auto;
+  padding: 0.5rem 1rem;
+  border-radius: 2.25rem;
+  cursor: pointer;
+}
+
 /******************/
 /* MEDIA QUERIES */
 /****************/
