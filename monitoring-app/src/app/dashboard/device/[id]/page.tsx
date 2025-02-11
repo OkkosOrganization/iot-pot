@@ -2,7 +2,6 @@ import { getSession } from "@auth0/nextjs-auth0";
 import { getDevice } from "../../../../../db/db";
 import styles from "./page.module.css";
 import { DeviceNavi } from "@/app/components/DeviceNavi";
-import { SensorCard } from "@/app/components/SensorCard";
 import { MqttContextProvider } from "@/app/contexts/mqttContext";
 import { DevicePageContent } from "@/app/components/DevicePageContent";
 
