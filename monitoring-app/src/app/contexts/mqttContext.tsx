@@ -111,9 +111,25 @@ export const MqttContextProvider = ({
           console.log("airTemperature:", message.toString());
           setAirTemperature(parseInt(message.toString()));
           break;
+        case `device/${deviceId}/soilTemperature`:
+          console.log("soilTemperature:", message.toString());
+          setSoilTemperature(parseInt(message.toString()));
+          break;
+        case `device/${deviceId}/soilPh`:
+          console.log("soilPh:", message.toString());
+          setSoilPh(parseInt(message.toString()));
+          break;
+        case `device/${deviceId}/soilMoisture`:
+          console.log("soilMoisture:", message.toString());
+          setSoilMoisture(parseInt(message.toString()));
+          break;
+        case `device/${deviceId}/luminosity`:
+          console.log("luminosity:", message.toString());
+          setLuminosity(parseInt(message.toString()));
+          break;
       }
     });
-  }, []);
+  }, [deviceId]);
 
   return (
     <MqttContext.Provider
