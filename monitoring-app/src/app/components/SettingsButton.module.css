@@ -13,3 +13,17 @@
 .settingsBtn * {
   color: var(--darkGrey);
 }
+
+.settingsBtn:hover * {
+  color: var(--lime);
+}
+.settingsBtn:hover {
+  background: var(--darkGrey);
+}
+
+.settingsBtn path:nth-child(2) {
+  fill: #e8e8e8;
+}
+.settingsBtn:hover path:nth-child(2) {
+  fill: var(--darkGrey);
+}
