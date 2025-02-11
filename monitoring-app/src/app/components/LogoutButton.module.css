@@ -1,7 +1,7 @@
 .logoutBtn {
   background: var(--grey);
   font-family: var(--poppins);
-  color: #fff;
+  color: var(--darkGrey);
   margin-top: auto;
   padding: 0.25rem 0 0 0;
   width: 2rem;
@@ -10,4 +10,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.logoutBtn:hover {
+  background-color: var(--darkGrey);
+  color: var(--lime);
+}
+.logoutBtn a {
+  color: inherit;
 }
