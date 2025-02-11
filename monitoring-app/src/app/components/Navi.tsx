@@ -6,7 +6,7 @@ import styles from "./Navi.module.css";
 import Link from "next/link";
 import { PlantIcon } from "./PlantIcon";
 import { usePathname } from "next/navigation";
-import { PlusIcon } from "./PlusIcon";
+import { PlusIcon } from "./icons/PlusIcon";
 import { useState } from "react";
 import { AddDeviceDialog } from "./AddDeviceDialog";
 import { SettingsButton } from "./SettingsButton";

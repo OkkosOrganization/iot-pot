@@ -8,7 +8,7 @@ import {
 import styles from "./AddDeviceDialog.module.css";
 import { AddDevice } from "./actions";
 import { Device } from "./Navi";
-import { Xicon } from "./xicon";
+import { Xicon } from "./icons/xicon";
 import { Spinner } from "./Spinner";
 
 type AddDeviceDialogProps = {

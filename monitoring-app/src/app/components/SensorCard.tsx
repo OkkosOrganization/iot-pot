@@ -1,5 +1,5 @@
-import { AirHumidityIcon } from "./icons/AirHumidity";
-import { AirTemperatureIcon } from "./icons/AirTemperature";
+import { AirHumidityIcon } from "./icons/AirHumidityIcon";
+import { AirTemperatureIcon } from "./icons/AirTemperatureIcon";
 import { LuminosityIcon } from "./icons/LuminosityIcon";
 import { WaterOverFlowIcon } from "./icons/WaterOverFlowIcon";
 import { SoilMoistureIcon } from "./icons/SoilMoistureIcon";

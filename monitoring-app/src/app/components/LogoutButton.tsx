@@ -1,6 +1,6 @@
 import Link from "next/link";
 import styles from "./LogoutButton.module.css";
-import { LogoutIcon } from "./LogoutIcon";
+import { LogoutIcon } from "./icons/LogoutIcon";
 export const LogoutButton = () => {
   return (
     <button className={styles.logoutBtn}>
