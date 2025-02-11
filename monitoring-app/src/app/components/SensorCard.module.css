@@ -1,0 +1,51 @@
+.container {
+  width: calc(25% - 2rem);
+  aspect-ratio: 1/1;
+  border-radius: 2rem;
+  background: var(--grey);
+}
+
+.content {
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+  gap: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+.title {
+  font-family: var(--roboto);
+  font-weight: 300;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+}
+
+.iconContainer {
+  display: flex;
+  height: 100%;
+  width: max-content;
+  min-height: 2.5rem;
+  max-height: 8rem;
+}
+.iconContainer svg {
+  width: auto;
+  height: 100%;
+}
+
+.valueAndUnit {
+  font-family: var(--roboto);
+}
+.value {
+  font-weight: 800;
+  font-size: 1.5rem;
+}
+.unit {
+  font-weight: 600;
+  font-size: 1rem;
+  margin-left: 0.1rem;
+}

@@ -12,6 +12,11 @@
   align-items: center;
   gap: 1rem;
 }
+.userName {
+  font-family: var(--poppins);
+  font-weight: 500;
+  font-size: 1.5rem;
+}
 .deviceNavi {
   position: relative;
   top: -2rem;

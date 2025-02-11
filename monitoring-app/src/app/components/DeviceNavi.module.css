@@ -1,0 +1,25 @@
+.container {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+}
+.listItem {
+  margin: 0;
+  padding: 0;
+}
+.link {
+  display: block;
+  width: max-content;
+  height: 2rem;
+  padding: 0.25rem 0.5rem;
+  color: var(--darkGrey);
+  font-size: 0.6875rem;
+  font-family: var(--poppins);
+  font-weight: 600;
+  line-height: 1.5rem;
+  border-radius: 3rem;
+}
+.active {
+  background: var(--darkGrey);
+  color: var(--lime);
+}
