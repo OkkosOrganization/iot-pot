@@ -1,5 +1,5 @@
 .container {
-  width: calc(25% - 2rem);
+  width: calc(50% - 2rem);
   aspect-ratio: 1/1;
   border-radius: 2rem;
   background: var(--grey);
@@ -29,7 +29,7 @@
   display: flex;
   height: 100%;
   width: max-content;
-  min-height: 2.5rem;
+  min-height: 2rem;
   max-height: 8rem;
 }
 .iconContainer svg {
@@ -48,4 +48,18 @@
   font-weight: 600;
   font-size: 1rem;
   margin-left: 0.1rem;
+}
+
+/******************/
+/* MEDIA QUERIES */
+/****************/
+@media screen and (min-width: 52rem) {
+  .container {
+    width: calc(33% - 2rem);
+  }
+}
+@media screen and (min-width: 62.5rem) {
+  .container {
+    width: calc(25% - 2rem);
+  }
 }
