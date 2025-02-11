@@ -11,7 +11,7 @@
   display: block;
   width: max-content;
   height: 2rem;
-  padding: 0.25rem 0.5rem;
+  padding: 0.25rem 1rem;
   color: var(--darkGrey);
   font-size: 0.6875rem;
   font-family: var(--poppins);
