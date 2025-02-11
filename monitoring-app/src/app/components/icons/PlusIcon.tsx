@@ -3,7 +3,7 @@ export const PlusIcon = () => (
     <path
       d="M7 12H12M17 12H12M12 12V7V17"
       stroke="currentColor"
-      strokeOpacity="0.75"
+      strokeOpacity="1"
       strokeWidth="1.5"
     />
   </svg>
