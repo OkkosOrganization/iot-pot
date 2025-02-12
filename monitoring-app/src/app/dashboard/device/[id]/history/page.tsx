@@ -2,8 +2,6 @@ import { getSession } from "@auth0/nextjs-auth0";
 import { getDevice } from "../../../../../../db/db";
 import { DeviceNavi } from "../../../../components/DeviceNavi";
 import { DeviceHistoryPageContent } from "../../../../components/DeviceHistoryPageContent";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers";
 import styles from "./page.module.css";
 
 export default async function DeviceHistoryPage({
