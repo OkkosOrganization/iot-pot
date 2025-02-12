@@ -1,0 +1,42 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  padding-top: 4rem;
+}
+
+.title {
+  align-self: center;
+}
+
+.naviContainer {
+  background: var(--grey);
+  padding: 0.25rem;
+  border-radius: 3rem;
+}
+
+.content {
+  width: 100%;
+  border-radius: 2rem;
+
+  padding: 2rem 0;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+}
+
+/******************/
+/* MEDIA QUERIES */
+/****************/
+@media screen and (min-width: 37.5rem) {
+  .content {
+    background: var(--lightGrey);
+    overflow: hidden;
+    box-shadow: 0 0.25rem 0.25rem 0 rgba(0, 0, 0, 0.15);
+  }
+}
