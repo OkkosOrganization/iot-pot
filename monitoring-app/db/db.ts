@@ -68,11 +68,9 @@ export const getMeasurementsByWeek = (
     .select()
     .from(schema.measurements)
     .where(
-      and(
-        eq(schema.measurements.deviceId, deviceId),
-        sql`EXTRACT(YEAR FROM ${schema.measurements.timestamp}) = ${year}`,
-        sql`EXTRACT(WEEK FROM ${schema.measurements.timestamp}) = ${weekNumber}`
-      )
+      sql`${schema.measurements.deviceId} = ${deviceId} 
+      AND EXTRACT(YEAR FROM ${schema.measurements.timestamp}) = ${year} 
+      AND EXTRACT(WEEK FROM ${schema.measurements.timestamp}) = ${weekNumber}`
     )
     .orderBy(asc(schema.measurements.timestamp));
 };
@@ -100,10 +98,7 @@ export const getMeasurementsByDay = (deviceId: string, date: string) => {
     .select()
     .from(schema.measurements)
     .where(
-      and(
-        eq(schema.measurements.deviceId, deviceId),
-        sql`DATE(${schema.measurements.timestamp}) = ${date}`
-      )
+      sql`${schema.measurements.deviceId} = ${deviceId} AND DATE(${schema.measurements.timestamp}) = ${date}`
     )
     .orderBy(asc(schema.measurements.timestamp));
 };
