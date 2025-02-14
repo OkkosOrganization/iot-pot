@@ -3,6 +3,7 @@ import { getDevice } from "../../../../../../db/db";
 import { DeviceNavi } from "../../../../components/DeviceNavi";
 import { DeviceHistoryPageContent } from "../../../../components/DeviceHistoryPageContent";
 import styles from "./page.module.css";
+import { Device } from "@/app/components/Navi";
 
 export default async function DeviceHistoryPage({
   params,
@@ -28,7 +29,7 @@ export default async function DeviceHistoryPage({
         <DeviceNavi deviceId={id} />
       </div>
       <div className={styles.content}>
-        <DeviceHistoryPageContent />
+        <DeviceHistoryPageContent device={device[0] as Device} />
       </div>
     </div>
   );

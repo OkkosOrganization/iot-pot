@@ -2,7 +2,7 @@ import { drizzle } from "drizzle-orm/neon-http";
 
 import * as schema from "../drizzle/schema";
 export const db = drizzle(process.env.DATABASE_URL!, { schema: schema });
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, sql, and, asc } from "drizzle-orm";
 
 export const getUser = async (userAuth0Id: string) => {
   const dbData = await db
@@ -50,13 +50,57 @@ export const addDevice = async (
   return newDevice;
 };
 
-export const getLatestMeasurements = (deviceId: number) => {
+export const getLatestMeasurements = (deviceId: string) => {
   return db
     .select()
     .from(schema.measurements)
     .where(eq(schema.measurements.deviceId, deviceId))
     .orderBy(desc(schema.measurements.id))
     .limit(1);
+};
+
+export const getMeasurementsByWeek = (
+  deviceId: string,
+  weekNumber: number,
+  year: number
+) => {
+  return db
+    .select()
+    .from(schema.measurements)
+    .where(
+      sql`${schema.measurements.deviceId} = ${deviceId} 
+      AND EXTRACT(YEAR FROM ${schema.measurements.timestamp}) = ${year} 
+      AND EXTRACT(WEEK FROM ${schema.measurements.timestamp}) = ${weekNumber}`
+    )
+    .orderBy(asc(schema.measurements.timestamp));
+};
+
+export const getMeasurementsByMonth = (
+  deviceId: string,
+  month: number,
+  year: number
+) => {
+  return db
+    .select()
+    .from(schema.measurements)
+    .where(
+      and(
+        eq(schema.measurements.deviceId, deviceId),
+        sql`EXTRACT(YEAR FROM ${schema.measurements.timestamp}) = ${year}`,
+        sql`EXTRACT(MONTH FROM ${schema.measurements.timestamp}) = ${month}`
+      )
+    )
+    .orderBy(asc(schema.measurements.timestamp));
+};
+
+export const getMeasurementsByDay = (deviceId: string, date: string) => {
+  return db
+    .select()
+    .from(schema.measurements)
+    .where(
+      sql`${schema.measurements.deviceId} = ${deviceId} AND DATE(${schema.measurements.timestamp}) = ${date}`
+    )
+    .orderBy(asc(schema.measurements.timestamp));
 };
 
 export const addUser = (auth0Id: string) => {
