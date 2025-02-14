@@ -12,7 +12,17 @@ import { Device } from "./Navi";
 dayjs.extend(utc);
 dayjs.extend(weekOfYear);
 
-const fetcher = (...args) => fetch(...args).then((res) => res.json());
+//const fetcher = (...args) => fetch(...args).then((res) => res.json());
+const fetcher = async (
+  url: string,
+  options?: RequestInit
+): Promise<ApiResponse> => {
+  const response = await fetch(url, options);
+  if (!response.ok) {
+    throw new Error(`HTTP error! Status: ${response.status}`);
+  }
+  return response.json() as Promise<ApiResponse>;
+};
 
 type ApiResponse = {
   status: 0 | 1;
