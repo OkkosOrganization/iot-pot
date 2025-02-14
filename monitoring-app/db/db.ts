@@ -50,7 +50,7 @@ export const addDevice = async (
   return newDevice;
 };
 
-export const getLatestMeasurements = (deviceId: number) => {
+export const getLatestMeasurements = (deviceId: string) => {
   return db
     .select()
     .from(schema.measurements)
