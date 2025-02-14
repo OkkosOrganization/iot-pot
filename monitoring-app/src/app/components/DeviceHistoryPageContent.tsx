@@ -3,11 +3,12 @@
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DeviceHistoryContent } from "./DeviceHistoryContent";
+import { Device } from "./Navi";
 
-export const DeviceHistoryPageContent = () => {
+export const DeviceHistoryPageContent = ({ device }: { device: Device }) => {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <DeviceHistoryContent />
+      <DeviceHistoryContent device={device} />
     </LocalizationProvider>
   );
 };
