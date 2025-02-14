@@ -25,7 +25,7 @@ type ApiResponse = {
       airHumidity: number;
       soilMoisture: number;
     };
-    error?: any;
+    error?: string;
   }[];
 };
 
@@ -66,9 +66,6 @@ export const DeviceHistoryContent = ({ device }: { device: Device }) => {
     fetcher
   );
 
-  const pData = []; // VALUES, Y
-  const xLabels = ["00", "01", "02", "03", "04", "05", "06"]; // LABELS, X
-
   type dataType = {
     airTemperature: number[];
     airHumidity: number[];
@@ -95,15 +92,34 @@ export const DeviceHistoryContent = ({ device }: { device: Device }) => {
           data.dates.push(hoursMinutes);
         }
       }
-      console.log(dayData);
       break;
     case "month":
+      if (monthData && monthData.data.length) {
+        for (const row of monthData.data) {
+          data.airTemperature.push(row.data.airTemperature);
+          data.airHumidity.push(row.data.airHumidity);
+          data.soilMoisture.push(row.data.soilMoisture);
+          const d = new Date(row.timestamp).toLocaleTimeString();
+          const split = d.split(":");
+          const hoursMinutes = split[0] + ":" + split[1];
+          data.dates.push(hoursMinutes);
+        }
+      }
       break;
     case "week":
+      if (weekData && weekData.data.length) {
+        for (const row of weekData.data) {
+          data.airTemperature.push(row.data.airTemperature);
+          data.airHumidity.push(row.data.airHumidity);
+          data.soilMoisture.push(row.data.soilMoisture);
+          const d = new Date(row.timestamp).toLocaleTimeString();
+          const split = d.split(":");
+          const hoursMinutes = split[0] + ":" + split[1];
+          data.dates.push(hoursMinutes);
+        }
+      }
       break;
   }
-  const labels = [];
-
   return (
     <div className={styles.container}>
       <div className={styles.visualizationContainer}>
