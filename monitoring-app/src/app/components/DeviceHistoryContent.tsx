@@ -3,60 +3,175 @@ import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { MonthCalendar } from "@mui/x-date-pickers";
 import { useState } from "react";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 import weekOfYear from "dayjs/plugin/weekOfYear";
 import styles from "./DeviceHistoryContent.module.css";
 import { LineChart } from "@mui/x-charts";
+import useSWR from "swr";
+import { Device } from "./Navi";
+dayjs.extend(utc);
 dayjs.extend(weekOfYear);
 
-const pData = [21, 21, 22, 25, 21, 27, 23];
-const xLabels = ["00", "01", "02", "03", "04", "05", "06"];
+const fetcher = (...args: unknown) => fetch(...args).then((res) => res.json());
 
-export const DeviceHistoryContent = () => {
+type ApiResponse = {
+  status: 0 | 1;
+  data: {
+    id: number;
+    deviceId: string;
+    timestamp: string;
+    data: {
+      airTemperature: number;
+      airHumidity: number;
+      soilMoisture: number;
+    };
+    error?: any;
+  }[];
+};
+
+type SensorLabels = "airTemperature" | "airHumidity" | "soilMoisture";
+const SENSOR_LABELS_MAP: Record<SensorLabels, string> = {
+  airTemperature: "Air Temperature",
+  airHumidity: "Air Humidity",
+  soilMoisture: "Soil Moisture",
+};
+
+export const DeviceHistoryContent = ({ device }: { device: Device }) => {
   const [mode, setMode] = useState<"day" | "week" | "month">("day");
-  const [date, setDate] = useState<Date | null>(null);
+  const [chosenSensorLabel, setChosenSensorLabel] =
+    useState<SensorLabels>("airTemperature");
+  const [date, setDate] = useState<string | null>(null);
+  const [weekNumber, setWeekNumber] = useState<number | null>(null);
+  const [year, setYear] = useState<number | null>(null);
+  const [month, setMonth] = useState<number | null>(null);
+
+  const { data: weekData, error: weekError } = useSWR<ApiResponse>(
+    mode === "week" && year !== null && weekNumber !== null
+      ? `/api/measurementsByWeek/?deviceId=${device.deviceId}&weekNumber=${weekNumber}&year=${year}`
+      : null,
+    fetcher
+  );
+
+  const { data: monthData, error: monthError } = useSWR<ApiResponse>(
+    mode === "month" && year !== null && month !== null
+      ? `/api/measurementsByMonth/?deviceId=${device.deviceId}&month=${month}&year=${year}`
+      : null,
+    fetcher
+  );
+
+  const { data: dayData, error: dayError } = useSWR<ApiResponse>(
+    mode === "day" && date !== null
+      ? `/api/measurementsByDay/?deviceId=${device.deviceId}&date=${date}`
+      : null,
+    fetcher
+  );
+
+  const pData = []; // VALUES, Y
+  const xLabels = ["00", "01", "02", "03", "04", "05", "06"]; // LABELS, X
+
+  type dataType = {
+    airTemperature: number[];
+    airHumidity: number[];
+    soilMoisture: number[];
+    dates: string[];
+  };
+
+  const data: dataType = {
+    airTemperature: [],
+    airHumidity: [],
+    soilMoisture: [],
+    dates: [],
+  };
+  switch (mode) {
+    case "day":
+      if (dayData && dayData.data.length) {
+        for (const row of dayData.data) {
+          data.airTemperature.push(row.data.airTemperature);
+          data.airHumidity.push(row.data.airHumidity);
+          data.soilMoisture.push(row.data.soilMoisture);
+          const d = new Date(row.timestamp).toLocaleTimeString();
+          const split = d.split(":");
+          const hoursMinutes = split[0] + ":" + split[1];
+          data.dates.push(hoursMinutes);
+        }
+      }
+      console.log(dayData);
+      break;
+    case "month":
+      break;
+    case "week":
+      break;
+  }
+  const labels = [];
+
   return (
     <div className={styles.container}>
       <div className={styles.visualizationContainer}>
         <div className={styles.panel}>
-          {mode === "day" ? <div>Graph for {date?.toDateString()}</div> : null}
-
-          {mode === "week" ? (
+          {weekError || monthError || dayError ? (
             <div>
-              Graph for week {dayjs(date).week()}, {dayjs(date).year()}
+              {weekError && weekError}
+              {monthError && monthError}
+              {dayError && dayError}
             </div>
           ) : null}
 
-          {mode === "month" ? (
-            <div>
-              Graph for month {dayjs(date).month()}, {dayjs(date).year()}
-            </div>
-          ) : null}
+          <div>
+            {Object.entries(SENSOR_LABELS_MAP).map(([key, label]) => {
+              return (
+                <button
+                  key={key}
+                  onClick={() => setChosenSensorLabel(key as SensorLabels)}
+                >
+                  {label.toLocaleUpperCase()}
+                </button>
+              );
+            })}
+          </div>
 
-          <LineChart
-            height={368}
-            series={[
-              {
-                curve: "linear",
-                data: pData,
-                label: "Air temperature",
-                color: "#6a5acd",
-              },
-            ]}
-            xAxis={[{ scaleType: "point", data: xLabels }]}
-            sx={{
-              "& .MuiLineElement-root": {
-                strokeWidth: 4,
-              },
-              "& .MuiMarkElement-root": {
-                strokeWidth: 4,
-                scale: 1.25,
-              },
-              "& .MuiChartsAxis-line": {
-                strokeWidth: 2,
-                stroke: "#727272",
-              },
-            }}
-          />
+          {data.dates.length && chosenSensorLabel ? (
+            <LineChart
+              height={366}
+              series={[
+                {
+                  curve: "linear",
+                  data: data[chosenSensorLabel],
+
+                  color: "#6a5acd",
+                },
+              ]}
+              xAxis={[
+                {
+                  scaleType: "point",
+                  data: data.dates,
+                  tickLabelStyle: {
+                    angle: 45,
+                    textAnchor: "start",
+                    fontSize: 12,
+                  },
+                  disableLine: true,
+                  disableTicks: true,
+                },
+              ]}
+              yAxis={[
+                {
+                  disableLine: true,
+                  disableTicks: true,
+                },
+              ]}
+              axisHighlight={{ x: "none" }}
+              margin={{ top: 30, right: 30, bottom: 50, left: 30 }}
+              sx={{
+                "& .MuiLineElement-root": {
+                  strokeWidth: 4,
+                },
+                "& .MuiMarkElement-root": {
+                  strokeWidth: 4,
+                  scale: 1.25,
+                },
+              }}
+            />
+          ) : null}
         </div>
       </div>
       <div className={styles.toolsContainer}>
@@ -95,9 +210,12 @@ export const DeviceHistoryContent = () => {
                 views={["day", "month"]}
                 maxDate={dayjs(Date.now())}
                 onChange={(value) => {
-                  const date = dayjs(value).toDate();
-                  console.log(date);
-                  setDate(date);
+                  const date = dayjs(value).utc().toDate();
+                  const dateString = dayjs(date).format("YYYY-MM-DD");
+                  setDate(dateString);
+                  setWeekNumber(null);
+                  setYear(null);
+                  setMonth(null);
                 }}
               />
             ) : null}
@@ -108,9 +226,11 @@ export const DeviceHistoryContent = () => {
                 displayWeekNumber
                 onChange={(value) => {
                   const week = dayjs(value).week();
-                  const date = dayjs(value).toDate();
-                  console.log(week);
-                  setDate(date);
+                  const year = dayjs(value).year();
+                  setWeekNumber(week);
+                  setYear(year);
+                  setMonth(null);
+                  setDate(null);
                 }}
               />
             ) : null}
@@ -118,9 +238,12 @@ export const DeviceHistoryContent = () => {
               <MonthCalendar
                 maxDate={dayjs(Date.now())}
                 onChange={(value) => {
-                  const date = dayjs(value).toDate();
-                  console.log(date);
-                  setDate(date);
+                  const month = dayjs(value).month();
+                  const year = dayjs(value).year();
+                  setMonth(month);
+                  setYear(year);
+                  setDate(null);
+                  setWeekNumber(null);
                 }}
               />
             ) : null}
