@@ -12,7 +12,7 @@ import { Device } from "./Navi";
 dayjs.extend(utc);
 dayjs.extend(weekOfYear);
 
-const fetcher = (...args: unknown) => fetch(...args).then((res) => res.json());
+const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 type ApiResponse = {
   status: 0 | 1;
