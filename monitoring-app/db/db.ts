@@ -1,8 +1,8 @@
 import { drizzle } from "drizzle-orm/neon-http";
-
 import * as schema from "../drizzle/schema";
 export const db = drizzle(process.env.DATABASE_URL!, { schema: schema });
 import { eq, desc, sql, and, asc } from "drizzle-orm";
+import { SensorValues } from "@/app/contexts/mqttContext";
 
 export const getUser = async (userAuth0Id: string) => {
   const dbData = await db
@@ -111,4 +111,11 @@ export const addUser = (auth0Id: string) => {
     })
     .onConflictDoNothing()
     .returning();
+};
+
+export const addMeasurements = (deviceId: string, data: SensorValues) => {
+  return db.insert(schema.measurements).values({
+    deviceId: deviceId,
+    data: data,
+  });
 };
