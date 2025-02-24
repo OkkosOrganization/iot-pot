@@ -38,14 +38,15 @@ export const getDevice = async (deviceId: string) => {
   return dbData;
 };
 
-export const addDevice = async (
+export const updateDevice = async (
   deviceId: string,
   title: string,
   userId: number
 ) => {
   const newDevice = await db
-    .insert(schema.devices)
-    .values({ deviceId: deviceId, title: title, userId: userId })
+    .update(schema.devices)
+    .set({ title: title, userId: userId })
+    .where(eq(schema.devices.deviceId, deviceId))
     .returning();
   return newDevice;
 };
