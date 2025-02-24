@@ -82,6 +82,7 @@ export const AddDeviceDialog = ({
           <button type="submit" className={styles.submitBtn}>
             ADD DEVICE
           </button>
+          <p>{state?.error as string}</p>
         </form>
         {isPending ? (
           <div className={styles.spinnerContainer}>
