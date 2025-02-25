@@ -40,84 +40,86 @@ void getLow8SectionValue(void)
   }
   delay(10);
 }
-int getWaterLevel(){
+int getWaterLevel()
+{
   int sensorvalue_min = 250;
   int sensorvalue_max = 255;
   int low_count = 0;
   int high_count = 0;
-  while (1)
+  if (Wire.available())
   {
-    uint32_t touch_val = 0;
-    uint8_t trig_section = 0;
-    low_count = 0;
-    high_count = 0;
-    getLow8SectionValue();
-    getHigh12SectionValue();
-
-    //Serial.println("low 8 sections value = ");
-    for (int i = 0; i < 8; i++)
+    while (1)
     {
-      //Serial.print(low_data[i]);
-      //Serial.print(".");
-      if (low_data[i] >= sensorvalue_min && low_data[i] <= sensorvalue_max)
+      uint32_t touch_val = 0;
+      uint8_t trig_section = 0;
+      low_count = 0;
+      high_count = 0;
+      getLow8SectionValue();
+      getHigh12SectionValue();
+
+      //Serial.println("low 8 sections value = ");
+      for (int i = 0; i < 8; i++)
       {
-        low_count++;
+        //Serial.print(low_data[i]);
+        //Serial.print(".");
+        if (low_data[i] >= sensorvalue_min && low_data[i] <= sensorvalue_max)
+        {
+          low_count++;
+        }
+        if (low_count == 8)
+        {
+          //Serial.print("      ");
+          //Serial.print("PASS");
+        }
       }
-      if (low_count == 8)
+      //Serial.println("  ");
+      //Serial.println("  ");
+      //Serial.println("high 12 sections value = ");
+      for (int i = 0; i < 12; i++)
       {
-        //Serial.print("      ");
-        //Serial.print("PASS");
-      }
-    }
-    //Serial.println("  ");
-    //Serial.println("  ");
-    //Serial.println("high 12 sections value = ");
-    for (int i = 0; i < 12; i++)
-    {
-      //Serial.print(high_data[i]);
-      //Serial.print(".");
+        //Serial.print(high_data[i]);
+        //Serial.print(".");
 
-      if (high_data[i] >= sensorvalue_min && high_data[i] <= sensorvalue_max)
+        if (high_data[i] >= sensorvalue_min && high_data[i] <= sensorvalue_max)
+        {
+          high_count++;
+        }
+        if (high_count == 12)
+        {
+          //Serial.print("      ");
+          //Serial.print("PASS");
+        }
+      }
+
+      //Serial.println("  ");
+      //Serial.println("  ");
+
+      for (int i = 0 ; i < 8; i++) {
+        if (low_data[i] > THRESHOLD) {
+          touch_val |= 1 << i;
+
+        }
+      }
+      for (int i = 0 ; i < 12; i++) {
+        if (high_data[i] > THRESHOLD) {
+          touch_val |= (uint32_t)1 << (8 + i);
+        }
+      }
+
+      while (touch_val & 0x01)
       {
-        high_count++;
+        trig_section++;
+        touch_val >>= 1;
       }
-      if (high_count == 12)
-      {
-        //Serial.print("      ");
-        //Serial.print("PASS");
-      }
+
+      /*
+      Serial.print("water level = ");
+      Serial.print(trig_section * 5);
+      Serial.println("% ");
+      Serial.println(" ");
+      Serial.println("*********************************************************");
+      */
+      waterLevel = trig_section * 5;
     }
-
-    //Serial.println("  ");
-    //Serial.println("  ");
-
-    for (int i = 0 ; i < 8; i++) {
-      if (low_data[i] > THRESHOLD) {
-        touch_val |= 1 << i;
-
-      }
-    }
-    for (int i = 0 ; i < 12; i++) {
-      if (high_data[i] > THRESHOLD) {
-        touch_val |= (uint32_t)1 << (8 + i);
-      }
-    }
-
-    while (touch_val & 0x01)
-    {
-      trig_section++;
-      touch_val >>= 1;
-    }
-
-    /*
-    Serial.print("water level = ");
-    Serial.print(trig_section * 5);
-    Serial.println("% ");
-    Serial.println(" ");
-    Serial.println("*********************************************************");
-    */
-    delay(1000);
-    waterLevel = trig_section * 5;
-    return(waterLevel);
   }
 }
