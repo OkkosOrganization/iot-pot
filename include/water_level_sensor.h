@@ -10,7 +10,7 @@
 #define ATTINY1_HIGH_ADDR   0x78
 #define ATTINY2_LOW_ADDR   0x77
 
-int getWaterLevel(void);
+void getWaterLevel();
 void getHigh12SectionValue(void);
 void getLow8SectionValue(void);
 
@@ -40,7 +40,7 @@ void getLow8SectionValue(void)
   }
   delay(10);
 }
-int getWaterLevel()
+void getWaterLevel()
 {
   int sensorvalue_min = 250;
   int sensorvalue_max = 255;
