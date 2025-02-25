@@ -4,7 +4,7 @@
 // out D2
 
 #include <DHT.h>
-#define DHT_SENSOR_PIN  D2 // 
+#define DHT_SENSOR_PIN  D2
 #define DHT_SENSOR_TYPE DHT22
 
 DHT dht_sensor(DHT_SENSOR_PIN, DHT_SENSOR_TYPE);
@@ -12,12 +12,6 @@ float airHumidity = 0;
 float airTemperature = 0;
 
 void getAirTemperatureAndHumidity();
-
-void setup() {
-  Serial.begin(9600);
-  dht_sensor.begin(); // initialize the DHT sensor
-}
-
 void getAirTemperatureAndHumidity() {
   // read humidity
   float humi  = dht_sensor.readHumidity();
