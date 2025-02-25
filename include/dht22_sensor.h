@@ -17,11 +17,11 @@ void getAirTemperatureAndHumidity() {
   float humi  = dht_sensor.readHumidity();
   // read temperature in Celsius
   float temperature_C = dht_sensor.readTemperature();
-
   // check whether the reading is successful or not
   if ( isnan(temperature_C) || isnan(humi)) {
     Serial.println("Failed to read from DHT sensor!");
   } else {
+    /*
     Serial.print("Humidity: ");
     Serial.print(humi);
     Serial.print("%");
@@ -29,6 +29,7 @@ void getAirTemperatureAndHumidity() {
     Serial.print("Temperature: ");
     Serial.print(temperature_C);
     Serial.print("°C  ~  ");
+    */
     airHumidity = humi;
     airTemperature = temperature_C;
   }
