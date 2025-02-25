@@ -3,6 +3,7 @@
 // + virta vcc 3.3V tai 5V
 // out D2
 
+#pragma once
 #include <DHT.h>
 #define DHT_SENSOR_PIN  D2
 #define DHT_SENSOR_TYPE DHT22
