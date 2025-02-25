@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "secrets.h"
+#include "water_level_sensor.h"
 #include <WebServer.h>
 #include <WiFi.h>
 #include <ArduinoJson.h>
@@ -62,11 +63,17 @@ void setup() {
   // GET UNIQUE DEVICE ID
   deviceId = ESP.getEfuseMac();
   deviceIdHex = String((uint32_t)(deviceId >> 32), HEX) + String((uint32_t)deviceId, HEX);
+
+  // I2C
+  Wire.begin();
 }
 
 // LOOP
 void loop() {
-  server->handleClient();    
+  server->handleClient();   
+  int waterLevel = getWaterLevel(); 
+  Serial.print("WATER LEVEL:");
+  Serial.println(waterLevel);
 }
 
 // INITIALIZES WIFI AP
