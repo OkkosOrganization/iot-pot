@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "secrets.h"
 #include "water_level_sensor.h"
+#include "dht22_sensor.h"
 #include <WebServer.h>
 #include <WiFi.h>
 #include <ArduinoJson.h>
@@ -66,6 +67,9 @@ void setup() {
 
   // I2C
   Wire.begin();
+
+  // DHT22
+  dht_sensor.begin(); 
 }
 
 // LOOP
