@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "secrets.h"
 #include "water_level_sensor.h"
+#include "dht22_sensor.h"
 #include <WebServer.h>
 #include <WiFi.h>
 #include <ArduinoJson.h>
@@ -24,6 +25,7 @@ void handleGetWateringThreshold();
 void handlePostWateringThreshold();
 void handleGetNotificationTriggers();
 void handlePostNotificationTriggers();
+void getSensorValues();
 
 // PREFERENCES
 Preferences preferences;
@@ -40,6 +42,10 @@ const char *soft_ap_ssid = "IoT-pot";
 const char *soft_ap_password = "TIES4571";
 WebServer* server;
 IPAddress apIP;
+
+// INTERVAL FOR SENSOR READINGS
+unsigned long previousMillis = 0;
+const unsigned long sensorReadInterval = 5000; // 5 seconds
 
 // SETUP
 void setup() {
@@ -66,14 +72,31 @@ void setup() {
 
   // I2C
   Wire.begin();
+
+  // DHT22
+  dht_sensor.begin(); 
 }
 
 // LOOP
 void loop() {
   server->handleClient();   
-  int waterLevel = getWaterLevel(); 
-  Serial.print("WATER LEVEL:");
-  Serial.println(waterLevel);
+  getSensorValues();
+}
+
+void getSensorValues(){
+  unsigned long currentMillis = millis();
+  if (currentMillis - previousMillis >= sensorReadInterval) {
+    previousMillis = currentMillis;
+
+    getWaterLevel(); 
+    getAirTemperatureAndHumidity();
+    Serial.print("WATER LEVEL:");
+    Serial.println(waterLevel);
+    Serial.print("AIR TEMPERATURE:");
+    Serial.println(airTemperature);  
+    Serial.print("AIR HUMIDITY:");
+    Serial.println(airHumidity); 
+  }  
 }
 
 // INITIALIZES WIFI AP
