@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "secrets.h"
 #include "water_level_sensor.h"
+#include "soil_ph_moisture_temperature_sensor.h"
 #include <WebServer.h>
 #include <WiFi.h>
 #include <ArduinoJson.h>
@@ -66,14 +67,15 @@ void setup() {
 
   // I2C
   Wire.begin();
+
+  // SOIL SENSOR
+  initSoilSensor();
 }
 
 // LOOP
 void loop() {
   server->handleClient();   
-  int waterLevel = getWaterLevel(); 
-  Serial.print("WATER LEVEL:");
-  Serial.println(waterLevel);
+  getSoilSensorValues();
 }
 
 // INITIALIZES WIFI AP
