@@ -3,9 +3,9 @@
 // koodissa luetaan arvo A4 pinnistä
 // kytkennät VCC =3.3V
 // GND= GND
-// A0 kytketään pinniin A4
+// A0 kytketään pinniin A3
 #include <Arduino.h>
-#define LIGHT_SENSOR_PIN A4 
+#define LIGHT_SENSOR_PIN A3 
 
 void initLdrSensor();
 void getLdrSensorValue();
