@@ -2,6 +2,7 @@
 #include "secrets.h"
 #include "water_level_sensor.h"
 #include "dht22_sensor.h"
+#include "LDR_sensor.h"
 #include <WebServer.h>
 #include <WiFi.h>
 #include <ArduinoJson.h>
@@ -64,7 +65,6 @@ void setup() {
   initWifiClient();
   initWiFiAp();
   initWebServer();
-  
 
   // GET UNIQUE DEVICE ID
   deviceId = ESP.getEfuseMac();
@@ -75,6 +75,9 @@ void setup() {
 
   // DHT22
   dht_sensor.begin(); 
+
+  // LDR
+  initLdrSensor();
 }
 
 // LOOP
@@ -90,12 +93,15 @@ void getSensorValues(){
 
     getWaterLevel(); 
     getAirTemperatureAndHumidity();
+    getLdrSensorValue();
     Serial.print("WATER LEVEL:");
     Serial.println(waterLevel);
     Serial.print("AIR TEMPERATURE:");
     Serial.println(airTemperature);  
     Serial.print("AIR HUMIDITY:");
     Serial.println(airHumidity); 
+    Serial.print("LUMINOSITY:");
+    Serial.println(lightSensorValue);     
   }  
 }
 
