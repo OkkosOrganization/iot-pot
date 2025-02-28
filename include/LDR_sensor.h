@@ -5,7 +5,7 @@
 // GND= GND
 // A0 kytketään pinniin A4
 #include <Arduino.h>
-#define AO_PIN A4 
+#define LIGHT_SENSOR_PIN A4 
 
 void initLdrSensor();
 void getLdrSensorValue();
@@ -18,5 +18,5 @@ void initLdrSensor() {
 }
 
 void getLdrSensorValue() {
-  lightSensorValue = analogRead(AO_PIN);
+  lightSensorValue = analogRead(LIGHT_SENSOR_PIN);
 }
