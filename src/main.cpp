@@ -1,12 +1,15 @@
 #include <Arduino.h>
+#include <inttypes.h>
 #include "secrets.h"
+#include "globals.h"
 #include "water_level_sensor.h"
 #include "soil_ph_moisture_temperature_sensor.h"
+#include "dht22_sensor.h"
+#include "LDR_sensor.h"
 #include <WebServer.h>
 #include <WiFi.h>
 #include <ArduinoJson.h>
 #include "html/index.h"
-#include <inttypes.h>
 #include <Preferences.h>
 
 // FUNCTION PROTOTYPES
@@ -25,6 +28,7 @@ void handleGetWateringThreshold();
 void handlePostWateringThreshold();
 void handleGetNotificationTriggers();
 void handlePostNotificationTriggers();
+void getSensorValues();
 
 // PREFERENCES
 Preferences preferences;
@@ -41,6 +45,10 @@ const char *soft_ap_ssid = "IoT-pot";
 const char *soft_ap_password = "TIES4571";
 WebServer* server;
 IPAddress apIP;
+
+// INTERVAL FOR SENSOR READINGS
+unsigned long previousMillis = 0;
+const unsigned long sensorReadInterval = 5000; // 5 seconds
 
 // SETUP
 void setup() {
@@ -59,7 +67,6 @@ void setup() {
   initWifiClient();
   initWiFiAp();
   initWebServer();
-  
 
   // GET UNIQUE DEVICE ID
   deviceId = ESP.getEfuseMac();
@@ -70,12 +77,38 @@ void setup() {
 
   // SOIL SENSOR
   initSoilSensor();
+
+  // DHT22
+  dht_sensor.begin(); 
+
+  // LDR
+  initLdrSensor();
 }
 
 // LOOP
 void loop() {
   server->handleClient();   
-  getSoilSensorValues();
+  getSensorValues();
+}
+
+void getSensorValues(){
+  unsigned long currentMillis = millis();
+  if (currentMillis - previousMillis >= sensorReadInterval) {
+    previousMillis = currentMillis;
+
+    getWaterLevel(); 
+    getAirTemperatureAndHumidity();
+    getLdrSensorValue();
+    getSoilSensorValues();
+    Serial.print("WATER LEVEL:");
+    Serial.println(waterLevel);
+    Serial.print("AIR TEMPERATURE:");
+    Serial.println(airTemperature);  
+    Serial.print("AIR HUMIDITY:");
+    Serial.println(airHumidity); 
+    Serial.print("LUMINOSITY:");
+    Serial.println(lightSensorValue);     
+  }  
 }
 
 // INITIALIZES WIFI AP
