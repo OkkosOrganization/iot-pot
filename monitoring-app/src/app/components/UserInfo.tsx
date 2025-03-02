@@ -46,7 +46,7 @@ export const UserInfo = () => {
         <h2>Devices:</h2>
         {userWitHDb?.db?.devices?.map((d: Device, i: number) => {
           return (
-            <div>
+            <div key={`device_${i}`}>
               <h3>{d.title}</h3>
               <button
                 className="btn"
