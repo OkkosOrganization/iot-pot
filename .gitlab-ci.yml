@@ -8,6 +8,9 @@ deploy_preview:
     - macos
   except:
     - main
+  rules:
+    - changes:
+        - monitoring-app/**
   before_script:
     - export NVM_DIR="$HOME/.nvm"
     - source "$NVM_DIR/nvm.sh"
@@ -27,6 +30,9 @@ deploy_production:
     - macos
   only:
     - main
+  rules:
+    - changes:
+        - monitoring-app/**
   before_script:
     - export NVM_DIR="$HOME/.nvm"
     - source "$NVM_DIR/nvm.sh"
