@@ -9,11 +9,6 @@ HardwareSerial SensorSerial(1);  // Serial1 for RS485 communication
 const int txPin = 6; // TX (to RS485 RX)
 const int rxPin = 7; // RX (to RS485 TX)
 
-// Stores sensor values
-float solPh = 0;
-float soilMoisture = 0;
-float soilTemperature = 0;
-
 void initSoilSensor();
 void getSoilSensorValues();
 
