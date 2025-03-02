@@ -16,7 +16,6 @@ void getLow8SectionValue(void);
 
 unsigned char low_data[8] = {0};
 unsigned char high_data[12] = {0};
-unsigned int waterLevel = 0;
 
 void getHigh12SectionValue(void)
 {

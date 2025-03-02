@@ -9,8 +9,6 @@
 #define DHT_SENSOR_TYPE DHT22
 
 DHT dht_sensor(DHT_SENSOR_PIN, DHT_SENSOR_TYPE);
-float airHumidity = 0;
-float airTemperature = 0;
 
 void getAirTemperatureAndHumidity();
 void getAirTemperatureAndHumidity() {

@@ -1,13 +1,15 @@
 #include <Arduino.h>
+#include <inttypes.h>
 #include "secrets.h"
+#include "globals.h"
 #include "water_level_sensor.h"
+#include "soil_ph_moisture_temperature_sensor.h"
 #include "dht22_sensor.h"
 #include "LDR_sensor.h"
 #include <WebServer.h>
 #include <WiFi.h>
 #include <ArduinoJson.h>
 #include "html/index.h"
-#include <inttypes.h>
 #include <Preferences.h>
 
 // FUNCTION PROTOTYPES
@@ -73,6 +75,9 @@ void setup() {
   // I2C
   Wire.begin();
 
+  // SOIL SENSOR
+  initSoilSensor();
+
   // DHT22
   dht_sensor.begin(); 
 
@@ -94,6 +99,7 @@ void getSensorValues(){
     getWaterLevel(); 
     getAirTemperatureAndHumidity();
     getLdrSensorValue();
+    getSoilSensorValues();
     Serial.print("WATER LEVEL:");
     Serial.println(waterLevel);
     Serial.print("AIR TEMPERATURE:");
