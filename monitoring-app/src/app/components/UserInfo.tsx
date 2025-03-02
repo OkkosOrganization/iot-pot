@@ -2,6 +2,7 @@
 import { useUser } from "@auth0/nextjs-auth0/client";
 import styles from "./UserInfo.module.css";
 import { DbUser, Device } from "./Navi";
+
 export const UserInfo = () => {
   const { user } = useUser();
   const userWitHDb = user as DbUser;
@@ -17,10 +18,8 @@ export const UserInfo = () => {
   }
 
   function deleteDevice(deviceId: string) {
-    // Lähetä pyyntö palvelimelle tai suorita tarvittavat toimenpiteet
     console.log(`Device ID ${deviceId} removing...`);
 
-    // Esimerkki: Fetch-pyyntö palvelimelle
     fetch(`/api/devices/${deviceId}`, {
       method: "DELETE",
     })
