@@ -27,8 +27,6 @@ deploy_production:
     - macos
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
-      changes:
-        - monitoring-app/**
   before_script:
     - export NVM_DIR="$HOME/.nvm"
     - source "$NVM_DIR/nvm.sh"
