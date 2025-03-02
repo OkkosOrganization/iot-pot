@@ -6,10 +6,9 @@ deploy_preview:
   tags:
     - vercel
     - macos
-  except:
-    - main
   rules:
-    - changes:
+    - if: '$CI_COMMIT_BRANCH != "main"'
+      changes:
         - monitoring-app/**
   before_script:
     - export NVM_DIR="$HOME/.nvm"
@@ -19,8 +18,6 @@ deploy_preview:
     - npm -v
     - npm install -g vercel
   script:
-    # - vercel pull --yes --environment=preview --token=$VERCEL_TOKEN ./monitoring-app
-    # - vercel build --token=$VERCEL_TOKEN ./monitoring-app
     - vercel deploy --token=$VERCEL_TOKEN ./monitoring-app
 
 deploy_production:
@@ -28,11 +25,8 @@ deploy_production:
   tags:
     - vercel
     - macos
-  only:
-    - main
   rules:
-    - changes:
-        - monitoring-app/**
+    - if: '$CI_COMMIT_BRANCH == "main"'
   before_script:
     - export NVM_DIR="$HOME/.nvm"
     - source "$NVM_DIR/nvm.sh"
@@ -41,6 +35,4 @@ deploy_production:
     - npm -v
     - npm install -g vercel
   script:
-    # - vercel pull --yes --environment=production --token=$VERCEL_TOKEN ./monitoring-app
-    # - vercel build --prod --token=$VERCEL_TOKEN ./monitoring-app
     - vercel deploy --prod --token=$VERCEL_TOKEN ./monitoring-app
