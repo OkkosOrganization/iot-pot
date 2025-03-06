@@ -2,8 +2,8 @@ import { getSession } from "@auth0/nextjs-auth0";
 import { getDevice } from "../../../../../db/db";
 import styles from "./page.module.css";
 import { DeviceNavi } from "@/app/components/DeviceNavi";
-import { MqttContextProvider } from "@/app/contexts/mqttContext";
 import { DevicePageContent } from "@/app/components/DevicePageContent";
+import { MqttContextProvider } from "@/contexts/mqttContext";
 
 export default async function Page({
   params,

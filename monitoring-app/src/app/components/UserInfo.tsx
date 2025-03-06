@@ -1,11 +1,10 @@
 "use client";
 import styles from "./UserInfo.module.css";
-import { Device } from "./Navi";
 import { Spinner } from "./Spinner";
 import Image from "next/image";
 import Link from "next/link";
-import { forceLoginRefresh } from "../utils";
-import { useExtendedUserContext } from "../contexts/extendedUserContext";
+import { Device } from "../../types";
+import { useExtendedUserContext } from "@/contexts/extendedUserContext";
 
 export const UserInfo = () => {
   const { user, isLoading, setUser } = useExtendedUserContext();
@@ -25,7 +24,7 @@ export const UserInfo = () => {
         method: "PATCH",
       });
       if (response.ok && user) {
-        let updatedUser = { ...user };
+        const updatedUser = { ...user };
         const updatedDevices = user?.db.devices.filter(
           (d: Device) => d.deviceId !== deviceId
         );

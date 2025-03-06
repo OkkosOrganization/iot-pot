@@ -6,11 +6,11 @@ import {
   useRef,
 } from "react";
 import styles from "./AddDeviceDialog.module.css";
-import { AddDevice } from "./actions";
 import { Xicon } from "./icons/xicon";
 import { Spinner } from "./Spinner";
-import { useExtendedUserContext } from "../contexts/extendedUserContext";
-import { User } from "./Navi";
+import { User } from "../../types";
+import { AddDevice } from "../../actions";
+import { useExtendedUserContext } from "@/contexts/extendedUserContext";
 
 type AddDeviceDialogProps = {
   showDialog: boolean;
@@ -25,7 +25,7 @@ export const AddDeviceDialog = ({
   showDialog,
   setShowDialog,
 }: AddDeviceDialogProps) => {
-  const { user, isLoading, setUser } = useExtendedUserContext();
+  const { user, setUser } = useExtendedUserContext();
   const [state, formAction, isPending] = useActionState(
     AddDevice,
     initialState

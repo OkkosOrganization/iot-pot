@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { type NextRequest } from "next/server";
 import { addMeasurements, getDevice } from "../../../../db/db";
-import { SensorValues } from "@/app/contexts/mqttContext";
+import { SensorValues } from "@/types";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();

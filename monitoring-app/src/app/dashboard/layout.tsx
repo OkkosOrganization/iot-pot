@@ -1,9 +1,9 @@
 import { getSession } from "@auth0/nextjs-auth0";
 import { UserProvider } from "@auth0/nextjs-auth0/client";
 import { redirect } from "next/navigation";
-import { Navi, User } from "../components/Navi";
-import { ExtendedUserProvider } from "../contexts/extendedUserContext";
+import { Navi } from "../components/Navi";
 import styles from "./layout.module.css";
+import { ExtendedUserProvider } from "@/contexts/extendedUserContext";
 
 export default async function DashboardLayout({
   children,
@@ -16,7 +16,7 @@ export default async function DashboardLayout({
     <UserProvider>
       <ExtendedUserProvider>
         <div className={styles.dashboard}>
-          <Navi user={session?.user as User} />
+          <Navi />
           <section className={styles.pageContainer}>{children}</section>
         </div>
       </ExtendedUserProvider>

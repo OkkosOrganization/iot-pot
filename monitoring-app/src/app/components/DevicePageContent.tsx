@@ -1,5 +1,5 @@
 "use client";
-import { useMqttContext } from "../contexts/mqttContext";
+import { useMqttContext } from "@/contexts/mqttContext";
 import { SensorCard } from "./SensorCard";
 
 export const DevicePageContent = () => {
