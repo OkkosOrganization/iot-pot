@@ -10,6 +10,7 @@ import { PlusIcon } from "./icons/PlusIcon";
 import { useState } from "react";
 import { AddDeviceDialog } from "./AddDeviceDialog";
 import { SettingsButton } from "./SettingsButton";
+import { useExtendedUserContext } from "../contexts/extendedUserContext";
 export type Device = {
   id: number;
   deviceId: string;
@@ -23,13 +24,10 @@ export type DbUser = {
     devices: Device[];
   };
 };
-type NaviProps = {
-  user: User;
-};
 export type User = UserProfile & DbUser;
-export const Navi = ({ user }: NaviProps) => {
+export const Navi = () => {
+  const { user, isLoading } = useExtendedUserContext();
   const [showDialog, setShowDialog] = useState<boolean>(false);
-  const [devices, setDevices] = useState<Device[]>(user?.db.devices || []);
   const pathname = usePathname();
 
   return (
@@ -42,7 +40,7 @@ export const Navi = ({ user }: NaviProps) => {
           <h2 className={styles.userName}>{user?.name}</h2>
         </div>
         <ul className={styles.deviceNavi}>
-          {devices?.map((d, i) => {
+          {user?.db.devices?.map((d, i) => {
             const isActiveItem = pathname.includes(
               `/dashboard/device/${d.deviceId}`
             );
@@ -79,12 +77,7 @@ export const Navi = ({ user }: NaviProps) => {
           <LogoutButton />
         </div>
       </nav>
-      <AddDeviceDialog
-        showDialog={showDialog}
-        setShowDialog={setShowDialog}
-        setDevices={setDevices}
-        userId={user?.db.id}
-      />
+      <AddDeviceDialog showDialog={showDialog} setShowDialog={setShowDialog} />
     </>
   );
 };
