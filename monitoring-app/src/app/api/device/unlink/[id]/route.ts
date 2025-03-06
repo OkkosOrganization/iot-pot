@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
 import { unLinkDevice } from "../../../../../../db/db";
 import { getSession, updateSession } from "@auth0/nextjs-auth0";
-import { Device } from "@/app/components/Navi";
+import { Device } from "@/types";
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  params: { params: { id: string } }
 ) {
   const session = await getSession();
-  const _params = await params;
+  const _params = await params.params;
   if (!session?.user) {
     return NextResponse.json(
       { success: 0, error: "Not authorized" },
