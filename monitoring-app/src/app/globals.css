@@ -53,6 +53,10 @@ ol {
 a {
   text-decoration: none;
 }
+a:hover,
+a:visited {
+  color: inherit;
+}
 img,
 video {
   max-width: 100%;

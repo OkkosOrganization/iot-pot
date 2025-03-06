@@ -1,4 +1,5 @@
 "use client";
+import { SensorValues } from "@/types";
 import mqtt, { MqttClient } from "mqtt";
 import { createContext, useContext, useEffect, useState } from "react";
 
@@ -7,15 +8,6 @@ type MqttContextType = {
   deviceId: string;
 } & SensorValues;
 
-export type SensorValues = {
-  airTemperature?: number;
-  airHumidity?: number;
-  soilMoisture?: number;
-  soilPH?: number;
-  soilTemperature?: number;
-  luminosity?: number;
-  deviceId: string;
-};
 type MqttContextProviderProps = {
   children: React.ReactNode;
   initialValues: SensorValues;

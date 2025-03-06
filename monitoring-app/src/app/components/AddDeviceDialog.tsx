@@ -6,16 +6,15 @@ import {
   useRef,
 } from "react";
 import styles from "./AddDeviceDialog.module.css";
-import { AddDevice } from "./actions";
-import { Device } from "./Navi";
 import { Xicon } from "./icons/xicon";
 import { Spinner } from "./Spinner";
+import { User } from "../../types";
+import { AddDevice } from "../../actions";
+import { useExtendedUserContext } from "@/contexts/extendedUserContext";
 
 type AddDeviceDialogProps = {
   showDialog: boolean;
   setShowDialog: Dispatch<SetStateAction<boolean>>;
-  userId: number;
-  setDevices: Dispatch<SetStateAction<Device[]>>;
 };
 const initialState = {
   device: [],
@@ -25,8 +24,8 @@ const initialState = {
 export const AddDeviceDialog = ({
   showDialog,
   setShowDialog,
-  setDevices,
 }: AddDeviceDialogProps) => {
+  const { user, setUser } = useExtendedUserContext();
   const [state, formAction, isPending] = useActionState(
     AddDevice,
     initialState
@@ -35,16 +34,13 @@ export const AddDeviceDialog = ({
   useEffect(() => {
     if (state?.device?.length) {
       console.log("Add new device");
-      setDevices((prev) => {
-        const updatedDevices = [...prev].concat(
-          state.device as unknown as Device
-        );
-        return updatedDevices;
-      });
+      const updatedUser = { ...user };
+      updatedUser.db?.devices.push(state.device[0]);
+      setUser(updatedUser as User);
       dialogRef.current?.close();
       setShowDialog(false);
     }
-  }, [state?.device, setDevices, setShowDialog]);
+  }, [state?.device, setUser, setShowDialog]);
   return (
     <dialog open={showDialog} className={styles.dialog} ref={dialogRef}>
       <div className={styles.container}>

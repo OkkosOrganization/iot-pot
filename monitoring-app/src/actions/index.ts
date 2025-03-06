@@ -1,7 +1,7 @@
 "use server";
 import { getSession, updateSession } from "@auth0/nextjs-auth0";
-import { updateDevice, getDevice } from "../../../db/db";
-import { Device } from "./Navi";
+import { updateDevice, getDevice } from "../../db/db";
+import { Device } from "../types";
 
 export async function AddDevice(previousState: unknown, formData: FormData) {
   const title = formData.get("title") as string;

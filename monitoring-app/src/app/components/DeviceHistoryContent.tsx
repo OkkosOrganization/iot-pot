@@ -8,7 +8,7 @@ import weekOfYear from "dayjs/plugin/weekOfYear";
 import styles from "./DeviceHistoryContent.module.css";
 import { LineChart } from "@mui/x-charts";
 import useSWR from "swr";
-import { Device } from "./Navi";
+import { Device } from "@/types";
 dayjs.extend(utc);
 dayjs.extend(weekOfYear);
 

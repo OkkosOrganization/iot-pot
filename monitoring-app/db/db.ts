@@ -2,7 +2,7 @@ import { drizzle } from "drizzle-orm/neon-http";
 import * as schema from "../drizzle/schema";
 export const db = drizzle(process.env.DATABASE_URL!, { schema: schema });
 import { eq, desc, sql, and, asc } from "drizzle-orm";
-import { SensorValues } from "@/app/contexts/mqttContext";
+import { SensorValues } from "@/types";
 
 export const getUser = async (userAuth0Id: string) => {
   const dbData = await db
@@ -46,6 +46,15 @@ export const updateDevice = async (
   const newDevice = await db
     .update(schema.devices)
     .set({ title: title, userId: userId })
+    .where(eq(schema.devices.deviceId, deviceId))
+    .returning();
+  return newDevice;
+};
+
+export const unLinkDevice = async (deviceId: string) => {
+  const newDevice = await db
+    .update(schema.devices)
+    .set({ title: "", userId: null })
     .where(eq(schema.devices.deviceId, deviceId))
     .returning();
   return newDevice;

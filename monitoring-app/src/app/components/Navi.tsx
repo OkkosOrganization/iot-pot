@@ -1,5 +1,4 @@
 "use client";
-import { UserProfile } from "@auth0/nextjs-auth0/client";
 import { Logo } from "./Logo";
 import { LogoutButton } from "./LogoutButton";
 import styles from "./Navi.module.css";
@@ -10,26 +9,12 @@ import { PlusIcon } from "./icons/PlusIcon";
 import { useState } from "react";
 import { AddDeviceDialog } from "./AddDeviceDialog";
 import { SettingsButton } from "./SettingsButton";
-export type Device = {
-  id: number;
-  deviceId: string;
-  userId: number;
-  title: string;
-};
-export type DbUser = {
-  db: {
-    id: number;
-    auth0Id: string;
-    devices: Device[];
-  };
-};
-type NaviProps = {
-  user: User;
-};
-export type User = UserProfile & DbUser;
-export const Navi = ({ user }: NaviProps) => {
+import { Device } from "../../types";
+import { useExtendedUserContext } from "@/contexts/extendedUserContext";
+
+export const Navi = () => {
+  const { user } = useExtendedUserContext();
   const [showDialog, setShowDialog] = useState<boolean>(false);
-  const [devices, setDevices] = useState<Device[]>(user?.db.devices || []);
   const pathname = usePathname();
 
   return (
@@ -42,7 +27,7 @@ export const Navi = ({ user }: NaviProps) => {
           <h2 className={styles.userName}>{user?.name}</h2>
         </div>
         <ul className={styles.deviceNavi}>
-          {devices?.map((d, i) => {
+          {user?.db.devices?.map((d: Device, i: number) => {
             const isActiveItem = pathname.includes(
               `/dashboard/device/${d.deviceId}`
             );
@@ -79,12 +64,7 @@ export const Navi = ({ user }: NaviProps) => {
           <LogoutButton />
         </div>
       </nav>
-      <AddDeviceDialog
-        showDialog={showDialog}
-        setShowDialog={setShowDialog}
-        setDevices={setDevices}
-        userId={user?.db.id}
-      />
+      <AddDeviceDialog showDialog={showDialog} setShowDialog={setShowDialog} />
     </>
   );
 };
