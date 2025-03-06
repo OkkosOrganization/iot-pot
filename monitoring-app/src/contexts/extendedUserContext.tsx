@@ -6,8 +6,8 @@ import {
   useState,
   ReactNode,
 } from "react";
-import { User } from "../components/Navi";
 import { useUser } from "@auth0/nextjs-auth0/client";
+import { User } from "@/types";
 
 type ExtendedUserType = {
   user: User | null;
