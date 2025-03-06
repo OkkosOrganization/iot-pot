@@ -51,6 +51,15 @@ export const updateDevice = async (
   return newDevice;
 };
 
+export const unLinkDevice = async (deviceId: string) => {
+  const newDevice = await db
+    .update(schema.devices)
+    .set({ title: "", userId: null })
+    .where(eq(schema.devices.deviceId, deviceId))
+    .returning();
+  return newDevice;
+};
+
 export const getLatestMeasurements = (deviceId: string) => {
   return db
     .select()
