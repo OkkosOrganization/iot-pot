@@ -1,3 +1,46 @@
 .container {
-  padding: 5rem;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.profileImage {
+  width: 5rem;
+  height: 5rem;
+  border-radius: 100%;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+.nickName {
+  font-family: var(--poppins);
+  margin: 0 0 4rem 0;
+}
+
+.devicesTitle {
+  margin: 0 0 1rem 0;
+}
+
+.devicesContainer {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.device {
+  padding: 1rem;
+  border-radius: 1rem;
+  border: 1px solid var(--mediumGrey);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.removeBtn {
+  margin-top: 1rem;
 }
