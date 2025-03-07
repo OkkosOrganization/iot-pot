@@ -19,7 +19,9 @@
   line-height: 1.5rem;
   border-radius: 3rem;
 }
-.active {
+.active,
+.active:visited,
+.active:active {
   background: var(--darkGrey);
   color: var(--lime);
 }
