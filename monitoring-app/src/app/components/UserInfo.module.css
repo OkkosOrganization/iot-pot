@@ -29,16 +29,25 @@
   gap: 1rem;
   justify-content: center;
   align-items: center;
+
+  box-shadow: 0 0.25rem 0.25rem 0 rgba(0, 0, 0, 0.15);
+  padding: 2rem;
+  background: var(--lightGrey);
+  border-radius: 1rem;
+  display: flex;
 }
 
 .device {
   padding: 1rem;
-  border-radius: 1rem;
-  border: 1px solid var(--mediumGrey);
-  display: flex;
+
   flex-direction: column;
   justify-content: center;
   align-items: center;
+
+  padding: 1rem;
+  background: var(--grey);
+  border-radius: 1rem;
+  display: flex;
 }
 
 .removeBtn {
