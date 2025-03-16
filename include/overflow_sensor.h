@@ -8,12 +8,10 @@
 #define SIGNAL_PIN A0 // Arduino Nano ESP32 pin A0 connected to sensor's signal pin
 //#define THRESHOLD   1000  // koodilla voitaisiin tehdä tarkistus onko vesivuotoa
 
-int smallWaterSensorValue = 0; // variable to store the sensor value
+void initOverFlowSensor();
+void getOverFlowSensorValue();
 
-void initSmallWaterSensor();
-void getSmallWaterSensorValue();
-
-void initSmallWaterSensor(){
+void initOverFlowSensor(){
     analogSetAttenuation(ADC_11db);
     //pinMode(LED_PIN, OUTPUT);   // Configure pin as an OUTPUT
     pinMode(POWER_PIN, OUTPUT);   // Configure pin as an OUTPUT
@@ -21,10 +19,10 @@ void initSmallWaterSensor(){
     //digitalWrite(LED_PIN,   LOW); // turn LED OFF
 }
 
-void getSmallWaterSensorValue(){
+void getOverFlowSensorValue(){
     digitalWrite(POWER_PIN, HIGH);  // turn the sensor ON
    // delay(10);                      // wait 10 milliseconds
-    smallWaterSensorValue = analogRead(SIGNAL_PIN); // read the analog value from sensor
+    overflowValue = analogRead(SIGNAL_PIN); // read the analog value from sensor
     digitalWrite(POWER_PIN, LOW);    // turn the sensor OFF
  
     //if (smallWaterSensorValue > THRESHOLD) {

@@ -2,6 +2,7 @@
 #include <inttypes.h>
 #include "secrets.h"
 #include "globals.h"
+#include "overflow_sensor.h"
 #include "water_level_sensor.h"
 #include "soil_ph_moisture_temperature_sensor.h"
 #include "dht22_sensor.h"
@@ -83,6 +84,9 @@ void setup() {
 
   // LDR
   initLdrSensor();
+
+  // OVERFLOW
+  initOverFlowSensor();
 }
 
 // LOOP
@@ -100,6 +104,7 @@ void getSensorValues(){
     getAirTemperatureAndHumidity();
     getLdrSensorValue();
     getSoilSensorValues();
+    getOverFlowSensorValue();
     Serial.print("WATER LEVEL:");
     Serial.println(waterLevel);
     Serial.print("AIR TEMPERATURE:");
@@ -108,6 +113,8 @@ void getSensorValues(){
     Serial.println(airHumidity); 
     Serial.print("LUMINOSITY:");
     Serial.println(lightSensorValue);     
+    Serial.print("OVERFLOW:");
+    Serial.println(overflowValue);         
   }  
 }
 
