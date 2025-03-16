@@ -16,6 +16,11 @@ const FontRoboto_Condensed = Roboto_Condensed({
 export const metadata: Metadata = {
   title: "IoT-Pot",
   description: "IoT-Pot Monitoring App",
+  icons: [
+    { rel: "icon", url: "/favicon-32x32.png" },
+    { rel: "apple-touch-icon", url: "/apple-icon.png" },
+  ],
+  manifest: "/site.webmanifest",
 };
 
 export default function RootLayout({
