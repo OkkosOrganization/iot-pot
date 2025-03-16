@@ -8,3 +8,4 @@ int lightSensorValue = 0;
 float solPh = 0;
 float soilMoisture = 0;
 float soilTemperature = 0;
+int overflowValue = 0;
