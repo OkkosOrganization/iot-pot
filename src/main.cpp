@@ -87,12 +87,12 @@ void setup() {
   // OVERFLOW
   initOverFlowSensor();
 
-  //LED
+  // LEDS
   initLeds();
-
-  led1.setState(GREEN);
-  led2.setState(GREEN);
-  led3.setState(GREEN);
+  led1.setState(OFF);
+  led2.setState(OFF);
+  led3.setState(OFF);
+  led4.setState(OFF);
 }
 
 // LOOP
