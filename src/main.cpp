@@ -2,6 +2,7 @@
 #include <inttypes.h>
 #include "secrets.h"
 #include "globals.h"
+#include "led.h"
 #include "overflow_sensor.h"
 #include "water_level_sensor.h"
 #include "soil_ph_moisture_temperature_sensor.h"
@@ -87,6 +88,13 @@ void setup() {
 
   // OVERFLOW
   initOverFlowSensor();
+
+  //LED
+  initLeds();
+
+  led1.setState(GREEN);
+  led2.setState(GREEN);
+  led3.setState(GREEN);
 }
 
 // LOOP
@@ -99,7 +107,6 @@ void getSensorValues(){
   unsigned long currentMillis = millis();
   if (currentMillis - previousMillis >= sensorReadInterval) {
     previousMillis = currentMillis;
-
     getWaterLevel(); 
     getAirTemperatureAndHumidity();
     getLdrSensorValue();
@@ -114,8 +121,10 @@ void getSensorValues(){
     Serial.print("LUMINOSITY:");
     Serial.println(lightSensorValue);     
     Serial.print("OVERFLOW:");
-    Serial.println(overflowValue);         
+    Serial.println(overflowValue);      
+
   }  
+
 }
 
 // INITIALIZES WIFI AP
