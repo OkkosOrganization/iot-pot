@@ -43,8 +43,6 @@ String deviceIdHex;
 IPAddress local_IP(192,168,0,1);
 IPAddress gateway(192,168,0,1);
 IPAddress subnet(255,255,255,0);
-const char *soft_ap_ssid = "IoT-pot";
-const char *soft_ap_password = "TIES4571";
 WebServer* server;
 IPAddress apIP;
 
