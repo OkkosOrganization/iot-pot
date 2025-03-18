@@ -2,6 +2,7 @@
 #include <inttypes.h>
 #include "secrets.h"
 #include "globals.h"
+#include "led.h"
 #include "overflow_sensor.h"
 #include "water_level_sensor.h"
 #include "soil_ph_moisture_temperature_sensor.h"
@@ -42,8 +43,6 @@ String deviceIdHex;
 IPAddress local_IP(192,168,0,1);
 IPAddress gateway(192,168,0,1);
 IPAddress subnet(255,255,255,0);
-const char *soft_ap_ssid = "IoT-pot";
-const char *soft_ap_password = "TIES4571";
 WebServer* server;
 IPAddress apIP;
 
@@ -87,6 +86,13 @@ void setup() {
 
   // OVERFLOW
   initOverFlowSensor();
+
+  // LEDS
+  initLeds();
+  led1.setState(OFF);
+  led2.setState(OFF);
+  led3.setState(OFF);
+  led4.setState(OFF);
 }
 
 // LOOP
@@ -99,7 +105,6 @@ void getSensorValues(){
   unsigned long currentMillis = millis();
   if (currentMillis - previousMillis >= sensorReadInterval) {
     previousMillis = currentMillis;
-
     getWaterLevel(); 
     getAirTemperatureAndHumidity();
     getLdrSensorValue();
@@ -114,8 +119,10 @@ void getSensorValues(){
     Serial.print("LUMINOSITY:");
     Serial.println(lightSensorValue);     
     Serial.print("OVERFLOW:");
-    Serial.println(overflowValue);         
+    Serial.println(overflowValue);      
+
   }  
+
 }
 
 // INITIALIZES WIFI AP
