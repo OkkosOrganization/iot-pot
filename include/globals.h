@@ -1,6 +1,8 @@
 #pragma once
 
-// GLOBAL VARIABLES FOR SENSOR VALUES
+// GLOBAL VARIABLES
+
+// SENSOR VALUES
 unsigned int waterLevel = 0;
 float airHumidity = 0;
 float airTemperature = 0;
@@ -19,3 +21,7 @@ uint8_t LED_PIN_5 = D8;
 uint8_t LED_PIN_6 = D5;
 uint8_t LED_PIN_7 = D4;
 uint8_t LED_PIN_8 = D3;
+
+// WIFI AP CREDENTIALS
+const char *soft_ap_ssid = "IoT-pot";
+const char *soft_ap_password = "TIES4571";
