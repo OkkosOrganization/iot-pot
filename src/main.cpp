@@ -92,7 +92,9 @@ void setup() {
   led1.setState(OFF);
   led2.setState(OFF);
   led3.setState(OFF);
-  led4.setState(OFF);
+  
+  pinMode(PUMP_PIN, OUTPUT);
+  digitalWrite(PUMP_PIN, LOW);
 }
 
 // LOOP
@@ -105,6 +107,7 @@ void getSensorValues(){
   unsigned long currentMillis = millis();
   if (currentMillis - previousMillis >= sensorReadInterval) {
     previousMillis = currentMillis;
+    digitalWrite(PUMP_PIN, HIGH);
     getWaterLevel(); 
     getAirTemperatureAndHumidity();
     getLdrSensorValue();
@@ -120,9 +123,8 @@ void getSensorValues(){
     Serial.println(lightSensorValue);     
     Serial.print("OVERFLOW:");
     Serial.println(overflowValue);      
-
   }  
-
+  digitalWrite(PUMP_PIN, LOW);
 }
 
 // INITIALIZES WIFI AP
