@@ -3,6 +3,7 @@
 #include "secrets.h"
 #include "globals.h"
 #include "led.h"
+#include "pump.h"
 #include "overflow_sensor.h"
 #include "water_level_sensor.h"
 #include "soil_ph_moisture_temperature_sensor.h"
@@ -93,8 +94,8 @@ void setup() {
   led2.setState(OFF);
   led3.setState(OFF);
   
-  pinMode(PUMP_PIN, OUTPUT);
-  digitalWrite(PUMP_PIN, LOW);
+  // PUMP
+  initPump();
 }
 
 // LOOP
