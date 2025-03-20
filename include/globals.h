@@ -7,7 +7,7 @@ unsigned int waterLevel = 0;
 float airHumidity = 0;
 float airTemperature = 0;
 int lightSensorValue = 0;
-float solPh = 0;
+float soilPh = 0;
 float soilMoisture = 0;
 float soilTemperature = 0;
 int overflowValue = 0;
@@ -24,6 +24,16 @@ uint8_t LED_PIN_6 = D5;
 
 // PUMP CONTROL
 uint8_t PUMP_PIN = D3;
+
+// INTERVAL FOR SENSOR READINGS
+unsigned long previousReadMillis = 0;
+const unsigned long sensorReadInterval = 5 * 1000; // 5 seconds
+
+// INTERVAL FOR WATERING
+unsigned long previousWateringMillis = 0;
+const unsigned long wateringInterval = 60 * 1000; // 1 minute
+long pumpStartTime = 0;
+long latestPumpTimeStamp = 0;
 
 // WIFI AP CREDENTIALS
 const char *soft_ap_ssid = "IoT-pot";
