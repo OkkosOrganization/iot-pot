@@ -32,6 +32,7 @@ void handlePostWateringThreshold();
 void handleGetNotificationTriggers();
 void handlePostNotificationTriggers();
 void getSensorValues();
+void waterPlant();
 
 // PREFERENCES
 Preferences preferences;
@@ -46,10 +47,6 @@ IPAddress gateway(192,168,0,1);
 IPAddress subnet(255,255,255,0);
 WebServer* server;
 IPAddress apIP;
-
-// INTERVAL FOR SENSOR READINGS
-unsigned long previousMillis = 0;
-const unsigned long sensorReadInterval = 5000; // 5 seconds
 
 // SETUP
 void setup() {
@@ -102,18 +99,19 @@ void setup() {
 void loop() {
   server->handleClient();   
   getSensorValues();
+  waterPlant();
 }
 
 void getSensorValues(){
   unsigned long currentMillis = millis();
-  if (currentMillis - previousMillis >= sensorReadInterval) {
-    previousMillis = currentMillis;
-    digitalWrite(PUMP_PIN, HIGH);
+  if (currentMillis - previousReadMillis >= sensorReadInterval) {
+    previousReadMillis = currentMillis;
     getWaterLevel(); 
     getAirTemperatureAndHumidity();
     getLdrSensorValue();
     getSoilSensorValues();
     getOverFlowSensorValue();
+    /*
     Serial.print("WATER LEVEL:");
     Serial.println(waterLevel);
     Serial.print("AIR TEMPERATURE:");
@@ -124,9 +122,71 @@ void getSensorValues(){
     Serial.println(lightSensorValue);     
     Serial.print("OVERFLOW:");
     Serial.println(overflowValue);      
+    */
   }  
-  digitalWrite(PUMP_PIN, LOW);
 }
+
+void waterPlant(){
+
+  // MAKE SURE THRESHOLD AND WATER AMOUNT ARE SET
+  float wateringThreshold = 0;
+  float wateringAmount = 0;
+  unsigned int wateringTime = 0;
+
+  if(preferences.isKey("watering-amount"))
+    wateringAmount = preferences.getInt("watering-amount");
+  else
+    return;
+
+  if(preferences.isKey("threshold"))
+    wateringThreshold = preferences.getInt("threshold");
+  else
+    return;    
+
+  // TRANSFORM WATER AMOUNT TO WATERING TIME
+  wateringTime = pump.getWateringTime(wateringAmount);   
+
+  // CHECK THAT TIME ELAPSED FROM LAST WATERING IS LARGER THAN WATERING INTERVAL
+  unsigned long currentMillis = millis();
+  if (currentMillis - previousWateringMillis >= wateringInterval) {
+    previousWateringMillis = currentMillis;
+
+    Serial.print("Watering time:");
+    Serial.println(wateringTime);
+    Serial.print("Watering amount:");
+    Serial.println(wateringAmount);  
+    Serial.print("Watering threshold:");
+    Serial.println(wateringThreshold);    
+    Serial.print("Soil moisture:");
+    Serial.println(soilMoisture);   
+    
+    // CHECK SOIL MOISTURE
+    if (soilMoisture <= wateringThreshold)
+    {
+      pump.setState(PUMP_ON);
+      pumpStartTime = currentMillis;
+    } 
+  }
+
+  if(pump.getState() == PUMP_ON) {
+    unsigned long currentMillis = millis();
+    Serial.print(currentMillis - pumpStartTime);
+    Serial.print(" : ");
+    Serial.println(wateringTime);
+    if(currentMillis - pumpStartTime < wateringTime)    
+    {
+      //Serial.println("PUMPING");
+      //Serial.println(currentMillis);
+    }
+    else {
+      //Serial.println("PUMP OFF");
+      //Serial.println(currentMillis);
+      pumpStartTime = 0;
+      pump.setState(PUMP_OFF);
+    }    
+  }
+}
+
 
 // INITIALIZES WIFI AP
 void initWiFiAp(){
