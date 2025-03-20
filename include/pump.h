@@ -2,36 +2,48 @@
 #include <Arduino.h>
 
 enum PUMPState {
+  PUMP_OFF,
   PUMP_ON,
-  PUMP_OFF
 };
 
 class PUMP {
   private:
     int pin;
+    PUMPState state;
 
   public:
     // Constuctor
-    PUMP(int pin) {
-      pin = pin;
+    PUMP(int pumpPin) {
+      pin = pumpPin;
+      state = PUMP_OFF;
     }
 
     void begin() {
       pinMode(pin, OUTPUT);
+      digitalWrite(pin, LOW);      
     }
 
-    void setState(PUMPState state) {
-      switch (state) {
-        case PUMP_ON:
-          digitalWrite(pin, HIGH);
-          break;
-        case PUMP_OFF:
-          digitalWrite(pin, LOW);
-          break;
-        default:
-          digitalWrite(pin, LOW);
-          break;
+    void setState(PUMPState newState) {
+      if (newState == PUMP_ON) {
+        digitalWrite(pin, HIGH);
+      } else {
+        digitalWrite(pin, LOW);
       }
+      this->state = newState;
+    }
+
+    PUMPState getState(){
+      return this->state;
+    }
+
+    unsigned int getWateringTime(int value) {
+      if (value < 0) value = 0;
+      if (value > 100) value = 100;
+
+      // MAX TIME: 1L = 15S = 15000MS
+      double max_time_ms = 15000;
+
+      return (value * max_time_ms) / 100;
     }
 };
 
