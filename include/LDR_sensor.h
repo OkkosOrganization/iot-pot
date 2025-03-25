@@ -18,5 +18,5 @@ void initLdrSensor() {
 }
 
 void getLdrSensorValue() {
-  lightSensorValue = analogRead(LIGHT_SENSOR_PIN);
+  luminosity = analogRead(LIGHT_SENSOR_PIN);
 }
