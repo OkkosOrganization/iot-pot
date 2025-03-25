@@ -9,26 +9,23 @@
 #include "led.h"
 #define THRESHOLD2 1000 
 
-
 void initOverFlowSensor();
 void getOverFlowSensorValue();
 
 bool waterDetected=false; // Mikä on mittauksen tila seuraavalla mittauksella
 
 void initOverFlowSensor(){
-    analogSetAttenuation(ADC_11db);
-    
-    pinMode(POWER_PIN, OUTPUT);   // Configure pin as an OUTPUT
-    digitalWrite(POWER_PIN, LOW); // turn the sensor OFF
-    
+  analogSetAttenuation(ADC_11db);
+  pinMode(POWER_PIN, OUTPUT);   // Configure pin as an OUTPUT
+  digitalWrite(POWER_PIN, LOW); // turn the sensor OFF
 }
 
 void getOverFlowSensorValue(){
     digitalWrite(POWER_PIN, HIGH);  // turn the sensor ON
-    overflowValue = analogRead(SIGNAL_PIN); // read the analog value from sensor
+    waterOverflow = analogRead(SIGNAL_PIN); // read the analog value from sensor
     digitalWrite(POWER_PIN, LOW);    // turn the sensor OFF
  
-    if (overflowValue > THRESHOLD2) { 
+    if (waterOverflow > THRESHOLD2) { 
         if (!waterDetected){
             waterDetected=true;
             Serial.print("The water is detected");
