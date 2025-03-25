@@ -147,3 +147,45 @@ export const addMeasurements = (deviceId: string, data: SensorValues) => {
     data: data,
   });
 };
+
+export const getNotesByWeek = (
+  deviceId: string,
+  weekNumber: number,
+  year: number
+) => {
+  return db
+    .select()
+    .from(schema.notes)
+    .where(
+      sql`${schema.notes.deviceId} = ${deviceId} 
+      AND EXTRACT(YEAR FROM ${schema.notes.date}) = ${year} 
+      AND EXTRACT(WEEK FROM ${schema.notes.date}) = ${weekNumber}`
+    )
+    .orderBy(desc(schema.notes.date));
+};
+
+export const getNotesByDay = (deviceId: string, date: string) => {
+  return db
+    .select()
+    .from(schema.notes)
+    .where(
+      sql`${schema.notes.deviceId} = ${deviceId} AND DATE(${schema.notes.date}) = ${date}`
+    )
+    .orderBy(desc(schema.notes.date));
+};
+
+export const getNotesByMonth = (
+  deviceId: string,
+  month: number,
+  year: number
+) => {
+  return db
+    .select()
+    .from(schema.notes)
+    .where(
+      sql`${schema.notes.deviceId} = ${deviceId} 
+        AND EXTRACT(YEAR FROM ${schema.notes.date}) = ${year} 
+        AND EXTRACT(MONTH FROM ${schema.notes.date}) = ${month}`
+    )
+    .orderBy(desc(schema.notes.date));
+};
