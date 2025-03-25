@@ -46,7 +46,7 @@ export const MqttContextProvider = ({
   const [waterOverflow, setWaterOverflow] = useState(
     initialValues.waterOverflow
   );
-  const deviceId = initialValues.deviceId.toLowerCase();
+  const deviceId = initialValues.deviceId.toUpperCase();
 
   const getClient = () => {
     return mqtt.connect(process.env.NEXT_PUBLIC_MQTT_URL as string, {
@@ -105,7 +105,7 @@ export const MqttContextProvider = ({
     client.on("message", (topic, message) => {
       switch (topic) {
         case `/device/${deviceId}/airHumidity/`:
-          console.log("airHumidity update:", message.toString());
+          console.log("airHumidity:", message.toString());
           setAirHumidity(parseInt(message.toString()));
           break;
         case `/device/${deviceId}/airTemperature/`:
