@@ -15,6 +15,7 @@
 #include <ArduinoJson.h>
 #include "html/index.h"
 #include <Preferences.h>
+#include <HTTPClient.h>
 
 // FUNCTION PROTOTYPES
 void initWiFiAp();
@@ -34,9 +35,10 @@ void handleGetNotificationTriggers();
 void handlePostNotificationTriggers();
 void getSensorValues();
 void publishValuesMqtt();
-void publishValuesHttp();
+void publishValuesHttps();
 void connectMqtt();
 void initMqtt();
+void convertValues();
 
 // PREFERENCES
 Preferences preferences;
@@ -69,6 +71,7 @@ void setup() {
   // GET UNIQUE DEVICE ID
   deviceId = ESP.getEfuseMac();
   deviceIdHex = String((uint32_t)(deviceId >> 32), HEX) + String((uint32_t)deviceId, HEX);
+  deviceIdHex.toUpperCase();
 
   // CREATE MQTT TOPICS: /device/<deviceId>/<sensorValueName>
   sprintf(soilTemperatureTopic, "/device/%s/soilTemperature/",deviceIdHex.c_str());
@@ -115,6 +118,7 @@ void loop() {
   server->handleClient();   
   getSensorValues();
   publishValuesMqtt();
+  publishValuesHttps();
 }
 
 // GETS VALUES FROM SENSORS
@@ -127,9 +131,23 @@ void getSensorValues(){
     getLdrSensorValue();
     getSoilSensorValues();
     getOverFlowSensorValue();   
+    convertValues();
   }  
 }
 
+// CONVERTS SENSOR VALUES TO STRINGS
+void convertValues(){
+  itoa(soilTemperature, soilTemperatureStr, 10);   
+  itoa(soilMoisture, soilMoistureStr, 10);
+  itoa(soilPh, soilPhStr, 10);
+  itoa(luminosity, luminosityStr, 10);
+  itoa(airTemperature, airTemperatureStr, 10);
+  itoa(airHumidity, airHumidityStr, 10);
+  itoa(waterLevel, waterLevelStr, 10);
+  itoa(waterOverflow, waterOverflowStr, 10);
+}
+
+// CONNECT TO BROKER
 void initMqtt() {
   wifiClientSecure.setInsecure();
   mqttClient.setClient(wifiClientSecure);
@@ -151,25 +169,11 @@ void connectMqtt(){
   }
 }
 
+// PUBLISH VALUES TO MQTT TOPICS
 void publishValuesMqtt() {
   unsigned long currentMillis = millis();
   if (currentMillis - previousMqttMillis >= mqttPublishInterval) {
     previousMqttMillis = currentMillis;
-
-    // Convert numbers to strings
-    char soilTemperatureStr[12], soilMoistureStr[12], soilPhStr[12];
-    char luminosityStr[12], presStr[12], waterLevelStr[12];
-    char overflowStr[12], airTemperatureStr[12], airHumidityStr[12];
-    char waterOverflowStr[12];
-
-    itoa(soilTemperature, soilTemperatureStr, 10);   
-    itoa(soilMoisture, soilMoistureStr, 10);
-    itoa(soilPh, soilPhStr, 10);
-    itoa(luminosity, luminosityStr, 10);
-    itoa(airTemperature, airTemperatureStr, 10);
-    itoa(airHumidity, airHumidityStr, 10);
-    itoa(waterLevel, waterLevelStr, 10);
-    itoa(waterOverflow, waterOverflowStr, 10);
 
     // PUBLISH TO EACH TOPIC
     if (mqttClient.publish(soilTemperatureTopic, soilTemperatureStr)) {
@@ -227,6 +231,58 @@ void publishValuesMqtt() {
     } else {
       Serial.println("MQTT publish failed");
     }      
+  }
+}
+
+// SEND VALUES AS HTTPS POST
+void publishValuesHttps() {
+
+  unsigned long currentMillis = millis();
+  if (currentMillis - previousHttpsMillis >= httpsPublishInterval) {
+    previousHttpsMillis = currentMillis;
+
+    JsonDocument doc;
+    doc["deviceId"] = deviceIdHex;
+
+    JsonObject data = doc["sensorValues"].to<JsonObject>();
+    data["airTemperature"] = airTemperature;
+    data["airHumidity"] = airHumidity;
+    data["soilTemperature"] = soilTemperature;
+    data["soilMoisture"] = soilMoisture;
+    data["soilPh"] = soilPh;
+    data["luminosity"] = luminosity;
+    data["waterLevel"] = waterLevel;
+    data["waterOverflow"] = waterOverflow;
+
+    String jsonString;
+    serializeJson(doc, jsonString);
+
+    WiFiClientSecure client;
+    client.setInsecure();
+    //client.setCACert(root_ca);  // CHECK SSL CERT
+
+    HTTPClient https;
+    if (https.begin(client, BACKEND_API_URL)) {
+      https.addHeader("Content-Type", "application/json");
+
+      int httpResponseCode = https.POST(jsonString);
+
+      Serial.print("HTTP Response code: ");
+      Serial.println(httpResponseCode);
+
+      if (httpResponseCode > 0) {
+        String response = https.getString();
+        Serial.println("Response:");
+        Serial.println(response);
+      } else {
+        Serial.print("POST error: ");
+        Serial.println(https.errorToString(httpResponseCode));
+      }
+
+      https.end();
+    } else {
+      Serial.println("Connection to API failed.");
+    }
   }
 }
 
