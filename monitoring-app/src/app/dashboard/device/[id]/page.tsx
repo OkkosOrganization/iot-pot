@@ -32,6 +32,8 @@ export default async function Page({
         soilPH: 0,
         soilTemperature: 0,
         luminosity: 0,
+        waterOverflow: 0,
+        waterLevel: 0,
       }}
     >
       <div className={styles.container}>
