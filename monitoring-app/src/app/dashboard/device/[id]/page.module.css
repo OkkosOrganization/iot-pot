@@ -16,19 +16,3 @@
   padding: 0.25rem;
   border-radius: 3rem;
 }
-
-.content {
-  width: 100%;
-  max-width: 48rem;
-  border-radius: 2rem;
-  overflow: hidden;
-  box-shadow: 0 0.25rem 0.25rem 0 rgba(0, 0, 0, 0.15);
-  padding: 2rem 0;
-  background: var(--lightGrey);
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  gap: 1rem;
-  align-items: center;
-  justify-content: center;
-}

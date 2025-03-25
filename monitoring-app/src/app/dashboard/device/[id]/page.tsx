@@ -42,7 +42,7 @@ export default async function Page({
           <DeviceNavi deviceId={id} />
         </div>
         <div className={styles.content}>
-          <DevicePageContent />
+          <DevicePageContent deviceId={id} />
         </div>
       </div>
     </MqttContextProvider>

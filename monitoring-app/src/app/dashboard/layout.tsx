@@ -5,11 +5,12 @@ import { Navi } from "../components/Navi";
 import styles from "./layout.module.css";
 import { ExtendedUserProvider } from "@/contexts/extendedUserContext";
 
+type DashboardLayoutProps = {
+  children: React.ReactNode;
+};
 export default async function DashboardLayout({
   children,
-}: {
-  children: React.ReactNode;
-}) {
+}: DashboardLayoutProps) {
   const session = await getSession();
   if (!session) return redirect("/");
   return (
