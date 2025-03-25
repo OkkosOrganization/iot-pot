@@ -22,4 +22,6 @@ export type SensorValues = {
   soilTemperature?: number;
   luminosity?: number;
   deviceId: string;
+  waterLevel: number;
+  waterOverflow: number;
 };
