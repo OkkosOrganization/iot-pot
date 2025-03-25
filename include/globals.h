@@ -12,6 +12,12 @@ float soilMoisture = 0;
 float soilTemperature = 0;
 int waterOverflow = 0;
 
+// STRING VERSIONS
+char soilTemperatureStr[12], soilMoistureStr[12], soilPhStr[12];
+char luminosityStr[12], presStr[12], waterLevelStr[12];
+char overflowStr[12], airTemperatureStr[12], airHumidityStr[12];
+char waterOverflowStr[12];
+
 // MQTT TOPICS
 char soilTemperatureTopic[64];    
 char soilPhTopic[64];    
@@ -38,8 +44,12 @@ const char *soft_ap_password = "TIES4571";
 
 // INTERVAL FOR SENSOR READINGS
 unsigned long previousReadMillis = 0;
-const unsigned long sensorReadInterval = 10000;
+const unsigned long sensorReadInterval = 10000; // 10 SECONDS
 
 // INTERVAL FOR MQTT PUBLISH
 unsigned long previousMqttMillis = 0;
-const unsigned long mqttPublishInterval = 20000;
+const unsigned long mqttPublishInterval = 20000; // 20 SECONDS
+
+// INTERVAL FOR HTTPS PUBLISH
+unsigned long previousHttpsMillis = 0;
+const unsigned long httpsPublishInterval = 1 * 60 * 1000; // 60 SECONDS
