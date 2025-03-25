@@ -21,6 +21,8 @@ export const defaultValues = {
   soilTemperature: 0,
   soilPh: 0,
   luminosity: 0,
+  waterLevel: 0,
+  waterOverflow: 0,
 } as MqttContextType;
 
 const MqttContext = createContext<MqttContextType>(defaultValues);
@@ -35,12 +37,16 @@ export const MqttContextProvider = ({
   );
   const [airHumidity, setAirHumidity] = useState(initialValues.airHumidity);
   const [soilMoisture, setSoilMoisture] = useState(initialValues.soilMoisture);
-  const [soilPh, setSoilPh] = useState(initialValues.soilPH);
+  const [soilPh, setSoilPh] = useState(initialValues.soilPh);
   const [soilTemperature, setSoilTemperature] = useState(
     initialValues.soilTemperature
   );
   const [luminosity, setLuminosity] = useState(initialValues.luminosity);
-  const deviceId = initialValues.deviceId;
+  const [waterLevel, setWaterLevel] = useState(initialValues.waterLevel);
+  const [waterOverflow, setWaterOverflow] = useState(
+    initialValues.waterOverflow
+  );
+  const deviceId = initialValues.deviceId.toLowerCase();
 
   const getClient = () => {
     return mqtt.connect(process.env.NEXT_PUBLIC_MQTT_URL as string, {
@@ -70,54 +76,65 @@ export const MqttContextProvider = ({
       console.log("MQTT connected");
 
       // SENSOR VALUES
-      client.subscribe(`device/${deviceId}`, () => {
-        console.log(`Subscribed to: device/${deviceId}`);
+      client.subscribe(`/device/${deviceId}/airHumidity/`, () => {
+        console.log(`Subscribed to: /device/${deviceId}/airHumidity/`);
       });
-      client.subscribe(`device/${deviceId}/airHumidity`, () => {
-        console.log(`Subscribed to: device/${deviceId}/airHumidity`);
+      client.subscribe(`/device/${deviceId}/airTemperature/`, () => {
+        console.log(`Subscribed to: /device/${deviceId}/airTemperature/`);
       });
-      client.subscribe(`device/${deviceId}/airTemperature`, () => {
-        console.log(`Subscribed to: device/${deviceId}/airTemperature`);
+      client.subscribe(`/device/${deviceId}/soilMoisture/`, () => {
+        console.log(`Subscribed to: /device/${deviceId}/soilMoisture/`);
       });
-      client.subscribe(`device/${deviceId}/soilMoisture`, () => {
-        console.log(`Subscribed to: device/${deviceId}/soilMoisture`);
+      client.subscribe(`/device/${deviceId}/soilPh/`, () => {
+        console.log(`Subscribed to: /device/${deviceId}/soilPh/`);
       });
-      client.subscribe(`device/${deviceId}/soilPh`, () => {
-        console.log(`Subscribed to: device/${deviceId}/soilPh`);
+      client.subscribe(`/device/${deviceId}/soilTemperature/`, () => {
+        console.log(`Subscribed to: /device/${deviceId}/soilTemperature/`);
       });
-      client.subscribe(`device/${deviceId}/soilTemperature`, () => {
-        console.log(`Subscribed to: device/${deviceId}/soilTemperature`);
+      client.subscribe(`/device/${deviceId}/luminosity/`, () => {
+        console.log(`Subscribed to: /device/${deviceId}/luminosity/`);
       });
-      client.subscribe(`device/${deviceId}/luminosity`, () => {
-        console.log(`Subscribed to: device/${deviceId}/luminosity`);
+      client.subscribe(`/device/${deviceId}/waterLevel/`, () => {
+        console.log(`Subscribed to: /device/${deviceId}/waterLevel/`);
+      });
+      client.subscribe(`/device/${deviceId}/waterOverflow/`, () => {
+        console.log(`Subscribed to: /device/${deviceId}/waterOverflow/`);
       });
     });
 
     client.on("message", (topic, message) => {
       switch (topic) {
-        case `device/${deviceId}/airHumidity`:
+        case `/device/${deviceId}/airHumidity/`:
           console.log("airHumidity update:", message.toString());
           setAirHumidity(parseInt(message.toString()));
           break;
-        case `device/${deviceId}/airTemperature`:
+        case `/device/${deviceId}/airTemperature/`:
           console.log("airTemperature:", message.toString());
           setAirTemperature(parseInt(message.toString()));
           break;
-        case `device/${deviceId}/soilTemperature`:
+        case `/device/${deviceId}/soilTemperature/`:
           console.log("soilTemperature:", message.toString());
           setSoilTemperature(parseInt(message.toString()));
           break;
-        case `device/${deviceId}/soilPh`:
+        case `/device/${deviceId}/soilPh/`:
           console.log("soilPh:", message.toString());
           setSoilPh(parseInt(message.toString()));
           break;
-        case `device/${deviceId}/soilMoisture`:
+        case `/device/${deviceId}/soilMoisture/`:
           console.log("soilMoisture:", message.toString());
           setSoilMoisture(parseInt(message.toString()));
           break;
-        case `device/${deviceId}/luminosity`:
+        case `/device/${deviceId}/luminosity/`:
           console.log("luminosity:", message.toString());
           setLuminosity(parseInt(message.toString()));
+          break;
+        case `/device/${deviceId}/waterLevel/`:
+          console.log("waterLevel:", message.toString());
+          setWaterLevel(parseInt(message.toString()));
+          break;
+        case `/device/${deviceId}/waterOverflow/`:
+          console.log("waterOverflow:", message.toString());
+          setWaterOverflow(parseInt(message.toString()));
           break;
       }
     });
@@ -131,9 +148,11 @@ export const MqttContextProvider = ({
         airTemperature: airTemperature,
         airHumidity: airHumidity,
         soilMoisture: soilMoisture,
-        soilPH: soilPh,
+        soilPh: soilPh,
         soilTemperature: soilTemperature,
         luminosity: luminosity,
+        waterLevel: waterLevel,
+        waterOverflow: waterOverflow,
       }}
     >
       {children}

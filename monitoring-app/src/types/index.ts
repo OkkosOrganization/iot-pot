@@ -18,8 +18,10 @@ export type SensorValues = {
   airTemperature?: number;
   airHumidity?: number;
   soilMoisture?: number;
-  soilPH?: number;
+  soilPh?: number;
   soilTemperature?: number;
   luminosity?: number;
   deviceId: string;
+  waterLevel: number;
+  waterOverflow: number;
 };

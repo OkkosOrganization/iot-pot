@@ -10,6 +10,7 @@
 #define ATTINY1_HIGH_ADDR   0x78
 #define ATTINY2_LOW_ADDR   0x77
 
+void initWaterLevelSensor();
 void getWaterLevel();
 void getHigh12SectionValue(void);
 void getLow8SectionValue(void);
@@ -17,6 +18,9 @@ void getLow8SectionValue(void);
 unsigned char low_data[8] = {0};
 unsigned char high_data[12] = {0};
 
+void initWaterLevelSensor(){
+  Wire.begin();
+}
 void getHigh12SectionValue(void)
 {
   memset(high_data, 0, sizeof(high_data));
@@ -47,8 +51,7 @@ void getWaterLevel()
   int high_count = 0;
   if (Wire.available())
   {
-    while (1)
-    {
+
       uint32_t touch_val = 0;
       uint8_t trig_section = 0;
       low_count = 0;
@@ -111,14 +114,19 @@ void getWaterLevel()
         touch_val >>= 1;
       }
 
-      /*
       Serial.print("water level = ");
       Serial.print(trig_section * 5);
       Serial.println("% ");
       Serial.println(" ");
       Serial.println("*********************************************************");
-      */
+
       waterLevel = trig_section * 5;
-    }
+    
   }
+  else
+  {
+    Serial.println("WIRE NOT AVAILABLE");
+    initWaterLevelSensor();
+  }
+    
 }

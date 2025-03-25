@@ -3,20 +3,46 @@ import { useMqttContext } from "@/contexts/mqttContext";
 import { SensorCard } from "./SensorCard";
 
 export const DevicePageContent = () => {
-  const { airTemperature, airHumidity } = useMqttContext();
+  const {
+    airTemperature,
+    airHumidity,
+    soilMoisture,
+    soilPh,
+    soilTemperature,
+    luminosity,
+    waterLevel,
+    waterOverflow,
+  } = useMqttContext();
   return (
     <>
       <SensorCard
         type="soilMoisture"
         title="Soil Moisture"
-        value={33}
+        value={soilMoisture as number}
         unit="%"
       />
-      <SensorCard type="waterLevel" title="Water Level" value={65} unit="%" />
+      <SensorCard
+        type="soilPh"
+        title="Soil PH"
+        value={soilPh as number}
+        unit="%"
+      />
+      <SensorCard
+        type="soilTemperature"
+        title="Soil Temperature"
+        value={soilTemperature as number}
+        unit="°C"
+      />
+      <SensorCard
+        type="waterLevel"
+        title="Water Level"
+        value={waterLevel}
+        unit="%"
+      />
       <SensorCard
         type="luminosity"
         title="Luminosity"
-        value={1293}
+        value={luminosity as number}
         unit="LUX"
       />
       <SensorCard
@@ -34,7 +60,7 @@ export const DevicePageContent = () => {
       <SensorCard
         type="waterOverflow"
         title="Water Overflow"
-        value={0}
+        value={waterOverflow}
         unit=""
       />
     </>
