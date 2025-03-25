@@ -37,7 +37,7 @@ export const MqttContextProvider = ({
   );
   const [airHumidity, setAirHumidity] = useState(initialValues.airHumidity);
   const [soilMoisture, setSoilMoisture] = useState(initialValues.soilMoisture);
-  const [soilPh, setSoilPh] = useState(initialValues.soilPH);
+  const [soilPh, setSoilPh] = useState(initialValues.soilPh);
   const [soilTemperature, setSoilTemperature] = useState(
     initialValues.soilTemperature
   );
@@ -148,7 +148,7 @@ export const MqttContextProvider = ({
         airTemperature: airTemperature,
         airHumidity: airHumidity,
         soilMoisture: soilMoisture,
-        soilPH: soilPh,
+        soilPh: soilPh,
         soilTemperature: soilTemperature,
         luminosity: luminosity,
         waterLevel: waterLevel,

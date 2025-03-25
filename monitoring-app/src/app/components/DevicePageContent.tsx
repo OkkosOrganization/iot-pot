@@ -7,7 +7,7 @@ export const DevicePageContent = () => {
     airTemperature,
     airHumidity,
     soilMoisture,
-    soilPH,
+    soilPh,
     soilTemperature,
     luminosity,
     waterLevel,
@@ -20,6 +20,18 @@ export const DevicePageContent = () => {
         title="Soil Moisture"
         value={soilMoisture as number}
         unit="%"
+      />
+      <SensorCard
+        type="soilPh"
+        title="Soil PH"
+        value={soilPh as number}
+        unit="%"
+      />
+      <SensorCard
+        type="soilTemperature"
+        title="Soil Temperature"
+        value={soilTemperature as number}
+        unit="°C"
       />
       <SensorCard
         type="waterLevel"

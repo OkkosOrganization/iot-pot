@@ -8,6 +8,7 @@ import styles from "./SensorCard.module.css";
 type SensorTypes =
   | "soilMoisture"
   | "soilTemperature"
+  | "soilPh"
   | "airTemperature"
   | "airHumidity"
   | "luminosity"
