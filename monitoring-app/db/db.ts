@@ -123,6 +123,24 @@ export const addUser = (auth0Id: string) => {
     .returning();
 };
 
+export const addNote = (
+  title: string,
+  content: string,
+  deviceId: string,
+  date: string
+) => {
+  return db
+    .insert(schema.notes)
+    .values({
+      title: title,
+      content: content,
+      deviceId: deviceId,
+      date: date,
+    })
+    .onConflictDoNothing()
+    .returning();
+};
+
 export const addMeasurements = (deviceId: string, data: SensorValues) => {
   return db.insert(schema.measurements).values({
     deviceId: deviceId,
