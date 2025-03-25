@@ -1,3 +1,7 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+}
 .container {
   display: flex;
   flex-direction: column-reverse;
@@ -6,16 +10,16 @@
   width: 100%;
   gap: 1rem;
   padding: 0;
+  margin-bottom: 2rem;
 }
 .visualizationContainer {
-  flex: 1 1 auto;
+  width: calc(100% - 380px);
   min-height: 100%;
   height: 100%;
-  width: 100%;
   align-items: stretch;
 }
 .toolsContainer {
-  flex: 0 0 auto;
+  width: max-content;
 }
 .panel {
   background-color: var(--grey);
@@ -85,15 +89,34 @@
   line-height: 2rem;
 }
 
+.container,
+.notesContainer {
+  width: 100%;
+  border-radius: 2rem;
+
+  padding: 2rem 0;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+}
+
 /******************/
 /* MEDIA QUERIES */
 /****************/
 @media screen and (min-width: 37.5rem) {
-  .container {
+  .container,
+  .notesContainer {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: flex-start;
-    padding: 0 1rem;
+    padding: 1rem;
+
+    background: var(--lightGrey);
+    overflow: hidden;
+    box-shadow: 0 0.25rem 0.25rem 0 rgba(0, 0, 0, 0.15);
   }
 }

@@ -26,6 +26,7 @@
   display: flex;
   flex-direction: column;
   padding: 2rem;
+  overflow: hidden;
 }
 
 .title {
@@ -35,7 +36,7 @@
 
 .form {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: space-between;
   gap: 1rem;
 }
@@ -93,4 +94,13 @@
 
 .error {
   color: red;
+}
+
+/******************/
+/* MEDIA QUERIES */
+/****************/
+@media screen and (min-width: 54rem) {
+  .form {
+    flex-direction: row;
+  }
 }

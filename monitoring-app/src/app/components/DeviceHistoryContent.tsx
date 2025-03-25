@@ -24,6 +24,17 @@ const fetcher = async (
   return response.json() as Promise<ApiResponse>;
 };
 
+const notesFetcher = async (
+  url: string,
+  options?: RequestInit
+): Promise<NotesApiResponse> => {
+  const response = await fetch(url, options);
+  if (!response.ok) {
+    throw new Error(`HTTP error! Status: ${response.status}`);
+  }
+  return response.json() as Promise<NotesApiResponse>;
+};
+
 type ApiResponse = {
   status: 0 | 1;
   data: {
@@ -34,16 +45,37 @@ type ApiResponse = {
       airTemperature: number;
       airHumidity: number;
       soilMoisture: number;
+      soilPh: number;
+      soilTemperature: number;
     };
     error?: string;
   }[];
 };
 
-type SensorLabels = "airTemperature" | "airHumidity" | "soilMoisture";
+type NotesApiResponse = {
+  status: 0 | 1;
+  data: {
+    id: number;
+    date: string;
+    content: string;
+    title: string;
+    deviceId: string;
+    error?: string;
+  }[];
+};
+
+type SensorLabels =
+  | "airTemperature"
+  | "airHumidity"
+  | "soilMoisture"
+  | "soilPh"
+  | "soilTemperature";
 const SENSOR_LABELS_MAP: Record<SensorLabels, string> = {
   airTemperature: "Air Temperature",
   airHumidity: "Air Humidity",
   soilMoisture: "Soil Moisture",
+  soilPh: "Soil Ph",
+  soilTemperature: "Soil Temperature",
 };
 
 export const DeviceHistoryContent = ({ device }: { device: Device }) => {
@@ -76,10 +108,35 @@ export const DeviceHistoryContent = ({ device }: { device: Device }) => {
     fetcher
   );
 
+  const { data: notesWeekData, error: notesWeekError } =
+    useSWR<NotesApiResponse>(
+      mode === "week" && year !== null && weekNumber !== null
+        ? `/api/notesByWeek/?deviceId=${device.deviceId}&weekNumber=${weekNumber}&year=${year}`
+        : null,
+      notesFetcher
+    );
+
+  const { data: notesdayData, error: notesDayError } = useSWR<NotesApiResponse>(
+    mode === "day" && date !== null
+      ? `/api/notesByDay/?deviceId=${device.deviceId}&date=${date}`
+      : null,
+    notesFetcher
+  );
+
+  const { data: notesMonthData, error: notesMonthError } =
+    useSWR<NotesApiResponse>(
+      mode === "month" && year !== null && month !== null
+        ? `/api/notesByMonth/?deviceId=${device.deviceId}&month=${month}&year=${year}`
+        : null,
+      notesFetcher
+    );
+
   type dataType = {
     airTemperature: number[];
     airHumidity: number[];
     soilMoisture: number[];
+    soilPh: number[];
+    soilTemperature: number[];
     dates: string[];
   };
 
@@ -87,6 +144,8 @@ export const DeviceHistoryContent = ({ device }: { device: Device }) => {
     airTemperature: [],
     airHumidity: [],
     soilMoisture: [],
+    soilPh: [],
+    soilTemperature: [],
     dates: [],
   };
   switch (mode) {
@@ -96,6 +155,8 @@ export const DeviceHistoryContent = ({ device }: { device: Device }) => {
           data.airTemperature.push(row.data.airTemperature);
           data.airHumidity.push(row.data.airHumidity);
           data.soilMoisture.push(row.data.soilMoisture);
+          data.soilPh.push(row.data.soilPh);
+          data.soilTemperature.push(row.data.soilTemperature);
           const d = new Date(row.timestamp).toLocaleTimeString();
           const split = d.split(":");
           const hoursMinutes = split[0] + ":" + split[1];
@@ -109,6 +170,8 @@ export const DeviceHistoryContent = ({ device }: { device: Device }) => {
           data.airTemperature.push(row.data.airTemperature);
           data.airHumidity.push(row.data.airHumidity);
           data.soilMoisture.push(row.data.soilMoisture);
+          data.soilPh.push(row.data.soilPh);
+          data.soilTemperature.push(row.data.soilTemperature);
           const d = new Date(row.timestamp).toLocaleTimeString();
           const split = d.split(":");
           const hoursMinutes = split[0] + ":" + split[1];
@@ -122,6 +185,8 @@ export const DeviceHistoryContent = ({ device }: { device: Device }) => {
           data.airTemperature.push(row.data.airTemperature);
           data.airHumidity.push(row.data.airHumidity);
           data.soilMoisture.push(row.data.soilMoisture);
+          data.soilPh.push(row.data.soilPh);
+          data.soilTemperature.push(row.data.soilTemperature);
           const d = new Date(row.timestamp).toLocaleTimeString();
           const split = d.split(":");
           const hoursMinutes = split[0] + ":" + split[1];
@@ -131,7 +196,7 @@ export const DeviceHistoryContent = ({ device }: { device: Device }) => {
       break;
   }
   return (
-    <>
+    <div className={styles.wrapper}>
       <div className={styles.container}>
         <div className={styles.visualizationContainer}>
           <div className={styles.panel}>
@@ -278,7 +343,48 @@ export const DeviceHistoryContent = ({ device }: { device: Device }) => {
           </div>
         </div>
       </div>
-      <div>className={styles.container}</div>
-    </>
+      <h2>Notes</h2>
+      <div className={styles.notesContainer}>
+        <form className={styles.form}>
+          <div className={styles.side}>
+            {mode === "day"
+              ? notesdayData?.data?.map((n, i: number) => {
+                  return (
+                    <div key={n?.id}>
+                      <span>{n.title}</span>
+                      <span>{n.date}</span>
+                      <div>{n.content}</div>
+                    </div>
+                  );
+                })
+              : null}
+
+            {mode === "week"
+              ? notesWeekData?.data?.map((n, i: number) => {
+                  return (
+                    <div key={n?.id}>
+                      <span>{n.title}</span>
+                      <span>{n.date}</span>
+                      <div>{n.content}</div>
+                    </div>
+                  );
+                })
+              : null}
+
+            {mode === "month"
+              ? notesMonthData?.data?.map((n, i: number) => {
+                  return (
+                    <div key={n?.id}>
+                      <span>{n.title}</span>
+                      <span>{n.date}</span>
+                      <div>{n.content}</div>
+                    </div>
+                  );
+                })
+              : null}
+          </div>
+        </form>
+      </div>
+    </div>
   );
 };
