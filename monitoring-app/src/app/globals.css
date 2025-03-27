@@ -92,7 +92,7 @@ body {
   position: relative;
   z-index: 2;
 }
-.container {
+.main {
   margin: 0 auto;
   width: 100%;
   min-height: 100%;
@@ -100,6 +100,7 @@ body {
   flex-direction: column;
   padding: 0.5rem;
   background-color: #fff;
+  overflow-x: hidden;
 }
 h1,
 h2,
@@ -119,6 +120,33 @@ h3 {
   cursor: pointer;
 }
 
+input {
+  width: 100%;
+  border: 1px solid var(--darkGrey);
+  border-radius: 1rem;
+  padding: 0.25rem 0.75rem;
+  align-self: flex-start;
+}
+
+/* MUI STYLE OVERRIDES */
+.MuiTypography-root,
+.MuiInputBase-root,
+.MuiDateCalendar-root,
+.MuiDateCalendar-root *,
+.MuiPickersDay-root {
+  font-family: "Roboto Condensed", sans-serif !important;
+}
+.MuiPickersDay-root.Mui-selected {
+  background-color: var(--purple) !important;
+  color: white !important;
+}
+.MuiPickersDay-root.Mui-selected:hover {
+  background-color: var(--purple) !important;
+}
+.MuiPickersDay-root.MuiPickersDay-today {
+  border: 1px solid var(--purple);
+}
+
 /******************/
 /* MEDIA QUERIES */
 /****************/
@@ -126,7 +154,7 @@ h3 {
   body {
     padding: 1.25rem;
   }
-  .container {
+  .main {
     padding: 1.25rem;
     border-radius: 2.5rem;
   }
