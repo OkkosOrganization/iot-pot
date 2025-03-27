@@ -2,26 +2,48 @@
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { MonthCalendar } from "@mui/x-date-pickers";
 import { useState } from "react";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import utc from "dayjs/plugin/utc";
 import weekOfYear from "dayjs/plugin/weekOfYear";
 import styles from "./DeviceHistoryContent.module.css";
 import { LineChart } from "@mui/x-charts";
 import useSWR from "swr";
-import { Device } from "@/types";
+import {
+  Device,
+  MeasurementsApiResponse,
+  Note,
+  NotesApiResponse,
+  SensorLabels,
+} from "@/types";
+import { NoteItem } from "./NoteItem";
+import updateLocale from "dayjs/plugin/updateLocale";
 dayjs.extend(utc);
 dayjs.extend(weekOfYear);
+dayjs.extend(updateLocale);
+dayjs.updateLocale("en", {
+  weekStart: 1,
+});
 
-//const fetcher = (...args) => fetch(...args).then((res) => res.json());
+const SENSOR_LABELS_MAP: Record<SensorLabels, string> = {
+  airTemperature: "Air Temperature",
+  airHumidity: "Air Humidity",
+  soilMoisture: "Soil Moisture",
+  soilPh: "Soil Ph",
+  soilTemperature: "Soil Temperature",
+  luminosity: "Luminosity",
+  waterLevel: "Water Level",
+  waterOverflow: "Water Overflow",
+};
+
 const fetcher = async (
   url: string,
   options?: RequestInit
-): Promise<ApiResponse> => {
+): Promise<MeasurementsApiResponse> => {
   const response = await fetch(url, options);
   if (!response.ok) {
     throw new Error(`HTTP error! Status: ${response.status}`);
   }
-  return response.json() as Promise<ApiResponse>;
+  return response.json() as Promise<MeasurementsApiResponse>;
 };
 
 const notesFetcher = async (
@@ -35,98 +57,60 @@ const notesFetcher = async (
   return response.json() as Promise<NotesApiResponse>;
 };
 
-type ApiResponse = {
-  status: 0 | 1;
-  data: {
-    id: number;
-    deviceId: string;
-    timestamp: string;
-    data: {
-      airTemperature: number;
-      airHumidity: number;
-      soilMoisture: number;
-      soilPh: number;
-      soilTemperature: number;
-    };
-    error?: string;
-  }[];
-};
-
-type NotesApiResponse = {
-  status: 0 | 1;
-  data: {
-    id: number;
-    date: string;
-    content: string;
-    title: string;
-    deviceId: string;
-    error?: string;
-  }[];
-};
-
-type SensorLabels =
-  | "airTemperature"
-  | "airHumidity"
-  | "soilMoisture"
-  | "soilPh"
-  | "soilTemperature";
-const SENSOR_LABELS_MAP: Record<SensorLabels, string> = {
-  airTemperature: "Air Temperature",
-  airHumidity: "Air Humidity",
-  soilMoisture: "Soil Moisture",
-  soilPh: "Soil Ph",
-  soilTemperature: "Soil Temperature",
-};
-
-export const DeviceHistoryContent = ({ device }: { device: Device }) => {
+type DeviceHistoryContentProps = { device: Device };
+export const DeviceHistoryContent = ({ device }: DeviceHistoryContentProps) => {
+  const initialDate = dayjs(Date.now());
   const [mode, setMode] = useState<"day" | "week" | "month">("day");
   const [chosenSensorLabel, setChosenSensorLabel] =
     useState<SensorLabels>("airTemperature");
-  const [date, setDate] = useState<string | null>(null);
-  const [weekNumber, setWeekNumber] = useState<number | null>(null);
-  const [year, setYear] = useState<number | null>(null);
-  const [month, setMonth] = useState<number | null>(null);
+  const [date, setDate] = useState<Dayjs>(initialDate);
+  const [weekNumber, setWeekNumber] = useState<number>(initialDate.week());
+  const [year, setYear] = useState<number | null>(initialDate.year());
+  const [month, setMonth] = useState<number | null>(initialDate.month());
 
-  const { data: weekData, error: weekError } = useSWR<ApiResponse>(
+  // MEASUREMENTS FETCHERS
+  const { data: weekData, error: weekError } = useSWR<MeasurementsApiResponse>(
     mode === "week" && year !== null && weekNumber !== null
       ? `/api/measurementsByWeek/?deviceId=${device.deviceId}&weekNumber=${weekNumber}&year=${year}`
       : null,
     fetcher
   );
-
-  const { data: monthData, error: monthError } = useSWR<ApiResponse>(
-    mode === "month" && year !== null && month !== null
-      ? `/api/measurementsByMonth/?deviceId=${device.deviceId}&month=${month}&year=${year}`
-      : null,
-    fetcher
-  );
-
-  const { data: dayData, error: dayError } = useSWR<ApiResponse>(
-    mode === "day" && date !== null
-      ? `/api/measurementsByDay/?deviceId=${device.deviceId}&date=${date}`
-      : null,
-    fetcher
-  );
-
-  const { data: notesWeekData, error: notesWeekError } =
-    useSWR<NotesApiResponse>(
-      mode === "week" && year !== null && weekNumber !== null
-        ? `/api/notesByWeek/?deviceId=${device.deviceId}&weekNumber=${weekNumber}&year=${year}`
+  const { data: monthData, error: monthError } =
+    useSWR<MeasurementsApiResponse>(
+      mode === "month" && year !== null && month !== null
+        ? `/api/measurementsByMonth/?deviceId=${device.deviceId}&month=${month}&year=${year}`
         : null,
-      notesFetcher
+      fetcher
     );
-
-  const { data: notesdayData, error: notesDayError } = useSWR<NotesApiResponse>(
+  const { data: dayData, error: dayError } = useSWR<MeasurementsApiResponse>(
     mode === "day" && date !== null
-      ? `/api/notesByDay/?deviceId=${device.deviceId}&date=${date}`
+      ? `/api/measurementsByDay/?deviceId=${device.deviceId}&date=${dayjs(
+          date
+        ).format("YYYY-MM-DD")}`
+      : null,
+    fetcher
+  );
+
+  // NOTES FETCHERS
+  const { data: notesDayData, error: notesDayError } = useSWR<NotesApiResponse>(
+    mode === "day" && date !== null
+      ? `/api/notesByDay/?deviceId=${device.deviceId}&date=${dayjs(date).format(
+          "YYYY-MM-DD"
+        )}`
       : null,
     notesFetcher
   );
-
   const { data: notesMonthData, error: notesMonthError } =
     useSWR<NotesApiResponse>(
       mode === "month" && year !== null && month !== null
         ? `/api/notesByMonth/?deviceId=${device.deviceId}&month=${month}&year=${year}`
+        : null,
+      notesFetcher
+    );
+  const { data: notesWeekData, error: notesWeekError } =
+    useSWR<NotesApiResponse>(
+      mode === "week" && year !== null && weekNumber !== null
+        ? `/api/notesByWeek/?deviceId=${device.deviceId}&weekNumber=${weekNumber}&year=${year}`
         : null,
       notesFetcher
     );
@@ -137,6 +121,9 @@ export const DeviceHistoryContent = ({ device }: { device: Device }) => {
     soilMoisture: number[];
     soilPh: number[];
     soilTemperature: number[];
+    luminosity: number[];
+    waterLevel: number[];
+    waterOverflow: number[];
     dates: string[];
   };
 
@@ -146,6 +133,9 @@ export const DeviceHistoryContent = ({ device }: { device: Device }) => {
     soilMoisture: [],
     soilPh: [],
     soilTemperature: [],
+    luminosity: [],
+    waterLevel: [],
+    waterOverflow: [],
     dates: [],
   };
   switch (mode) {
@@ -172,10 +162,8 @@ export const DeviceHistoryContent = ({ device }: { device: Device }) => {
           data.soilMoisture.push(row.data.soilMoisture);
           data.soilPh.push(row.data.soilPh);
           data.soilTemperature.push(row.data.soilTemperature);
-          const d = new Date(row.timestamp).toLocaleTimeString();
-          const split = d.split(":");
-          const hoursMinutes = split[0] + ":" + split[1];
-          data.dates.push(hoursMinutes);
+          const d = new Date(row.timestamp).toLocaleString();
+          data.dates.push(d);
         }
       }
       break;
@@ -187,10 +175,8 @@ export const DeviceHistoryContent = ({ device }: { device: Device }) => {
           data.soilMoisture.push(row.data.soilMoisture);
           data.soilPh.push(row.data.soilPh);
           data.soilTemperature.push(row.data.soilTemperature);
-          const d = new Date(row.timestamp).toLocaleTimeString();
-          const split = d.split(":");
-          const hoursMinutes = split[0] + ":" + split[1];
-          data.dates.push(hoursMinutes);
+          const d = new Date(row.timestamp).toLocaleDateString();
+          data.dates.push(d);
         }
       }
       break;
@@ -199,7 +185,7 @@ export const DeviceHistoryContent = ({ device }: { device: Device }) => {
     <div className={styles.wrapper}>
       <div className={styles.container}>
         <div className={styles.visualizationContainer}>
-          <div className={styles.panel}>
+          <div>
             {weekError || monthError || dayError ? (
               <div>
                 {weekError && weekError}
@@ -208,17 +194,22 @@ export const DeviceHistoryContent = ({ device }: { device: Device }) => {
               </div>
             ) : null}
 
-            <div>
-              {Object.entries(SENSOR_LABELS_MAP).map(([key, label]) => {
-                return (
-                  <button
-                    key={key}
-                    onClick={() => setChosenSensorLabel(key as SensorLabels)}
-                  >
-                    {label.toLocaleUpperCase()}
-                  </button>
-                );
-              })}
+            <div className={styles.valueSelectorContainer}>
+              <div className={styles.valueSelector}>
+                {Object.entries(SENSOR_LABELS_MAP).map(([key, label]) => {
+                  return (
+                    <button
+                      className={
+                        key === chosenSensorLabel ? styles.activeBtn : ""
+                      }
+                      key={key}
+                      onClick={() => setChosenSensorLabel(key as SensorLabels)}
+                    >
+                      {label.toLocaleUpperCase()}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             {data.dates.length && chosenSensorLabel ? (
@@ -239,7 +230,7 @@ export const DeviceHistoryContent = ({ device }: { device: Device }) => {
                     tickLabelStyle: {
                       angle: 45,
                       textAnchor: "start",
-                      fontSize: 12,
+                      fontSize: 10,
                     },
                     disableLine: true,
                     disableTicks: true,
@@ -301,13 +292,10 @@ export const DeviceHistoryContent = ({ device }: { device: Device }) => {
                 <DateCalendar
                   views={["day", "month"]}
                   maxDate={dayjs(Date.now())}
+                  value={dayjs(date)}
                   onChange={(value) => {
-                    const date = dayjs(value).utc().toDate();
-                    const dateString = dayjs(date).format("YYYY-MM-DD");
-                    setDate(dateString);
-                    setWeekNumber(null);
-                    setYear(null);
-                    setMonth(null);
+                    const date = dayjs(value);
+                    setDate(date);
                   }}
                 />
               ) : null}
@@ -321,8 +309,6 @@ export const DeviceHistoryContent = ({ device }: { device: Device }) => {
                     const year = dayjs(value).year();
                     setWeekNumber(week);
                     setYear(year);
-                    setMonth(null);
-                    setDate(null);
                   }}
                 />
               ) : null}
@@ -334,8 +320,6 @@ export const DeviceHistoryContent = ({ device }: { device: Device }) => {
                     const year = dayjs(value).year();
                     setMonth(month);
                     setYear(year);
-                    setDate(null);
-                    setWeekNumber(null);
                   }}
                 />
               ) : null}
@@ -343,47 +327,33 @@ export const DeviceHistoryContent = ({ device }: { device: Device }) => {
           </div>
         </div>
       </div>
-      <h2>Notes</h2>
+      <h2 className={styles.notesTitle}>Notes</h2>
       <div className={styles.notesContainer}>
-        <form className={styles.form}>
-          <div className={styles.side}>
-            {mode === "day"
-              ? notesdayData?.data?.map((n, i: number) => {
-                  return (
-                    <div key={n?.id}>
-                      <span>{n.title}</span>
-                      <span>{n.date}</span>
-                      <div>{n.content}</div>
-                    </div>
-                  );
-                })
-              : null}
+        <div className={styles.notes}>
+          {mode === "day"
+            ? notesDayData?.data?.length
+              ? notesDayData?.data?.map((n: Note) => (
+                  <NoteItem note={n} key={n.id} />
+                ))
+              : "No notes"
+            : null}
 
-            {mode === "week"
-              ? notesWeekData?.data?.map((n, i: number) => {
-                  return (
-                    <div key={n?.id}>
-                      <span>{n.title}</span>
-                      <span>{n.date}</span>
-                      <div>{n.content}</div>
-                    </div>
-                  );
-                })
-              : null}
+          {mode === "week"
+            ? notesWeekData?.data?.length
+              ? notesWeekData?.data?.map((n: Note) => (
+                  <NoteItem note={n} key={n.id} />
+                ))
+              : "No notes"
+            : null}
 
-            {mode === "month"
-              ? notesMonthData?.data?.map((n, i: number) => {
-                  return (
-                    <div key={n?.id}>
-                      <span>{n.title}</span>
-                      <span>{n.date}</span>
-                      <div>{n.content}</div>
-                    </div>
-                  );
-                })
-              : null}
-          </div>
-        </form>
+          {mode === "month"
+            ? notesMonthData?.data?.length
+              ? notesMonthData?.data?.map((n: Note) => (
+                  <NoteItem note={n} key={n.id} />
+                ))
+              : "No notes"
+            : null}
+        </div>
       </div>
     </div>
   );
