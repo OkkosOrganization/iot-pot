@@ -1,4 +1,4 @@
-import { pgTable, unique, serial, varchar, foreignKey, integer, json, timestamp, date, text } from "drizzle-orm/pg-core"
+import { pgTable, unique, serial, varchar, foreignKey, integer, json, timestamp, text } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
 
@@ -39,9 +39,10 @@ export const measurements = pgTable("measurements", {
 
 export const notes = pgTable("notes", {
 	id: serial().primaryKey().notNull(),
-	date: date().default(sql`CURRENT_DATE`).notNull(),
+	date: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	content: text(),
 	deviceId: varchar("device_id", { length: 255 }).notNull(),
+	title: varchar({ length: 512 }),
 }, (table) => [
 	foreignKey({
 			columns: [table.deviceId],

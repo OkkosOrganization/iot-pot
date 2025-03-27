@@ -123,9 +123,69 @@ export const addUser = (auth0Id: string) => {
     .returning();
 };
 
+export const addNote = (
+  title: string,
+  content: string,
+  deviceId: string,
+  date: string
+) => {
+  return db
+    .insert(schema.notes)
+    .values({
+      title: title,
+      content: content,
+      deviceId: deviceId,
+      date: date,
+    })
+    .onConflictDoNothing()
+    .returning();
+};
+
 export const addMeasurements = (deviceId: string, data: SensorValues) => {
   return db.insert(schema.measurements).values({
     deviceId: deviceId,
     data: data,
   });
+};
+
+export const getNotesByWeek = (
+  deviceId: string,
+  weekNumber: number,
+  year: number
+) => {
+  return db
+    .select()
+    .from(schema.notes)
+    .where(
+      sql`${schema.notes.deviceId} = ${deviceId} 
+      AND EXTRACT(YEAR FROM ${schema.notes.date}) = ${year} 
+      AND EXTRACT(WEEK FROM ${schema.notes.date}) = ${weekNumber}`
+    )
+    .orderBy(desc(schema.notes.date));
+};
+
+export const getNotesByDay = (deviceId: string, date: string) => {
+  return db
+    .select()
+    .from(schema.notes)
+    .where(
+      sql`${schema.notes.deviceId} = ${deviceId} AND DATE(${schema.notes.date}) = ${date}`
+    )
+    .orderBy(desc(schema.notes.date));
+};
+
+export const getNotesByMonth = (
+  deviceId: string,
+  month: number,
+  year: number
+) => {
+  return db
+    .select()
+    .from(schema.notes)
+    .where(
+      sql`${schema.notes.deviceId} = ${deviceId} 
+        AND EXTRACT(YEAR FROM ${schema.notes.date}) = ${year} 
+        AND EXTRACT(MONTH FROM ${schema.notes.date}) = ${month}`
+    )
+    .orderBy(desc(schema.notes.date));
 };

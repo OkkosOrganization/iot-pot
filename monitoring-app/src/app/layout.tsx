@@ -33,7 +33,7 @@ export default function RootLayout({
       <body
         className={`${FontPoppins.variable} ${FontRoboto_Condensed.variable}`}
       >
-        <main className="container">{children}</main>
+        <main className="main">{children}</main>
       </body>
     </html>
   );
