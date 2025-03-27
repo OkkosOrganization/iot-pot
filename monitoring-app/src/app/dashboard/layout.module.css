@@ -4,8 +4,10 @@
   flex-direction: column;
 }
 .pageContainer {
+  max-width: 100%;
   width: 100%;
   padding: 1rem;
+  overflow: hidden;
 }
 
 /******************/
@@ -17,6 +19,12 @@
     flex-direction: row;
     flex-grow: 1;
   }
+  .pageContainer {
+    padding: 2rem;
+  }
+}
+
+@media screen and (min-width: 80em) {
   .pageContainer {
     padding: 4rem;
   }
