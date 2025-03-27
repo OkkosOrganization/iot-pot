@@ -13,6 +13,7 @@
 /****************/
 @media screen and (min-width: 37.5rem) {
   .dashboard {
+    width: 100%;
     flex-direction: row;
     flex-grow: 1;
   }
