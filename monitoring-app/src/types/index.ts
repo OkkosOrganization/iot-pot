@@ -25,3 +25,45 @@ export type SensorValues = {
   waterLevel: number;
   waterOverflow: number;
 };
+
+export type Note = {
+  id: string;
+  title: string;
+  content: string;
+  date: string;
+  deviceId: string;
+  error: string;
+};
+
+export type MeasurementItem = {
+  id: number;
+  deviceId: string;
+  timestamp: string;
+  data: {
+    airTemperature: number;
+    airHumidity: number;
+    soilMoisture: number;
+    soilPh: number;
+    soilTemperature: number;
+  };
+  error?: string;
+};
+
+export type MeasurementsApiResponse = {
+  status: 0 | 1;
+  data: MeasurementItem[];
+};
+export type NotesApiResponse = {
+  status: 0 | 1;
+  data: Note[];
+};
+
+export type SensorLabels =
+  | "airTemperature"
+  | "airHumidity"
+  | "soilMoisture"
+  | "soilPh"
+  | "soilTemperature"
+  | "luminosity"
+  | "waterLevel"
+  | "waterOverflow";
