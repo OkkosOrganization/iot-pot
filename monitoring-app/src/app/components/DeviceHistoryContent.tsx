@@ -185,41 +185,40 @@ export const DeviceHistoryContent = ({ device }: DeviceHistoryContentProps) => {
     <div className={styles.wrapper}>
       <div className={styles.container}>
         <div className={styles.visualizationContainer}>
-          <div>
-            {weekError ||
-            monthError ||
-            dayError ||
-            notesDayError ||
-            notesWeekError ||
-            notesMonthError ? (
-              <div>
-                {weekError && weekError}
-                {monthError && monthError}
-                {dayError && dayError}
-                {notesDayError && notesDayError}
-                {notesWeekError && notesWeekError}
-                {notesMonthError && notesMonthError}
-              </div>
-            ) : null}
-
-            <div className={styles.valueSelectorContainer}>
-              <div className={styles.valueSelector}>
-                {Object.entries(SENSOR_LABELS_MAP).map(([key, label]) => {
-                  return (
-                    <button
-                      className={
-                        key === chosenSensorLabel ? styles.activeBtn : ""
-                      }
-                      key={key}
-                      onClick={() => setChosenSensorLabel(key as SensorLabels)}
-                    >
-                      {label.toLocaleUpperCase()}
-                    </button>
-                  );
-                })}
-              </div>
+          {weekError ||
+          monthError ||
+          dayError ||
+          notesDayError ||
+          notesWeekError ||
+          notesMonthError ? (
+            <div>
+              {weekError && weekError}
+              {monthError && monthError}
+              {dayError && dayError}
+              {notesDayError && notesDayError}
+              {notesWeekError && notesWeekError}
+              {notesMonthError && notesMonthError}
             </div>
+          ) : null}
 
+          <div className={styles.valueSelectorContainer}>
+            <div className={styles.valueSelector}>
+              {Object.entries(SENSOR_LABELS_MAP).map(([key, label]) => {
+                return (
+                  <button
+                    className={
+                      key === chosenSensorLabel ? styles.activeBtn : ""
+                    }
+                    key={key}
+                    onClick={() => setChosenSensorLabel(key as SensorLabels)}
+                  >
+                    {label.toLocaleUpperCase()}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          <div className={styles.chartContainer}>
             {data.dates.length && chosenSensorLabel ? (
               <LineChart
                 height={366}
@@ -335,6 +334,7 @@ export const DeviceHistoryContent = ({ device }: DeviceHistoryContentProps) => {
           </div>
         </div>
       </div>
+
       <h2 className={styles.notesTitle}>Notes</h2>
       <div className={styles.notesContainer}>
         <div className={styles.notes}>

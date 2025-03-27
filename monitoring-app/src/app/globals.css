@@ -86,7 +86,6 @@ body {
   line-height: 1.5;
   color: var(--black);
   background-color: var(--lightGrey);
-  padding: 0;
 }
 #logo {
   position: relative;
@@ -100,7 +99,7 @@ body {
   flex-direction: column;
   padding: 0.5rem;
   background-color: #fff;
-  overflow-x: hidden;
+  position: relative;
 }
 h1,
 h2,
