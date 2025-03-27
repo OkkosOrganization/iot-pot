@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getNotesByDay, getNotesByWeek } from "../../../../db/db";
+import { getNotesByDay } from "../../../../db/db";
 import { type NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {

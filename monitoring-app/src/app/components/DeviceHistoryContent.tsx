@@ -186,11 +186,19 @@ export const DeviceHistoryContent = ({ device }: DeviceHistoryContentProps) => {
       <div className={styles.container}>
         <div className={styles.visualizationContainer}>
           <div>
-            {weekError || monthError || dayError ? (
+            {weekError ||
+            monthError ||
+            dayError ||
+            notesDayError ||
+            notesWeekError ||
+            notesMonthError ? (
               <div>
                 {weekError && weekError}
                 {monthError && monthError}
                 {dayError && dayError}
+                {notesDayError && notesDayError}
+                {notesWeekError && notesWeekError}
+                {notesMonthError && notesMonthError}
               </div>
             ) : null}
 
