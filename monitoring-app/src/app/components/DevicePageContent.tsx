@@ -7,6 +7,11 @@ import dayjs, { Dayjs } from "dayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { MouseEvent, useState } from "react";
+import updateLocale from "dayjs/plugin/updateLocale";
+dayjs.extend(updateLocale);
+dayjs.updateLocale("en", {
+  weekStart: 1,
+});
 
 type DevicePageContentProps = {
   deviceId: string;
@@ -73,7 +78,7 @@ export const DevicePageContent = ({ deviceId }: DevicePageContentProps) => {
           type="soilPh"
           title="Soil PH"
           value={soilPh as number}
-          unit="%"
+          unit=""
         />
         <SensorCard
           type="soilTemperature"
@@ -117,15 +122,16 @@ export const DevicePageContent = ({ deviceId }: DevicePageContentProps) => {
         <form className={styles.form}>
           <div className={styles.side}>
             <div className={styles.inputContainer}>
-              <input
-                placeholder="Title"
-                onChange={(e) => setTitle(e.currentTarget.value)}
-              ></input>
+              <label className={styles.inputLabel}>Title</label>
+              <input onChange={(e) => setTitle(e.currentTarget.value)} />
             </div>
-            <textarea
-              placeholder="Note content"
-              onChange={(e) => setContent(e.currentTarget.value)}
-            ></textarea>
+            <div className={styles.inputContainer}>
+              <label className={styles.inputLabel}>Note content</label>
+              <textarea
+                rows={3}
+                onChange={(e) => setContent(e.currentTarget.value)}
+              ></textarea>
+            </div>
             <div className={styles.bottom}>
               <p className={styles.error}>{error ? error : ""}</p>
               <button className="btn" onClick={postNote}>
