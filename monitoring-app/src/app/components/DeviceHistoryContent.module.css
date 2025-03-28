@@ -7,7 +7,22 @@
 }
 .visualizationContainer {
   width: 100%;
+}
+.chartContainer {
+  padding: 1rem;
+  background: var(--grey);
+  border-radius: 1rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  font-family: "Roboto Condensed";
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 1.43;
   min-height: 25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 .toolsContainer {
   width: max-content;
@@ -65,7 +80,7 @@
   overflow-y: hidden;
   scroll-snap-type: x mandatory;
   width: max-content;
-  margin: 0 auto;
+  margin: 0 auto 1rem auto;
   /* Scrollbar oletuksena piiloon */
   scrollbar-width: none; /* Firefox */
 }
@@ -115,6 +130,7 @@
   color: var(--lime);
   background-color: var(--darkGrey);
 }
+
 .datePickerContainer {
   width: 100%;
   background-color: var(--grey);

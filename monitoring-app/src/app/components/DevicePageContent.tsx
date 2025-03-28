@@ -28,6 +28,7 @@ export const DevicePageContent = ({ deviceId }: DevicePageContentProps) => {
     waterOverflow,
   } = useMqttContext();
   const [error, setError] = useState<string>("");
+  const [success, setSuccess] = useState<string>("");
   const [date, setDate] = useState<Dayjs>(dayjs(Date.now()));
   const [title, setTitle] = useState<string>("");
   const [content, setContent] = useState<string>("");
@@ -47,21 +48,26 @@ export const DevicePageContent = ({ deviceId }: DevicePageContentProps) => {
           date: date,
         }),
       });
+      console.log(response);
       if (response.ok) {
+        console.log("OK");
         setTitle("");
         setContent("");
         setError("");
+        setSuccess("Note added ✅");
       } else {
         const body = await response.json();
 
         if (body?.success === 0) {
           console.log(body);
-          setError(body.error);
+          setError(`${body.error}❌`);
+          setSuccess("");
         }
       }
     } catch (error) {
       console.error("Error:", error);
-      setError("Error");
+      setError("Error ❌");
+      setSuccess("");
     }
   };
 
@@ -123,17 +129,22 @@ export const DevicePageContent = ({ deviceId }: DevicePageContentProps) => {
           <div className={styles.side}>
             <div className={styles.inputContainer}>
               <label className={styles.inputLabel}>Title</label>
-              <input onChange={(e) => setTitle(e.currentTarget.value)} />
+              <input
+                onChange={(e) => setTitle(e.currentTarget.value)}
+                value={title}
+              />
             </div>
             <div className={styles.inputContainer}>
               <label className={styles.inputLabel}>Note content</label>
               <textarea
                 rows={3}
+                value={content}
                 onChange={(e) => setContent(e.currentTarget.value)}
               ></textarea>
             </div>
             <div className={styles.bottom}>
-              <p className={styles.error}>{error ? error : ""}</p>
+              {error ? <p className={styles.error}>{error}</p> : null}
+              {success ? <p className={styles.success}>{success}</p> : null}
               <button className="btn" onClick={postNote}>
                 submit
               </button>
