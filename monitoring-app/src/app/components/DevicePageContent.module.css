@@ -87,16 +87,28 @@
 }
 
 .bottom {
+  width: 100%;
   padding-top: 2rem;
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
-  gap: 1rem;
+}
+.bottom button {
+  margin: 0;
+  justify-self: flex-end;
 }
 
 .error {
+  flex: 1;
+  text-align: left;
   color: red;
+}
+
+.success {
+  flex: 1;
+  text-align: left;
+  color: green;
 }
 
 /******************/

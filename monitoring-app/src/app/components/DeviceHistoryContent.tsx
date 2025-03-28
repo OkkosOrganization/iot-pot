@@ -261,7 +261,9 @@ export const DeviceHistoryContent = ({ device }: DeviceHistoryContentProps) => {
                   },
                 }}
               />
-            ) : null}
+            ) : (
+              "No data to display"
+            )}
           </div>
         </div>
         <div className={styles.toolsContainer}>
