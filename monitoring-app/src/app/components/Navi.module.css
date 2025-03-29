@@ -4,7 +4,7 @@
   justify-content: flex-start;
   align-items: flex-start;
   position: relative;
-  width: 5rem;
+  width: 100%;
 }
 .logoContainer {
   display: flex;
@@ -15,7 +15,7 @@
 .userName {
   font-family: var(--poppins);
   font-weight: 500;
-  font-size: 1.5rem;
+  font-size: 1rem;
 }
 .deviceNavi {
   position: relative;
@@ -95,7 +95,6 @@
   display: block;
 }
 .addDeviceBtn {
-  margin-top: 1rem;
   top: 0.75rem;
   justify-content: center;
   background-color: var(--grey);
@@ -107,7 +106,9 @@
 }
 
 .footer {
-  position: relative;
+  position: absolute;
+  top: 0.125rem;
+  right: 0rem;
   margin-left: 1.25rem;
   display: flex;
   flex-direction: column;
@@ -119,4 +120,25 @@
   background-color: var(--grey);
   border-radius: 3rem;
   margin-top: auto;
+}
+
+/******************/
+/* MEDIA QUERIES */
+/****************/
+@media screen and (min-width: 37.5rem) {
+  .navi {
+    width: 5rem;
+  }
+  .userName {
+    font-size: 1.5rem;
+  }
+  .footer {
+    position: relative;
+    top: auto;
+    right: auto;
+  }
+  .addDeviceBtn {
+    margin-top: 1rem;
+    top: 0.75rem;
+  }
 }
