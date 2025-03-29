@@ -166,7 +166,7 @@
 .notesContainer {
   width: 100%;
   border-radius: 2rem;
-  padding: 2rem 0;
+  padding: 2rem 0 0 0;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
