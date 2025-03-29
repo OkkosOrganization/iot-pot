@@ -6,7 +6,7 @@
 .pageContainer {
   max-width: 100%;
   width: 100%;
-  padding: 1rem;
+  padding: 0 0 0.25rem 0;
   overflow: hidden;
 }
 

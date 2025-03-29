@@ -4,7 +4,6 @@
   justify-content: center;
   align-items: center;
   gap: 2rem;
-  padding-top: 4rem;
 }
 
 .title {
@@ -28,4 +27,7 @@
 /* MEDIA QUERIES */
 /****************/
 @media screen and (min-width: 37.5rem) {
+  .container {
+    padding-top: 4rem;
+  }
 }

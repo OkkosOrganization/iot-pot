@@ -1,17 +1,10 @@
 "use client";
 import { useMqttContext } from "@/contexts/mqttContext";
 import { SensorCard } from "./SensorCard";
-import styles from "./DevicePageContent.module.css";
-import { DateCalendar } from "@mui/x-date-pickers";
-import dayjs, { Dayjs } from "dayjs";
+import { NoteForm } from "./NoteForm";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { MouseEvent, useState } from "react";
-import updateLocale from "dayjs/plugin/updateLocale";
-dayjs.extend(updateLocale);
-dayjs.updateLocale("en", {
-  weekStart: 1,
-});
+import styles from "./DevicePageContent.module.css";
 
 type DevicePageContentProps = {
   deviceId: string;
@@ -27,49 +20,6 @@ export const DevicePageContent = ({ deviceId }: DevicePageContentProps) => {
     waterLevel,
     waterOverflow,
   } = useMqttContext();
-  const [error, setError] = useState<string>("");
-  const [success, setSuccess] = useState<string>("");
-  const [date, setDate] = useState<Dayjs>(dayjs(Date.now()));
-  const [title, setTitle] = useState<string>("");
-  const [content, setContent] = useState<string>("");
-
-  const postNote = async (e: MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    try {
-      const response = await fetch(`/api/note/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title: title,
-          content: content,
-          deviceId: deviceId,
-          date: date,
-        }),
-      });
-      console.log(response);
-      if (response.ok) {
-        console.log("OK");
-        setTitle("");
-        setContent("");
-        setError("");
-        setSuccess("Note added ✅");
-      } else {
-        const body = await response.json();
-
-        if (body?.success === 0) {
-          console.log(body);
-          setError(`${body.error}❌`);
-          setSuccess("");
-        }
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      setError("Error ❌");
-      setSuccess("");
-    }
-  };
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -123,46 +73,7 @@ export const DevicePageContent = ({ deviceId }: DevicePageContentProps) => {
           unit=""
         />
       </div>
-      <h2 className={styles.title}>Add note</h2>
-      <div className={styles.notesContainer}>
-        <form className={styles.form}>
-          <div className={styles.side}>
-            <div className={styles.inputContainer}>
-              <label className={styles.inputLabel}>Title</label>
-              <input
-                onChange={(e) => setTitle(e.currentTarget.value)}
-                value={title}
-              />
-            </div>
-            <div className={styles.inputContainer}>
-              <label className={styles.inputLabel}>Note content</label>
-              <textarea
-                rows={3}
-                value={content}
-                onChange={(e) => setContent(e.currentTarget.value)}
-              ></textarea>
-            </div>
-            <div className={styles.bottom}>
-              {error ? <p className={styles.error}>{error}</p> : null}
-              {success ? <p className={styles.success}>{success}</p> : null}
-              <button className="btn" onClick={postNote}>
-                submit
-              </button>
-            </div>
-          </div>
-          <div className={styles.date}>
-            <DateCalendar
-              views={["day", "month", "year"]}
-              maxDate={dayjs(Date.now())}
-              value={date}
-              onChange={(value) => {
-                const date = dayjs(value);
-                setDate(date);
-              }}
-            />
-          </div>
-        </form>
-      </div>
+      <NoteForm deviceId={deviceId} />
     </LocalizationProvider>
   );
 };
