@@ -53,3 +53,7 @@ const unsigned long mqttPublishInterval = 20000; // 20 SECONDS
 // INTERVAL FOR HTTPS PUBLISH
 unsigned long previousHttpsMillis = 0;
 const unsigned long httpsPublishInterval = 1 * 60 * 1000; // 60 SECONDS
+
+// INTERVAL FOR NOTIFICATIONS
+unsigned long previousNotificationMillis = 0;
+const unsigned long notificationSendInterval = 1 * 60 * 1000; // 60 SECONDS
