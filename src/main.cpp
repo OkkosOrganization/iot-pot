@@ -119,6 +119,7 @@ void loop() {
   getSensorValues();
   publishValuesMqtt();
   publishValuesHttps();
+  sendNotifications();
 }
 
 // GETS VALUES FROM SENSORS
@@ -283,6 +284,20 @@ void publishValuesHttps() {
     } else {
       Serial.println("Connection to API failed.");
     }
+  }
+}
+
+// SEND NOTIFICATIONS
+void sendNotifications() {
+  unsigned long currentMillis = millis();
+  if (currentMillis - previousNotificationMillis >= notificationSendInterval) {
+    previousNotificationMillis = currentMillis;
+    
+    Serial.println(NOTIFICATION_API_URL);
+    // TODO: 
+    // CHECK NOTIFICATION TRIGGERS
+    // CHECK SENSOR VALUES
+    // SEND HTTPS POST 
   }
 }
 
