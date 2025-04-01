@@ -1,0 +1,84 @@
+.dialog {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: -1;
+  opacity: 0;
+}
+
+.dialog[open] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  z-index: 1000;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  width: 100%;
+  padding: 2rem 1rem;
+  max-width: 28rem;
+  min-height: 20rem;
+  align-items: center;
+  background: #fff;
+  margin: 0 auto;
+  position: relative;
+  border-radius: 2rem;
+  overflow: hidden;
+  overflow-y: auto;
+}
+
+.container::-webkit-scrollbar {
+  width: 0.75rem;
+}
+
+.container::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 2rem 0;
+}
+
+.container::-webkit-scrollbar-thumb {
+  background-color: var(--darkGrey);
+  border-radius: 1rem;
+  border: 2px solid transparent;
+  background-clip: content-box;
+  right: 0.5rem;
+  position: relative;
+}
+
+.header {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0 1rem 0;
+}
+
+.closeDialogBtn {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 100%;
+  cursor: pointer;
+}
+
+.title {
+  text-align: left;
+}
+
+.content p {
+  margin: 0 0 1rem 0;
+}
+
+.content h3 {
+  margin: 0 0 0.5rem 0;
+}
