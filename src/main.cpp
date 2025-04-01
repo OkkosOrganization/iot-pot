@@ -311,6 +311,8 @@ void sendNotifications() {
           "email": <userEmail>,
           "type": <"tank-empty" | "soil-moisture" | "overflow">
         }
+
+      TÄMÄ ON UUTTA SISÄLTÖÄ!!
     */
   }
 }
