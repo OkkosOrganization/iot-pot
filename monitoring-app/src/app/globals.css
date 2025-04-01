@@ -135,7 +135,9 @@ input {
 .MuiPickersDay-root {
   font-family: "Roboto Condensed", sans-serif !important;
 }
-.MuiPickersDay-root.Mui-selected {
+.MuiPickersDay-root.Mui-selected,
+.MuiPickersMonth-root.Mui-selected,
+.MuiPickersMonth-monthButton.Mui-selected {
   background-color: var(--purple) !important;
   color: white !important;
 }
