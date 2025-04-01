@@ -264,7 +264,7 @@ void publishValuesHttps() {
     //client.setCACert(root_ca);  // CHECK SSL CERT
 
     HTTPClient https;
-    if (https.begin(client, BACKEND_API_URL)) {
+    if (https.begin(client, MEASUREMENTS_API_URL)) {
       https.addHeader("Content-Type", "application/json");
 
       int httpResponseCode = https.POST(jsonString);
