@@ -67,3 +67,13 @@ export type SensorLabels =
   | "luminosity"
   | "waterLevel"
   | "waterOverflow";
+
+export const NOTIFICATION_TYPES = [
+  "soil-moisture",
+  "tank-empty",
+  "overflow",
+] as const;
+export type NotificationTypes = (typeof NOTIFICATION_TYPES)[number];
+export function isNotificationType(value: string): value is NotificationTypes {
+  return (NOTIFICATION_TYPES as readonly string[]).includes(value);
+}
