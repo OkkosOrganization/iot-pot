@@ -38,6 +38,10 @@ uint8_t LED_PIN_6 = D5;
 uint8_t LED_PIN_7 = D4;
 uint8_t LED_PIN_8 = D3;
 
+// API URLS
+char MEASUREMENTS_API_URL[60] = "https://iot-pot.com/api/measurements";
+char NOTIFICATION_API_URL[31] = "https://iot-pot.com/api/notify";
+
 // WIFI AP CREDENTIALS
 const char *soft_ap_ssid = "IoT-pot";
 const char *soft_ap_password = "TIES4571";
