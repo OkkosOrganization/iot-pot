@@ -4,7 +4,9 @@ import { SensorCard } from "./SensorCard";
 import { NoteForm } from "./NoteForm";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { useState } from "react";
 import styles from "./DevicePageContent.module.css";
+import { SensorInfoDialog } from "./SensorInfoDialog";
 
 type DevicePageContentProps = {
   deviceId: string;
@@ -20,6 +22,12 @@ export const DevicePageContent = ({ deviceId }: DevicePageContentProps) => {
     waterLevel,
     waterOverflow,
   } = useMqttContext();
+
+  const [showDialog, setShowDialog] = useState<boolean>(false);
+
+  const showSensorInfoDialog = () => {
+    setShowDialog(true);
+  };
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -72,8 +80,15 @@ export const DevicePageContent = ({ deviceId }: DevicePageContentProps) => {
           value={waterOverflow}
           unit=""
         />
+        <button
+          className={`btn ${styles.sensorInfoDialogBtn}`}
+          onClick={showSensorInfoDialog}
+        >
+          <span>i</span>
+        </button>
       </div>
       <NoteForm deviceId={deviceId} />
+      <SensorInfoDialog showDialog={showDialog} setShowDialog={setShowDialog} />
     </LocalizationProvider>
   );
 };
