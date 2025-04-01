@@ -39,6 +39,7 @@ void publishValuesHttps();
 void connectMqtt();
 void initMqtt();
 void convertValues();
+void sendNotifications();
 
 // PREFERENCES
 Preferences preferences;
