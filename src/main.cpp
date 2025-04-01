@@ -293,11 +293,24 @@ void sendNotifications() {
   if (currentMillis - previousNotificationMillis >= notificationSendInterval) {
     previousNotificationMillis = currentMillis;
     
+    Serial.println("Check notifications:");
     Serial.println(NOTIFICATION_API_URL);
     // TODO: 
-    // CHECK NOTIFICATION TRIGGERS
-    // CHECK SENSOR VALUES
-    // SEND HTTPS POST 
+    /*
+      1.CHECK NOTIFICATION TRIGGERS
+        preferences.isKey("soil-moisture")
+        smt = preferences.getBool("soil-moisture");
+      
+      2.CHECK SENSOR VALUES
+        if (soilMoisture > preferences.getInt("threshold"))
+
+      3.SEND HTTPS POST REQUEST, POST REQUEST BODY SHOULD BE IN JSON FORMAT LIKE:
+        {
+          "deviceId": <deviceId>,
+          "email": <userEmail>,
+          "type": <"tank-empty" | "soil-moisture" | "overflow">
+        }
+    */
   }
 }
 
