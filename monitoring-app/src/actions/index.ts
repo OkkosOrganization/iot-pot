@@ -30,7 +30,7 @@ export async function AddDevice(previousState: unknown, formData: FormData) {
               }
               return { device: newDevice, error: null };
             } else {
-              return { device: [], error: "An error occured" };
+              return { device: [], error: "An error occured ❌" };
             }
           } catch (e) {
             console.log(e);
@@ -39,10 +39,10 @@ export async function AddDevice(previousState: unknown, formData: FormData) {
           }
         } else {
           console.log("Device in use:", deviceRow[0].userId);
-          return { device: [], error: "Device already in use" };
+          return { device: [], error: "Device already in use ❌" };
         }
       } else {
-        return { device: [], error: "No device found" };
+        return { device: [], error: "No device found ❌" };
       }
     }
   }

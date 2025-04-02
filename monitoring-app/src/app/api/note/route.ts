@@ -21,18 +21,30 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  if (!title) {
+    return NextResponse.json(
+      { success: 0, error: "No title" },
+      { status: 400 }
+    );
+  }
+
+  if (!content) {
+    return NextResponse.json(
+      { success: 0, error: "No content" },
+      { status: 400 }
+    );
+  }
+
+  if (!date) {
+    return NextResponse.json({ success: 0, error: "No date" }, { status: 400 });
+  }
+
   if (
     !session.user.db.devices.filter((d: Device) => d.deviceId === deviceId)
       .length
   )
     return NextResponse.json(
       { success: 0, error: "Not device owner" },
-      { status: 400 }
-    );
-
-  if (!title.length || !content.length || !date.length)
-    return NextResponse.json(
-      { success: 0, error: "Invalid params" },
       { status: 400 }
     );
 
