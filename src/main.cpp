@@ -39,6 +39,7 @@ void publishValuesHttps();
 void connectMqtt();
 void initMqtt();
 void convertValues();
+void sendNotifications();
 
 // PREFERENCES
 Preferences preferences;
@@ -119,6 +120,7 @@ void loop() {
   getSensorValues();
   publishValuesMqtt();
   publishValuesHttps();
+  sendNotifications();
 }
 
 // GETS VALUES FROM SENSORS
@@ -262,7 +264,7 @@ void publishValuesHttps() {
     //client.setCACert(root_ca);  // CHECK SSL CERT
 
     HTTPClient https;
-    if (https.begin(client, BACKEND_API_URL)) {
+    if (https.begin(client, MEASUREMENTS_API_URL)) {
       https.addHeader("Content-Type", "application/json");
 
       int httpResponseCode = https.POST(jsonString);
@@ -283,6 +285,39 @@ void publishValuesHttps() {
     } else {
       Serial.println("Connection to API failed.");
     }
+  }
+}
+
+// SEND NOTIFICATIONS
+void sendNotifications() {
+  unsigned long currentMillis = millis();
+  if (currentMillis - previousNotificationMillis >= notificationSendInterval) {
+    previousNotificationMillis = currentMillis;
+    
+    Serial.println("Check notifications:");
+    Serial.println(NOTIFICATION_API_URL);
+    // TODO: 
+    /*
+      1.CHECK NOTIFICATION TRIGGERS
+        preferences.isKey("soil-moisture")
+        smt = preferences.getBool("soil-moisture");
+      
+      2.CHECK SENSOR VALUES
+        if (soilMoisture > preferences.getInt("threshold"))
+
+      3.SEND HTTPS POST REQUEST, POST REQUEST BODY SHOULD BE IN JSON FORMAT LIKE:
+        {
+          "deviceId": <deviceId>,
+          "email": <userEmail>,
+          "type": <"tank-empty" | "soil-moisture" | "overflow">
+        }
+
+      TÄMÄ ON UUTTA SISÄLTÖÄ!!
+
+      TAAS UUSI KOMMENTTI, JEE
+
+      Testing, Testing.. Kokeillaan saanko gitlabiin asti tuotua :)
+    */
   }
 }
 
