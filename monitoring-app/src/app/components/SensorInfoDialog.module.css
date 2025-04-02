@@ -69,6 +69,15 @@
   height: 2.25rem;
   border-radius: 100%;
   cursor: pointer;
+  background-color: var(--purple);
+}
+.closeDialogBtn:hover {
+  transform-origin: center center;
+  transform: scale(1.1);
+  transition: all 0.2s ease-in-out;
+}
+.closeDialogBtn * {
+  stroke: white;
 }
 
 .title {
