@@ -9,14 +9,7 @@
 #include <Arduino.h>
 #define LIGHT_SENSOR_PIN A3 
 
-void initLdrSensor();
 void getLdrSensorValue();
-
-void initLdrSensor() {
-  // set the ADC attenuation to 11 dB (up to ~3.3V input)
-  analogSetAttenuation(ADC_11db);
-}
-
 void getLdrSensorValue() {
   luminosity = analogRead(LIGHT_SENSOR_PIN);
 }
