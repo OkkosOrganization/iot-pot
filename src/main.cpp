@@ -6,6 +6,7 @@
 #include "overflow_sensor.h"
 #include "water_level_sensor.h"
 #include "soil_ph_moisture_temperature_sensor.h"
+#include "soil_moisture_sensor.h"
 #include "dht22_sensor.h"
 #include "LDR_sensor.h"
 #include <WebServer.h>
@@ -84,6 +85,9 @@ void setup() {
   sprintf(waterLevelTopic, "/device/%s/waterLevel/",deviceIdHex.c_str());
   sprintf(luminosityTopic, "/device/%s/luminosity/",deviceIdHex.c_str());
 
+  // INIT ANALOG SENSORS
+  analogSetAttenuation(ADC_11db);
+
   // WATER LEVEL
   initWaterLevelSensor();
 
@@ -92,9 +96,6 @@ void setup() {
 
   // DHT22
   dht_sensor.begin(); 
-
-  // LDR
-  initLdrSensor();
 
   // OVERFLOW
   initOverFlowSensor();
@@ -105,7 +106,6 @@ void setup() {
   led2.setState(OFF);
   led3.setState(OFF);
   led4.setState(OFF);
-
 
   // INITIALIZES THE WIFI IN ACCESS POINT AND CLIENT MODE
   WiFi.mode(WIFI_MODE_APSTA);
@@ -131,8 +131,14 @@ void getSensorValues(){
     getWaterLevel(); 
     getAirTemperatureAndHumidity();
     getLdrSensorValue();
-    getSoilSensorValues();
     getOverFlowSensorValue();   
+
+    // USE MODBUS SENSOR IF AVAILABLE
+    if(soilSensorAvailable())
+      getSoilSensorValues();
+    else
+      getAnalogSoilMoistureValue();
+
     convertValues();
   }  
 }
@@ -378,7 +384,8 @@ void initWifiClient(){
       }
       else
       {
-        Serial.println("Could not connect to WiFi");        
+        Serial.println("Could not connect to WiFi");
+        led1.setState(RED);        
         break;
       }
     }
@@ -388,11 +395,13 @@ void initWifiClient(){
       Serial.print("ESP32 IP on the WiFi network: ");
       Serial.println(WiFi.localIP());
       initMqtt();
+      led1.setState(GREEN);
     }
   }  
   else
   {
     Serial.println("No SSID or password");
+    led1.setState(RED);
   }
 }
 
