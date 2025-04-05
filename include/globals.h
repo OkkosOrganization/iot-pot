@@ -10,7 +10,12 @@ int luminosity = 0;
 float soilPh = 0;
 float soilMoisture = 0;
 float soilTemperature = 0;
-int waterOverflow = 0;
+
+enum WATER_OVERFLOW_STATE {
+  NO_OVERFLOW,
+  OVERFLOW
+};
+int waterOverflow = NO_OVERFLOW;
 
 // STRING VERSIONS
 char soilTemperatureStr[12], soilMoistureStr[12], soilPhStr[12];
@@ -35,8 +40,8 @@ uint8_t LED_PIN_3 = D10;
 uint8_t LED_PIN_4 = D9;
 uint8_t LED_PIN_5 = D8;
 uint8_t LED_PIN_6 = D5;
-uint8_t LED_PIN_7 = D4;
-uint8_t LED_PIN_8 = D3;
+uint8_t LED_PIN_7 = D6;
+uint8_t LED_PIN_8 = D7;
 
 // API URLS
 char MEASUREMENTS_API_URL[60] = "https://iot-pot.com/api/measurements";
