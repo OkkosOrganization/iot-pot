@@ -183,62 +183,67 @@ void publishValuesMqtt() {
   if (currentMillis - previousMqttMillis >= mqttPublishInterval) {
     previousMqttMillis = currentMillis;
 
+    bool publishFailed = false;
+
     // PUBLISH TO EACH TOPIC
     if (mqttClient.publish(soilTemperatureTopic, soilTemperatureStr)) {
       Serial.print(soilTemperatureTopic);
       Serial.println(soilTemperatureStr);
     } else {
-      Serial.println("MQTT publish failed");
+      publishFailed = true;
     }
 
     if (mqttClient.publish(soilPhTopic, soilPhStr)) {
       Serial.print(soilPhTopic);
       Serial.println(soilPhStr);
     } else {
-      Serial.println("MQTT publish failed");
+      publishFailed = true;
     }  
     
     if (mqttClient.publish(soilMoistureTopic, soilMoistureStr)) {
       Serial.print(soilMoistureTopic);
       Serial.println(soilMoistureStr);
     } else {
-      Serial.println("MQTT publish failed");
+      publishFailed = true;
     }      
 
     if (mqttClient.publish(airTemperatureTopic, soilTemperatureStr)) {
       Serial.print(airTemperatureTopic);
       Serial.println(airTemperatureStr);
     } else {
-      Serial.println("MQTT publish failed");
+      publishFailed = true;
     } 
     
     if (mqttClient.publish(airHumidityTopic, airHumidityStr)) {
       Serial.print(airHumidityTopic);
       Serial.println(airHumidityStr);
     } else {
-      Serial.println("MQTT publish failed");
+      publishFailed = true;
     }  
     
     if (mqttClient.publish(luminosityTopic, luminosityStr)) {
       Serial.print(luminosityTopic);
       Serial.println(luminosityStr);
     } else {
-      Serial.println("MQTT publish failed");
+      publishFailed = true;
     }  
     
     if (mqttClient.publish(waterLevelTopic, waterLevelStr)) {
       Serial.print(waterLevelTopic);
       Serial.println(waterLevelStr);
     } else {
-      Serial.println("MQTT publish failed");
+      publishFailed = true;
     }  
     
     if (mqttClient.publish(waterOverflowTopic, waterOverflowStr)) {
       Serial.print(waterOverflowTopic);
       Serial.println(waterOverflowStr);
     } else {
-      Serial.println("MQTT publish failed");
+      publishFailed = true;
     }      
+
+    if(publishFailed)
+      connectMqtt();
   }
 }
 
