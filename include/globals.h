@@ -61,3 +61,6 @@ const unsigned long httpsPublishInterval = 1 * 60 * 1000; // 60 SECONDS
 // INTERVAL FOR NOTIFICATIONS
 unsigned long previousNotificationMillis = 0;
 const unsigned long notificationSendInterval = 1 * 60 * 1000; // 60 SECONDS
+
+//smt
+bool smt=false;

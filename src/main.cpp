@@ -299,9 +299,35 @@ void sendNotifications() {
     // TODO: 
     /*
       1.CHECK NOTIFICATION TRIGGERS
-        preferences.isKey("soil-moisture")
+       if (preferences.isKey("soil-moisture")){
         smt = preferences.getBool("soil-moisture");
-      
+          if (smt){
+            Serial.println("Soil moisture notifications enabled.");
+            if (soilMoisture > preferences.getInt("threshold"))
+
+              if WiFi.status()=WL_CONNECTED
+            }
+          }
+        }
+        else if (preferences.isKey("tank-empty")){
+          smt=preferences.getBool("tank-empty");
+          if (smt){
+            Serial.println("Tank-empty notifications enabled");
+            if (waterLevel > preferences.getInt("threshold"))
+             //Aloitetaan lähetys
+            }
+          }
+        }
+        else if (preferences.isKey("overflow")){
+          smt=preferences.getBool("overflow");
+          if (smt){
+            Serial.println("overflow notifications enabled");
+            if (waterOverflow > preferences.getInt("threshold"))
+
+            //Aloitetaan lähetys
+            }
+          }
+        }
       2.CHECK SENSOR VALUES
         if (soilMoisture > preferences.getInt("threshold"))
 
@@ -311,6 +337,47 @@ void sendNotifications() {
           "email": <userEmail>,
           "type": <"tank-empty" | "soil-moisture" | "overflow">
         }
+
+      Versio 2:
+
+       */
+
+      if (preferences.isKey("soil-moisture") && smt==true && soilMoisture < preferences.getInt("threshold")){
+        if (WiFi.status()==WL_CONNECTED){  //Tarkistetaan Wifi.status
+
+          HTTPClient http;
+          http.begin(NOTIFICATION_API_URL);
+
+          http.addHeader("Content-Type", "application/json");
+
+          DynamicJsonDocument jsonDoc(200);
+           
+          String email= "susan.m.paloranta@jyu.fi";
+
+          jsonDoc["deviceId"] = deviceId;        
+          jsonDoc["email"] = "email";                
+          jsonDoc["type"] = "soil-moisture";
+
+          String jsonData;
+          serializeJson(jsonDoc, jsonData);
+
+          int httpResponseCode = http.POST(jsonData);
+          if (httpResponseCode > 0) {
+            Serial.print("HTTP Response code: ");
+            Serial.println(httpResponseCode);
+        } else {
+            Serial.print("Error code: ");
+            Serial.println(httpResponseCode);
+        }
+
+        http.end();  // Vapautetaan resurssit
+
+        }
+      }
+     
+
+// TODO: 
+    /*
 
       TÄMÄ ON UUTTA SISÄLTÖÄ!!
 
