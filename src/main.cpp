@@ -342,49 +342,49 @@ void sendNotifications() {
 
        */
 
-      if (preferences.isKey("soil-moisture") && smt==true && soilMoisture < preferences.getInt("threshold")){
-        if (WiFi.status()==WL_CONNECTED){  //Tarkistetaan Wifi.status
+    bool soilMoistureNotificationSet = preferences.isKey("soil-moisture");
+    bool smt = preferences.getBool("soil-moisture");
+    int threshold = preferences.getInt("threshold");
 
-          HTTPClient http;
-          http.begin(NOTIFICATION_API_URL);
+    Serial.println(soilMoistureNotificationSet);
+    Serial.println(smt);
+    Serial.println(threshold);
+    
+    // FORCE SOILMOISTURE TO 10, FOR TESTING
+    if (soilMoisture > threshold)
+    {
+      threshold = 100;
+      soilMoisture = 0;
+    }
 
-          http.addHeader("Content-Type", "application/json");
+    if (soilMoistureNotificationSet && smt==true && soilMoisture < threshold && WiFi.status() == WL_CONNECTED) { 
+      WiFiClientSecure client;
+      client.setInsecure();
+      HTTPClient https;
+      JsonDocument jsonDoc;
+      String email= "susan.m.paloranta@jyu.fi";
+      jsonDoc["deviceId"] = deviceIdHex;        
+      jsonDoc["email"] = email;                
+      jsonDoc["type"] = "soil-moisture";
+      String jsonData;
 
-          DynamicJsonDocument jsonDoc(200);
-           
-          String email= "susan.m.paloranta@jyu.fi";
-
-          jsonDoc["deviceId"] = deviceId;        
-          jsonDoc["email"] = "email";                
-          jsonDoc["type"] = "soil-moisture";
-
-          String jsonData;
-          serializeJson(jsonDoc, jsonData);
-
-          int httpResponseCode = http.POST(jsonData);
-          if (httpResponseCode > 0) {
+      if (https.begin(client, NOTIFICATION_API_URL)) {
+        https.addHeader("Content-Type", "application/json");
+        serializeJson(jsonDoc, jsonData);
+        Serial.println(jsonData);
+        int httpResponseCode = https.POST(jsonData);
+        if (httpResponseCode > 0) {
             Serial.print("HTTP Response code: ");
             Serial.println(httpResponseCode);
         } else {
             Serial.print("Error code: ");
             Serial.println(httpResponseCode);
+            String response = https.getString();
+            Serial.println(response);
         }
-
-        http.end();  // Vapautetaan resurssit
-
-        }
+        https.end();  // Vapautetaan resurssit
       }
-     
-
-// TODO: 
-    /*
-
-      TÄMÄ ON UUTTA SISÄLTÖÄ!!
-
-      TAAS UUSI KOMMENTTI, JEE
-
-      Testing, Testing.. Kokeillaan saanko gitlabiin asti tuotua :)
-    */
+    }
   }
 }
 
