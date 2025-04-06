@@ -15,7 +15,7 @@ enum WATER_OVERFLOW_STATE {
   NO_OVERFLOW,
   OVERFLOW
 };
-int waterOverflow = NO_OVERFLOW;
+byte waterOverflow = NO_OVERFLOW;
 
 // STRING VERSIONS
 char soilTemperatureStr[12], soilMoistureStr[12], soilPhStr[12];
