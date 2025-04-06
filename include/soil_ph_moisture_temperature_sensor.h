@@ -59,8 +59,8 @@ void getSoilSensorValues() {
       // MAP VALUE TO 0–100
       digitalSoilMoistureValue = map(digitalSoilMoistureValue, airValue, wetSoilValue, 0, 100);
 
-      Serial.print("DIGITAL SOIL SENSOR VALUE: ");
-      Serial.println(digitalSoilMoistureValue);
+      //Serial.print("DIGITAL SOIL SENSOR VALUE: ");
+      //Serial.println(digitalSoilMoistureValue);
       soilMoisture = digitalSoilMoistureValue;
 
     } else {
