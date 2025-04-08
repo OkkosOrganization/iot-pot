@@ -357,7 +357,7 @@ void sendNotifications() {
       soilMoisture = 0;
     }
 
-    if (soilMoistureNotificationSet && smt==true && soilMoisture < threshold && WiFi.status() == WL_CONNECTED) { 
+    if (soilMoistureNotificationSet && smt == true && soilMoisture < threshold && WiFi.status() == WL_CONNECTED) { 
       WiFiClientSecure client;
       client.setInsecure();
       HTTPClient https;
