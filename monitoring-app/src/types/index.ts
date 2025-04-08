@@ -45,6 +45,7 @@ export type MeasurementItem = {
     soilMoisture: number;
     soilPh: number;
     soilTemperature: number;
+    luminosity: number;
   };
   error?: string;
 };
