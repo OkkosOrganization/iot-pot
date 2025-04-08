@@ -338,27 +338,78 @@ void sendNotifications() {
           "type": <"tank-empty" | "soil-moisture" | "overflow">
         }
 
-      Versio 2:
 
        */
-      //if (preferences.isKey("soil-moisture") && smt==true && soilMoisture < preferences.getInt("threshold")){
-        if (WiFi.status()==WL_CONNECTED){  //Tarkistetaan Wifi.status
+     
+      bool smt = preferences.getBool("soil-moisture");
+      //Serial.print("value of smt is ");
+      //Serial.println(smt);
+      bool wte = preferences.getBool("tank-empty");
+      //Serial.print("value of wte is ");
+      //Serial.println(wte);
+      bool wo = preferences.getBool("overflow");
+      //Serial.print("value of wo is ");
+      //Serial.println(wo);
+
+      //if (preferences.isKey("threshold")) {
+        //int luku= preferences.getInt("threshold");
+        //Serial.print("value of threshold");
+        //Serial.println(luku);
+      //} 
+      //else {  
+      //Serial.println("Key 'threshold' does not exist.");
+      //}
+
+      
+      if (preferences.isKey("email")){
+        String email=preferences.getString("email");
+        if (preferences.isKey("soil-moisture") && smt==true && soilMoisture < preferences.getInt("threshold")){
+          if (WiFi.status()==WL_CONNECTED){ //Tarkistetaan Wifi.status
+            HTTPClient http;
+            http.begin(NOTIFICATION_API_URL);
+
+            http.addHeader("Content-Type", "application/json");
+
+            JsonDocument jsonDoc;
+         
+
+            jsonDoc["deviceId"] = deviceIdHex;           
+            jsonDoc["email"] = email;                
+            jsonDoc["type"] = "soil-moisture";
+
+            String jsonData;
+            serializeJson(jsonDoc, jsonData);
+
+            int httpResponseCode = http.POST(jsonData);
+            if (httpResponseCode > 0) {
+              Serial.print("HTTP Response code: ");
+              Serial.println(httpResponseCode);
+          } else {
+              Serial.print("Error code: ");
+              Serial.println(httpResponseCode);
+      }
+
+          http.end(); 
+        }
+
+      }
+      else if(preferences.isKey("tank-empty") && wte==true && waterLevel < preferences.getInt("threshold")){
+        if (WiFi.status()==WL_CONNECTED){ //Tarkistetaan Wifi.status
           HTTPClient http;
           http.begin(NOTIFICATION_API_URL);
- 
-          http.addHeader("Content-Type", "application/json");
- 
-          StaticJsonDocument<200> jsonDoc;
-           
-          String email= "susan.m.paloranta@student.jyu.fi";
 
-          jsonDoc["deviceId"] = deviceId;        
+          http.addHeader("Content-Type", "application/json");
+
+          JsonDocument jsonDoc;
+       
+
+          jsonDoc["deviceId"] = deviceIdHex;           
           jsonDoc["email"] = email;                
           jsonDoc["type"] = "soil-moisture";
- 
+
           String jsonData;
           serializeJson(jsonDoc, jsonData);
- 
+
           int httpResponseCode = http.POST(jsonData);
           if (httpResponseCode > 0) {
             Serial.print("HTTP Response code: ");
@@ -366,15 +417,43 @@ void sendNotifications() {
         } else {
             Serial.print("Error code: ");
             Serial.println(httpResponseCode);
-        }
- 
+    }
+
         http.end(); 
- 
-        }
       }
+      }
+      else if(preferences.isKey("overflow") && wo==true && waterOverflow>50){
+        if (WiFi.status()==WL_CONNECTED){ //Tarkistetaan Wifi.status
+          HTTPClient http;
+          http.begin(NOTIFICATION_API_URL);
 
-      
+          http.addHeader("Content-Type", "application/json");
 
+          JsonDocument jsonDoc;
+       
+
+          jsonDoc["deviceId"] = deviceIdHex;           
+          jsonDoc["email"] = email;                
+          jsonDoc["type"] = "soil-moisture";
+
+          String jsonData;
+          serializeJson(jsonDoc, jsonData);
+
+          int httpResponseCode = http.POST(jsonData);
+          if (httpResponseCode > 0) {
+            Serial.print("HTTP Response code: ");
+            Serial.println(httpResponseCode);
+        } else {
+            Serial.print("Error code: ");
+            Serial.println(httpResponseCode);
+    }
+
+        http.end(); 
+      }
+      }
+    }
+  }
+}
 // TODO: 
     /*
 
@@ -384,8 +463,8 @@ void sendNotifications() {
 
       Testing, Testing.. Kokeillaan saanko gitlabiin asti tuotua :)
     */
-    }
-  
+
+ 
 // INITIALIZES WIFI AP
 void initWiFiAp(){
   WiFi.softAPConfig(local_IP, gateway, subnet);
