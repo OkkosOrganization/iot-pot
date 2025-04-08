@@ -7,12 +7,10 @@
 #define POWER_PIN  D4 // Arduino Nano ESP32 pin D4 connected to sensor's VCC pin
 #define SIGNAL_PIN A0 // Arduino Nano ESP32 pin A0 connected to sensor's signal pin
 #include "led.h"
-#define THRESHOLD2 1000 
+#define OVERFLOW_THRESHOLD 1000 
 
 void initOverFlowSensor();
 void getOverFlowSensorValue();
-
-bool waterDetected=false; // Mikä on mittauksen tila seuraavalla mittauksella
 
 void initOverFlowSensor(){
   analogSetAttenuation(ADC_11db);
@@ -21,29 +19,17 @@ void initOverFlowSensor(){
 }
 
 void getOverFlowSensorValue(){
-    digitalWrite(POWER_PIN, HIGH);  // turn the sensor ON
-    waterOverflow = analogRead(SIGNAL_PIN); // read the analog value from sensor
-    digitalWrite(POWER_PIN, LOW);    // turn the sensor OFF
- 
-    if (waterOverflow > THRESHOLD2) { 
-        if (!waterDetected){
-            waterDetected=true;
-            Serial.print("The water is detected");
-            led3.setState(RED);
-        }  
-    }  
-        else{
-         if (waterDetected){
-            waterDetected=false;
-            led3.setState(OFF);
-            //led3.setState(GREEN);  
-            //delay(1000);
-            //led3.setState(OFF);
-         }
+  digitalWrite(POWER_PIN, HIGH);  // turn the sensor ON
+  waterOverflow = analogRead(SIGNAL_PIN); // read the analog value from sensor
+  digitalWrite(POWER_PIN, LOW);    // turn the sensor OFF
 
-        }
-    }
-
-
-    
-
+  if (waterOverflow > OVERFLOW_THRESHOLD) { 
+    Serial.print("OVERFLOW");
+    waterOverflow = 1;
+    led3.setState(RED);
+  }  
+  else{
+    waterOverflow = 0;
+    led3.setState(OFF);
+  }
+}
