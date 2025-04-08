@@ -296,177 +296,103 @@ void sendNotifications() {
     
     Serial.println("Check notifications:");
     Serial.println(NOTIFICATION_API_URL);
-    // TODO: 
-    /*
-      1.CHECK NOTIFICATION TRIGGERS
-       if (preferences.isKey("soil-moisture")){
-        smt = preferences.getBool("soil-moisture");
-          if (smt){
-            Serial.println("Soil moisture notifications enabled.");
-            if (soilMoisture > preferences.getInt("threshold"))
+    
+    // CHECK IF EMAIL IS SET
+    String email = preferences.getString("email", "");
+    if (sizeof(email) == 0)
+      return;
+    
+    // GET NOTIFICATION SETTINGS, DEFAULT VALUE = FALSE
+    bool smt = preferences.getBool("soil-moisture", false);
+    bool wte = preferences.getBool("tank-empty", false);
+    bool wo = preferences.getBool("overflow", false);
+  
+    // NOTIFICATION FOR SOIL-MOISTURE
+    if (smt==true && soilMoisture < preferences.getInt("threshold") && WiFi.status() == WL_CONNECTED) {
+      HTTPClient http;
+      http.begin(NOTIFICATION_API_URL);
+      http.addHeader("Content-Type", "application/json");
 
-              if WiFi.status()=WL_CONNECTED
-            }
-          }
-        }
-        else if (preferences.isKey("tank-empty")){
-          smt=preferences.getBool("tank-empty");
-          if (smt){
-            Serial.println("Tank-empty notifications enabled");
-            if (waterLevel > preferences.getInt("threshold"))
-             //Aloitetaan lähetys
-            }
-          }
-        }
-        else if (preferences.isKey("overflow")){
-          smt=preferences.getBool("overflow");
-          if (smt){
-            Serial.println("overflow notifications enabled");
-            if (waterOverflow > preferences.getInt("threshold"))
+      JsonDocument jsonDoc;
+      jsonDoc["deviceId"] = deviceIdHex;           
+      jsonDoc["email"] = email;                
+      jsonDoc["type"] = "soil-moisture";
 
-            //Aloitetaan lähetys
-            }
-          }
-        }
-      2.CHECK SENSOR VALUES
-        if (soilMoisture > preferences.getInt("threshold"))
+      String jsonData;
+      serializeJson(jsonDoc, jsonData);
 
-      3.SEND HTTPS POST REQUEST, POST REQUEST BODY SHOULD BE IN JSON FORMAT LIKE:
-        {
-          "deviceId": <deviceId>,
-          "email": <userEmail>,
-          "type": <"tank-empty" | "soil-moisture" | "overflow">
-        }
+      int httpResponseCode = http.POST(jsonData);
+      if (httpResponseCode > 0) {
+        Serial.print("HTTP Response code: ");
+        Serial.println(httpResponseCode);
+      }
+      else {
+        Serial.print("Error code: ");
+        Serial.println(httpResponseCode);
+      }
+      http.end(); 
+    }
+    
+    // NOTIFICATION FOR WATER TANK LEVEL
+    int waterTankThreshold = 50;
+    // TODO:
+    // DEFINE THIS IN GLOBALS?? OR PREFERENCES??
+    if(wte == true && waterLevel < waterTankThreshold && WiFi.status() == WL_CONNECTED) {
+      HTTPClient http;
+      http.begin(NOTIFICATION_API_URL);
+      http.addHeader("Content-Type", "application/json");
 
+      JsonDocument jsonDoc;
+      jsonDoc["deviceId"] = deviceIdHex;           
+      jsonDoc["email"] = email;                
+      jsonDoc["type"] = "soil-moisture";
 
-       */
-     
-      bool smt = preferences.getBool("soil-moisture");
-      //Serial.print("value of smt is ");
-      //Serial.println(smt);
-      bool wte = preferences.getBool("tank-empty");
-      //Serial.print("value of wte is ");
-      //Serial.println(wte);
-      bool wo = preferences.getBool("overflow");
-      //Serial.print("value of wo is ");
-      //Serial.println(wo);
+      String jsonData;
+      serializeJson(jsonDoc, jsonData);
 
-      //if (preferences.isKey("threshold")) {
-        //int luku= preferences.getInt("threshold");
-        //Serial.print("value of threshold");
-        //Serial.println(luku);
-      //} 
-      //else {  
-      //Serial.println("Key 'threshold' does not exist.");
-      //}
-
+      int httpResponseCode = http.POST(jsonData);
+      if (httpResponseCode > 0) {
+        Serial.print("HTTP Response code: ");
+        Serial.println(httpResponseCode);
+      } 
+      else {
+        Serial.print("Error code: ");
+        Serial.println(httpResponseCode);
+      }
+      http.end(); 
+    }
       
-      if (preferences.isKey("email")){
-        String email=preferences.getString("email");
-        if (preferences.isKey("soil-moisture") && smt==true && soilMoisture < preferences.getInt("threshold")){
-          if (WiFi.status()==WL_CONNECTED){ //Tarkistetaan Wifi.status
-            HTTPClient http;
-            http.begin(NOTIFICATION_API_URL);
+    // NOTIFICATION FOR WATER OVERFLOW
+    if(preferences.isKey("overflow") && wo == true && waterOverflow > 50 && WiFi.status() == WL_CONNECTED) {
+      HTTPClient http;
+      http.begin(NOTIFICATION_API_URL);
+      http.addHeader("Content-Type", "application/json");
 
-            http.addHeader("Content-Type", "application/json");
+      JsonDocument jsonDoc;
+      jsonDoc["deviceId"] = deviceIdHex;           
+      jsonDoc["email"] = email;                
+      jsonDoc["type"] = "soil-moisture";
 
-            JsonDocument jsonDoc;
-         
+      String jsonData;
+      serializeJson(jsonDoc, jsonData);
 
-            jsonDoc["deviceId"] = deviceIdHex;           
-            jsonDoc["email"] = email;                
-            jsonDoc["type"] = "soil-moisture";
-
-            String jsonData;
-            serializeJson(jsonDoc, jsonData);
-
-            int httpResponseCode = http.POST(jsonData);
-            if (httpResponseCode > 0) {
-              Serial.print("HTTP Response code: ");
-              Serial.println(httpResponseCode);
-          } else {
-              Serial.print("Error code: ");
-              Serial.println(httpResponseCode);
+      int httpResponseCode = http.POST(jsonData);
+      if (httpResponseCode > 0) {
+        Serial.print("HTTP Response code: ");
+        Serial.println(httpResponseCode);
+      } 
+      else {
+        Serial.print("Error code: ");
+        Serial.println(httpResponseCode);
       }
-
-          http.end(); 
-        }
-
-      }
-      else if(preferences.isKey("tank-empty") && wte==true && waterLevel < preferences.getInt("threshold")){
-        if (WiFi.status()==WL_CONNECTED){ //Tarkistetaan Wifi.status
-          HTTPClient http;
-          http.begin(NOTIFICATION_API_URL);
-
-          http.addHeader("Content-Type", "application/json");
-
-          JsonDocument jsonDoc;
-       
-
-          jsonDoc["deviceId"] = deviceIdHex;           
-          jsonDoc["email"] = email;                
-          jsonDoc["type"] = "soil-moisture";
-
-          String jsonData;
-          serializeJson(jsonDoc, jsonData);
-
-          int httpResponseCode = http.POST(jsonData);
-          if (httpResponseCode > 0) {
-            Serial.print("HTTP Response code: ");
-            Serial.println(httpResponseCode);
-        } else {
-            Serial.print("Error code: ");
-            Serial.println(httpResponseCode);
-    }
-
-        http.end(); 
-      }
-      }
-      else if(preferences.isKey("overflow") && wo==true && waterOverflow>50){
-        if (WiFi.status()==WL_CONNECTED){ //Tarkistetaan Wifi.status
-          HTTPClient http;
-          http.begin(NOTIFICATION_API_URL);
-
-          http.addHeader("Content-Type", "application/json");
-
-          JsonDocument jsonDoc;
-       
-
-          jsonDoc["deviceId"] = deviceIdHex;           
-          jsonDoc["email"] = email;                
-          jsonDoc["type"] = "soil-moisture";
-
-          String jsonData;
-          serializeJson(jsonDoc, jsonData);
-
-          int httpResponseCode = http.POST(jsonData);
-          if (httpResponseCode > 0) {
-            Serial.print("HTTP Response code: ");
-            Serial.println(httpResponseCode);
-        } else {
-            Serial.print("Error code: ");
-            Serial.println(httpResponseCode);
-    }
-
-        http.end(); 
-      }
-      }
-    }
+      http.end(); 
+    }      
   }
 }
-// TODO: 
-    /*
-
-      TÄMÄ ON UUTTA SISÄLTÖÄ!!
-
-      TAAS UUSI KOMMENTTI, JEE
-
-      Testing, Testing.. Kokeillaan saanko gitlabiin asti tuotua :)
-    */
 
  
 // INITIALIZES WIFI AP
-void initWiFiAp(){
+void initWiFiAp() {
   WiFi.softAPConfig(local_IP, gateway, subnet);
   WiFi.softAP(soft_ap_ssid, soft_ap_password);
 
