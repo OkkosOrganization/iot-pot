@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
             "There is water below the pot, please check and drain the water.";
           break;
         case "tank-empty":
-          subject = "IoT-pot notification: tank overflow";
+          subject = "IoT-pot notification: tank empty";
           msg = "The water tank is almost empty, please fill it.";
           break;
       }
