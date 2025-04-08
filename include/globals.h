@@ -10,7 +10,7 @@ int luminosity = 0;
 float soilPh = 0;
 float soilMoisture = 0;
 float soilTemperature = 0;
-int waterOverflow = 0;
+byte waterOverflow = 0;
 
 // STRING VERSIONS
 char soilTemperatureStr[12], soilMoistureStr[12], soilPhStr[12];
