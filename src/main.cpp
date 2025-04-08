@@ -341,53 +341,51 @@ void sendNotifications() {
       Versio 2:
 
        */
+      //if (preferences.isKey("soil-moisture") && smt==true && soilMoisture < preferences.getInt("threshold")){
+        if (WiFi.status()==WL_CONNECTED){  //Tarkistetaan Wifi.status
+          HTTPClient http;
+          http.begin(NOTIFICATION_API_URL);
+ 
+          http.addHeader("Content-Type", "application/json");
+ 
+          StaticJsonDocument<200> jsonDoc;
+           
+          String email= "susan.m.paloranta@student.jyu.fi";
 
-    bool soilMoistureNotificationSet = preferences.isKey("soil-moisture");
-    bool smt = preferences.getBool("soil-moisture");
-    int threshold = preferences.getInt("threshold");
-
-    Serial.println(soilMoistureNotificationSet);
-    Serial.println(smt);
-    Serial.println(threshold);
-    
-    // FORCE SOILMOISTURE TO 10, FOR TESTING
-    if (soilMoisture > threshold)
-    {
-      threshold = 100;
-      soilMoisture = 0;
-    }
-
-    if (soilMoistureNotificationSet && smt==true && soilMoisture < threshold && WiFi.status() == WL_CONNECTED) { 
-      WiFiClientSecure client;
-      client.setInsecure();
-      HTTPClient https;
-      JsonDocument jsonDoc;
-      String email= "susan.m.paloranta@jyu.fi";
-      jsonDoc["deviceId"] = deviceIdHex;        
-      jsonDoc["email"] = email;                
-      jsonDoc["type"] = "soil-moisture";
-      String jsonData;
-
-      if (https.begin(client, NOTIFICATION_API_URL)) {
-        https.addHeader("Content-Type", "application/json");
-        serializeJson(jsonDoc, jsonData);
-        Serial.println(jsonData);
-        int httpResponseCode = https.POST(jsonData);
-        if (httpResponseCode > 0) {
+          jsonDoc["deviceId"] = deviceId;        
+          jsonDoc["email"] = email;                
+          jsonDoc["type"] = "soil-moisture";
+ 
+          String jsonData;
+          serializeJson(jsonDoc, jsonData);
+ 
+          int httpResponseCode = http.POST(jsonData);
+          if (httpResponseCode > 0) {
             Serial.print("HTTP Response code: ");
             Serial.println(httpResponseCode);
         } else {
             Serial.print("Error code: ");
             Serial.println(httpResponseCode);
-            String response = https.getString();
-            Serial.println(response);
         }
-        https.end();  // Vapautetaan resurssit
+ 
+        http.end(); 
+ 
+        }
       }
-    }
-  }
-}
 
+      
+
+// TODO: 
+    /*
+
+      TÄMÄ ON UUTTA SISÄLTÖÄ!!
+
+      TAAS UUSI KOMMENTTI, JEE
+
+      Testing, Testing.. Kokeillaan saanko gitlabiin asti tuotua :)
+    */
+    }
+  
 // INITIALIZES WIFI AP
 void initWiFiAp(){
   WiFi.softAPConfig(local_IP, gateway, subnet);

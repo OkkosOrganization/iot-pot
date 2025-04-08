@@ -32,13 +32,13 @@ void getSoilSensorValues() {
     }
 
     // Read Soil Moisture (Register 0x0000)
-    result = node.readHoldingRegisters(0x0000, 1);
-    if (result == node.ku8MBSuccess) {
-        soilMoisture = node.getResponseBuffer(0); // 10.0; // Convert to %
-    } else {
-        Serial.print("Error reading Moisture, Code: ");
-        Serial.println(result);
-    }
+    //result = node.readHoldingRegisters(0x0000, 1);
+    //if (result == node.ku8MBSuccess) {
+        //soilMoisture = node.getResponseBuffer(0); // 10.0; // Convert to %
+    //} else {
+        //Serial.print("Error reading Moisture, Code: ");
+        //Serial.println(result);
+    //}
 
     // Read Soil Temperature (Register 0x0001)
     result = node.readHoldingRegisters(0x0001, 1);
