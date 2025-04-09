@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
           break;
       }
 
-      const msgHtml = `<p>${msg}</p>`;
+      const msgHtml = `<p style="text-align:center;"><img src="https://iot-pot.com/LOGO.png" width="81" height="80" alt="Logo" align="center" style="margin: 0 auto;" /></p><p style="text-align:center">${msg}</p>`;
       const res = await mg.messages.create("mail.iot-pot.com", {
         from: "No-Reply <noreply@mail.iot-pot.com>",
         to: [email],
