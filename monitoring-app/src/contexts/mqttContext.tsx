@@ -12,7 +12,8 @@ type MqttContextProviderProps = {
   children: React.ReactNode;
   initialValues: SensorValues;
 };
-export const defaultValues = {
+
+export const defaultValues: MqttContextType = {
   client: null,
   deviceId: "",
   airTemperature: 0,
@@ -23,7 +24,7 @@ export const defaultValues = {
   luminosity: 0,
   waterLevel: 0,
   waterOverflow: 0,
-} as MqttContextType;
+};
 
 const MqttContext = createContext<MqttContextType>(defaultValues);
 
@@ -32,7 +33,7 @@ export const MqttContextProvider = ({
   initialValues,
 }: MqttContextProviderProps) => {
   const [client, setClient] = useState<MqttClient | null>(null);
-  const [airTemperature, setAirTemperature] = useState<number | undefined>(
+  const [airTemperature, setAirTemperature] = useState(
     initialValues.airTemperature
   );
   const [airHumidity, setAirHumidity] = useState(initialValues.airHumidity);
@@ -46,113 +47,94 @@ export const MqttContextProvider = ({
   const [waterOverflow, setWaterOverflow] = useState(
     initialValues.waterOverflow
   );
+
   const deviceId = initialValues.deviceId.toUpperCase();
 
-  const getClient = () => {
-    return mqtt.connect(process.env.NEXT_PUBLIC_MQTT_URL as string, {
-      username: process.env.NEXT_PUBLIC_MQTT_USER,
-      password: process.env.NEXT_PUBLIC_MQTT_PASSWORD,
-    });
-  };
-
   useEffect(() => {
-    // INITIAL CONNECT
-    const client = getClient();
-    setClient(client);
+    const mqttClient = mqtt.connect(
+      process.env.NEXT_PUBLIC_MQTT_URL as string,
+      {
+        clientId: `web-${deviceId}`,
+        username: process.env.NEXT_PUBLIC_MQTT_USER,
+        password: process.env.NEXT_PUBLIC_MQTT_PASSWORD,
+        clean: false,
+      }
+    );
 
-    // RECONNECT
-    client.on("close", () => {
-      const client = getClient();
-      setClient(client);
-    });
+    setClient(mqttClient);
 
-    client.on("disconnect", () => {
-      const client = getClient();
-      setClient(client);
-    });
-
-    // SUBSCRIPTIONS
-    client.on("connect", () => {
+    mqttClient.on("connect", () => {
       console.log("MQTT connected");
 
-      // SENSOR VALUES
-      client.subscribe(`/device/${deviceId}/airHumidity/`, () => {
-        console.log(`Subscribed to: /device/${deviceId}/airHumidity/`);
-      });
-      client.subscribe(`/device/${deviceId}/airTemperature/`, () => {
-        console.log(`Subscribed to: /device/${deviceId}/airTemperature/`);
-      });
-      client.subscribe(`/device/${deviceId}/soilMoisture/`, () => {
-        console.log(`Subscribed to: /device/${deviceId}/soilMoisture/`);
-      });
-      client.subscribe(`/device/${deviceId}/soilPh/`, () => {
-        console.log(`Subscribed to: /device/${deviceId}/soilPh/`);
-      });
-      client.subscribe(`/device/${deviceId}/soilTemperature/`, () => {
-        console.log(`Subscribed to: /device/${deviceId}/soilTemperature/`);
-      });
-      client.subscribe(`/device/${deviceId}/luminosity/`, () => {
-        console.log(`Subscribed to: /device/${deviceId}/luminosity/`);
-      });
-      client.subscribe(`/device/${deviceId}/waterLevel/`, () => {
-        console.log(`Subscribed to: /device/${deviceId}/waterLevel/`);
-      });
-      client.subscribe(`/device/${deviceId}/waterOverflow/`, () => {
-        console.log(`Subscribed to: /device/${deviceId}/waterOverflow/`);
+      const topics = [
+        "airHumidity",
+        "airTemperature",
+        "soilMoisture",
+        "soilPh",
+        "soilTemperature",
+        "luminosity",
+        "waterLevel",
+        "waterOverflow",
+      ];
+
+      topics.forEach((key) => {
+        const topic = `/device/${deviceId}/${key}/`;
+        mqttClient.subscribe(topic, () => {
+          console.log(`Subscribed to: ${topic}`);
+        });
       });
     });
 
-    client.on("message", (topic, message) => {
-      switch (topic) {
-        case `/device/${deviceId}/airHumidity/`:
-          console.log("airHumidity:", message.toString());
-          setAirHumidity(parseInt(message.toString()));
-          break;
-        case `/device/${deviceId}/airTemperature/`:
-          console.log("airTemperature:", message.toString());
-          setAirTemperature(parseInt(message.toString()));
-          break;
-        case `/device/${deviceId}/soilTemperature/`:
-          console.log("soilTemperature:", message.toString());
-          setSoilTemperature(parseInt(message.toString()));
-          break;
-        case `/device/${deviceId}/soilPh/`:
-          console.log("soilPh:", message.toString());
-          setSoilPh(parseInt(message.toString()));
-          break;
-        case `/device/${deviceId}/soilMoisture/`:
-          console.log("soilMoisture:", message.toString());
-          setSoilMoisture(parseInt(message.toString()));
-          break;
-        case `/device/${deviceId}/luminosity/`:
-          console.log("luminosity:", message.toString());
-          setLuminosity(parseInt(message.toString()));
-          break;
-        case `/device/${deviceId}/waterLevel/`:
-          console.log("waterLevel:", message.toString());
-          setWaterLevel(parseInt(message.toString()));
-          break;
-        case `/device/${deviceId}/waterOverflow/`:
-          console.log("waterOverflow:", message.toString());
-          setWaterOverflow(parseInt(message.toString()));
-          break;
-      }
+    mqttClient.on("message", (topic, message) => {
+      const value = parseInt(message.toString());
+
+      if (topic.endsWith("/airHumidity/")) setAirHumidity(value);
+      else if (topic.endsWith("/airTemperature/")) setAirTemperature(value);
+      else if (topic.endsWith("/soilMoisture/")) setSoilMoisture(value);
+      else if (topic.endsWith("/soilPh/")) setSoilPh(value);
+      else if (topic.endsWith("/soilTemperature/")) setSoilTemperature(value);
+      else if (topic.endsWith("/luminosity/")) setLuminosity(value);
+      else if (topic.endsWith("/waterLevel/")) setWaterLevel(value);
+      else if (topic.endsWith("/waterOverflow/")) setWaterOverflow(value);
     });
+
+    mqttClient.on("close", () => {
+      console.log("MQTT connection closed");
+    });
+
+    return () => {
+      mqttClient.end(true, () => {
+        console.log("Disconnected MQTT on unmount");
+      });
+    };
   }, [deviceId]);
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (client?.connected) {
+        client.end(true);
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [client]);
 
   return (
     <MqttContext.Provider
       value={{
-        client: client,
-        deviceId: deviceId,
-        airTemperature: airTemperature,
-        airHumidity: airHumidity,
-        soilMoisture: soilMoisture,
-        soilPh: soilPh,
-        soilTemperature: soilTemperature,
-        luminosity: luminosity,
-        waterLevel: waterLevel,
-        waterOverflow: waterOverflow,
+        client,
+        deviceId,
+        airTemperature,
+        airHumidity,
+        soilMoisture,
+        soilPh,
+        soilTemperature,
+        luminosity,
+        waterLevel,
+        waterOverflow,
       }}
     >
       {children}
