@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <Wire.h>
 #include <inttypes.h>
 #include "secrets.h"
 #include "globals.h"
@@ -16,6 +17,7 @@
 #include "html/index.h"
 #include <Preferences.h>
 #include <HTTPClient.h>
+
 
 // FUNCTION PROTOTYPES
 void initWiFiAp();
@@ -40,6 +42,7 @@ void connectMqtt();
 void initMqtt();
 void convertValues();
 void sendNotifications();
+void updateLedStates();
 
 // PREFERENCES
 Preferences preferences;
@@ -106,7 +109,6 @@ void setup() {
   led3.setState(OFF);
   led4.setState(OFF);
 
-
   // INITIALIZES THE WIFI IN ACCESS POINT AND CLIENT MODE
   WiFi.mode(WIFI_MODE_APSTA);
   initWifiClient();
@@ -121,6 +123,15 @@ void loop() {
   publishValuesMqtt();
   publishValuesHttps();
   sendNotifications();
+  updateLedStates();
+}
+
+// UPDATES THE LED STATES
+void updateLedStates(){
+  led1.update();
+  led2.update();
+  led3.update();
+  led4.update();  
 }
 
 // GETS VALUES FROM SENSORS
@@ -159,9 +170,8 @@ void initMqtt() {
 void connectMqtt(){
   while (!mqttClient.connected()) {
     Serial.print("Connecting to MQTT...");
-    if (mqttClient.connect(MQTT_USER, MQTT_USER, MQTT_PASSWORD)) {
+    if (mqttClient.connect(deviceIdHex.c_str(), MQTT_USER, MQTT_PASSWORD,NULL, 0, false, NULL, false)) {
       Serial.println(" connected!");      
-      //mqttClient.loop();
     } else {
       Serial.print(" failed, rc=");
       Serial.print(mqttClient.state());
@@ -199,7 +209,7 @@ void publishValuesMqtt() {
       Serial.println("MQTT publish failed");
     }      
 
-    if (mqttClient.publish(airTemperatureTopic, soilTemperatureStr)) {
+    if (mqttClient.publish(airTemperatureTopic, airTemperatureStr)) {
       Serial.print(airTemperatureTopic);
       Serial.println(airTemperatureStr);
     } else {
@@ -232,7 +242,9 @@ void publishValuesMqtt() {
       Serial.println(waterOverflowStr);
     } else {
       Serial.println("MQTT publish failed");
-    }      
+    }     
+    
+    mqttClient.loop();
   }
 }
 
@@ -440,6 +452,7 @@ void initWifiClient(){
     int maxReconnectTries = 10;    
     while (WiFi.status() != WL_CONNECTED)
     {
+      led2.setState(YELLOW);     
       if(reconnectTries < maxReconnectTries)
       {      
         Serial.println("Connecting to WiFi..");
@@ -448,7 +461,8 @@ void initWifiClient(){
       }
       else
       {
-        Serial.println("Could not connect to WiFi");        
+        Serial.println("Could not connect to WiFi");   
+        led2.setState(RED);     
         break;
       }
     }
@@ -457,12 +471,14 @@ void initWifiClient(){
     {
       Serial.print("ESP32 IP on the WiFi network: ");
       Serial.println(WiFi.localIP());
+      led2.setState(GREEN);
       initMqtt();
     }
   }  
   else
   {
     Serial.println("No SSID or password");
+    led2.setState(RED);     
   }
 }
 
