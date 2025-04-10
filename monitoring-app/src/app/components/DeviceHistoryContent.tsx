@@ -17,6 +17,7 @@ import {
 } from "@/types";
 import { NoteItem } from "./NoteItem";
 import updateLocale from "dayjs/plugin/updateLocale";
+import { zeroFill } from "@/utils";
 dayjs.extend(utc);
 dayjs.extend(weekOfYear);
 dayjs.extend(updateLocale);
@@ -147,6 +148,7 @@ export const DeviceHistoryContent = ({ device }: DeviceHistoryContentProps) => {
           data.soilMoisture.push(row.data.soilMoisture);
           data.soilPh.push(row.data.soilPh);
           data.soilTemperature.push(row.data.soilTemperature);
+          data.luminosity.push(row.data.luminosity);
           const d = new Date(row.timestamp).toLocaleTimeString();
           const split = d.split(":");
           const hoursMinutes = split[0] + ":" + split[1];
@@ -162,8 +164,12 @@ export const DeviceHistoryContent = ({ device }: DeviceHistoryContentProps) => {
           data.soilMoisture.push(row.data.soilMoisture);
           data.soilPh.push(row.data.soilPh);
           data.soilTemperature.push(row.data.soilTemperature);
-          const d = new Date(row.timestamp).toLocaleString();
-          data.dates.push(d);
+          data.luminosity.push(row.data.luminosity);
+          const d = dayjs(new Date(row.timestamp));
+          const dStr = `${d.day() + 1}.${d.month() + 1}. ${zeroFill(
+            d.hour()
+          )}:${zeroFill(d.minute())}`;
+          data.dates.push(dStr);
         }
       }
       break;
@@ -175,8 +181,12 @@ export const DeviceHistoryContent = ({ device }: DeviceHistoryContentProps) => {
           data.soilMoisture.push(row.data.soilMoisture);
           data.soilPh.push(row.data.soilPh);
           data.soilTemperature.push(row.data.soilTemperature);
-          const d = new Date(row.timestamp).toLocaleDateString();
-          data.dates.push(d);
+          data.luminosity.push(row.data.luminosity);
+          const d = dayjs(new Date(row.timestamp));
+          const dStr = `${d.day() + 1}.${d.month() + 1}. ${zeroFill(
+            d.hour()
+          )}:${zeroFill(d.minute())}`;
+          data.dates.push(dStr);
         }
       }
       break;

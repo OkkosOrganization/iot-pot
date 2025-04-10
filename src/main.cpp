@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <Wire.h>
 #include <inttypes.h>
 #include "secrets.h"
 #include "globals.h"
@@ -16,6 +17,7 @@
 #include "html/index.h"
 #include <Preferences.h>
 #include <HTTPClient.h>
+
 
 // FUNCTION PROTOTYPES
 void initWiFiAp();
@@ -40,6 +42,7 @@ void connectMqtt();
 void initMqtt();
 void convertValues();
 void sendNotifications();
+void updateLedStates();
 
 // PREFERENCES
 Preferences preferences;
@@ -106,7 +109,6 @@ void setup() {
   led3.setState(OFF);
   led4.setState(OFF);
 
-
   // INITIALIZES THE WIFI IN ACCESS POINT AND CLIENT MODE
   WiFi.mode(WIFI_MODE_APSTA);
   initWifiClient();
@@ -121,6 +123,15 @@ void loop() {
   publishValuesMqtt();
   publishValuesHttps();
   sendNotifications();
+  updateLedStates();
+}
+
+// UPDATES THE LED STATES
+void updateLedStates(){
+  led1.update();
+  led2.update();
+  led3.update();
+  led4.update();  
 }
 
 // GETS VALUES FROM SENSORS
@@ -159,9 +170,8 @@ void initMqtt() {
 void connectMqtt(){
   while (!mqttClient.connected()) {
     Serial.print("Connecting to MQTT...");
-    if (mqttClient.connect(MQTT_USER, MQTT_USER, MQTT_PASSWORD)) {
+    if (mqttClient.connect(deviceIdHex.c_str(), MQTT_USER, MQTT_PASSWORD,NULL, 0, false, NULL, false)) {
       Serial.println(" connected!");      
-      //mqttClient.loop();
     } else {
       Serial.print(" failed, rc=");
       Serial.print(mqttClient.state());
@@ -199,7 +209,7 @@ void publishValuesMqtt() {
       Serial.println("MQTT publish failed");
     }      
 
-    if (mqttClient.publish(airTemperatureTopic, soilTemperatureStr)) {
+    if (mqttClient.publish(airTemperatureTopic, airTemperatureStr)) {
       Serial.print(airTemperatureTopic);
       Serial.println(airTemperatureStr);
     } else {
@@ -232,7 +242,9 @@ void publishValuesMqtt() {
       Serial.println(waterOverflowStr);
     } else {
       Serial.println("MQTT publish failed");
-    }      
+    }     
+    
+    mqttClient.loop();
   }
 }
 
@@ -296,33 +308,103 @@ void sendNotifications() {
     
     Serial.println("Check notifications:");
     Serial.println(NOTIFICATION_API_URL);
-    // TODO: 
-    /*
-      1.CHECK NOTIFICATION TRIGGERS
-        preferences.isKey("soil-moisture")
-        smt = preferences.getBool("soil-moisture");
+    
+    // CHECK IF EMAIL IS SET
+    String email = preferences.getString("email", "");
+    if (sizeof(email) == 0)
+      return;
+    
+    // GET NOTIFICATION SETTINGS, DEFAULT VALUE = FALSE
+    bool smt = preferences.getBool("soil-moisture", false);
+    bool wte = preferences.getBool("tank-empty", false);
+    bool wo = preferences.getBool("overflow", false);
+  
+    // NOTIFICATION FOR SOIL-MOISTURE
+    if (smt==true && soilMoisture < preferences.getInt("threshold") && WiFi.status() == WL_CONNECTED) {
+      HTTPClient http;
+      http.begin(NOTIFICATION_API_URL);
+      http.addHeader("Content-Type", "application/json");
+
+      JsonDocument jsonDoc;
+      jsonDoc["deviceId"] = deviceIdHex;           
+      jsonDoc["email"] = email;                
+      jsonDoc["type"] = "soil-moisture";
+
+      String jsonData;
+      serializeJson(jsonDoc, jsonData);
+
+      int httpResponseCode = http.POST(jsonData);
+      if (httpResponseCode > 0) {
+        Serial.print("HTTP Response code: ");
+        Serial.println(httpResponseCode);
+      }
+      else {
+        Serial.print("Error code: ");
+        Serial.println(httpResponseCode);
+      }
+      http.end(); 
+    }
+    
+    // NOTIFICATION FOR WATER TANK LEVEL
+    int waterTankThreshold = 50;
+    // TODO:
+    // DEFINE THIS IN GLOBALS?? OR PREFERENCES??
+    if(wte == true && waterLevel < waterTankThreshold && WiFi.status() == WL_CONNECTED) {
+      HTTPClient http;
+      http.begin(NOTIFICATION_API_URL);
+      http.addHeader("Content-Type", "application/json");
+
+      JsonDocument jsonDoc;
+      jsonDoc["deviceId"] = deviceIdHex;           
+      jsonDoc["email"] = email;                
+      jsonDoc["type"] = "soil-moisture";
+
+      String jsonData;
+      serializeJson(jsonDoc, jsonData);
+
+      int httpResponseCode = http.POST(jsonData);
+      if (httpResponseCode > 0) {
+        Serial.print("HTTP Response code: ");
+        Serial.println(httpResponseCode);
+      } 
+      else {
+        Serial.print("Error code: ");
+        Serial.println(httpResponseCode);
+      }
+      http.end(); 
+    }
       
-      2.CHECK SENSOR VALUES
-        if (soilMoisture > preferences.getInt("threshold"))
+    // NOTIFICATION FOR WATER OVERFLOW
+    if(preferences.isKey("overflow") && wo == true && waterOverflow > 50 && WiFi.status() == WL_CONNECTED) {
+      HTTPClient http;
+      http.begin(NOTIFICATION_API_URL);
+      http.addHeader("Content-Type", "application/json");
 
-      3.SEND HTTPS POST REQUEST, POST REQUEST BODY SHOULD BE IN JSON FORMAT LIKE:
-        {
-          "deviceId": <deviceId>,
-          "email": <userEmail>,
-          "type": <"tank-empty" | "soil-moisture" | "overflow">
-        }
+      JsonDocument jsonDoc;
+      jsonDoc["deviceId"] = deviceIdHex;           
+      jsonDoc["email"] = email;                
+      jsonDoc["type"] = "soil-moisture";
 
-      TÄMÄ ON UUTTA SISÄLTÖÄ!!
+      String jsonData;
+      serializeJson(jsonDoc, jsonData);
 
-      TAAS UUSI KOMMENTTI, JEE
-
-      Testing, Testing.. Kokeillaan saanko gitlabiin asti tuotua :)
-    */
+      int httpResponseCode = http.POST(jsonData);
+      if (httpResponseCode > 0) {
+        Serial.print("HTTP Response code: ");
+        Serial.println(httpResponseCode);
+      } 
+      else {
+        Serial.print("Error code: ");
+        Serial.println(httpResponseCode);
+      }
+      http.end(); 
+    }      
   }
 }
 
+ 
 // INITIALIZES WIFI AP
-void initWiFiAp(){
+void initWiFiAp() {
   WiFi.softAPConfig(local_IP, gateway, subnet);
   WiFi.softAP(soft_ap_ssid, soft_ap_password);
 
@@ -370,6 +452,7 @@ void initWifiClient(){
     int maxReconnectTries = 10;    
     while (WiFi.status() != WL_CONNECTED)
     {
+      led2.setState(YELLOW);     
       if(reconnectTries < maxReconnectTries)
       {      
         Serial.println("Connecting to WiFi..");
@@ -378,7 +461,8 @@ void initWifiClient(){
       }
       else
       {
-        Serial.println("Could not connect to WiFi");        
+        Serial.println("Could not connect to WiFi");   
+        led2.setState(RED);     
         break;
       }
     }
@@ -387,12 +471,14 @@ void initWifiClient(){
     {
       Serial.print("ESP32 IP on the WiFi network: ");
       Serial.println(WiFi.localIP());
+      led2.setState(GREEN);
       initMqtt();
     }
   }  
   else
   {
     Serial.println("No SSID or password");
+    led2.setState(RED);     
   }
 }
 

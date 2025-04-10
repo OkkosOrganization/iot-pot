@@ -3,14 +3,14 @@
 // GLOBAL VARIABLES
 
 // SENSOR VALUES
-unsigned int waterLevel = 0;
+int waterLevel = 0;
 float airHumidity = 0;
 float airTemperature = 0;
 int luminosity = 0;
 float soilPh = 0;
 float soilMoisture = 0;
 float soilTemperature = 0;
-int waterOverflow = 0;
+byte waterOverflow = 0;
 
 // STRING VERSIONS
 char soilTemperatureStr[12], soilMoistureStr[12], soilPhStr[12];
@@ -37,6 +37,23 @@ uint8_t LED_PIN_5 = D8;
 uint8_t LED_PIN_6 = D5;
 uint8_t LED_PIN_7 = D4;
 uint8_t LED_PIN_8 = D3;
+
+// LED STATES
+enum LED_STATE {
+  OFF,
+  RED,
+  GREEN,
+  YELLOW,
+  RED_BLINK,
+};
+
+// WATER LEVEL STATES
+enum WATER_LEVEL_STATE {
+  WATER_LEVEL_TOO_HIGH = 90,
+  WATER_LEVEL_HIGH = 60,
+  WATER_LEVEL_MEDIUM = 40,
+  WATER_LEVEL_LOW = 20
+};
 
 // API URLS
 char MEASUREMENTS_API_URL[60] = "https://iot-pot.com/api/measurements";

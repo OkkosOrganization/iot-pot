@@ -1,16 +1,15 @@
 #pragma once
 #include <Arduino.h>
 
-enum LEDState {
-  OFF,
-  RED,
-  GREEN,
-  YELLOW
-};
 class LED {
   private:
     int redPin;
     int greenPin;
+    bool blink = false;
+    unsigned long lastToggleTime = 0;
+    bool redState = false;
+    LED_STATE currentState = OFF;
+    const int BLINK_INTERVAL = 200;
 
   public:
     // Constructor
@@ -27,25 +26,47 @@ class LED {
     }
 
     // Set LED state
-    void setState(LEDState state) {
+    void setState(LED_STATE state) {
+      currentState = state;
       switch (state) {
         case RED:
-          digitalWrite(redPin, LOW);   // Red ON
+          digitalWrite(redPin, LOW);    // Red ON
           digitalWrite(greenPin, HIGH); // Green OFF
+          blink = false;
           break;
         case GREEN:
-          digitalWrite(redPin, HIGH);  // Red OFF
-          digitalWrite(greenPin, LOW); // Green ON
+          digitalWrite(redPin, HIGH);   // Red OFF
+          digitalWrite(greenPin, LOW);  // Green ON
+          blink = false;
           break;
         case YELLOW:
-          digitalWrite(redPin, LOW);   // Red ON
-          digitalWrite(greenPin, LOW); // Green ON
+          digitalWrite(redPin, LOW);    // Red ON
+          digitalWrite(greenPin, LOW);  // Green ON
+          blink = false;
+          break;
+        case RED_BLINK:
+          digitalWrite(greenPin, HIGH); // Green OFF
+          blink = true;
+          redState = false;
+          lastToggleTime = millis();
           break;
         case OFF:
         default:
-          digitalWrite(redPin, HIGH);  // Red OFF
+          digitalWrite(redPin, HIGH);   // Red OFF
           digitalWrite(greenPin, HIGH); // Green OFF
+          blink = false;
           break;
+      }
+    }
+
+    void update() {
+      if (blink && currentState == RED_BLINK) {
+        unsigned long now = millis();
+        if (now - lastToggleTime >= BLINK_INTERVAL) {
+          redState = !redState;
+          digitalWrite(redPin, redState ? LOW : HIGH);
+          lastToggleTime = now;
+        }
       }
     }
 };

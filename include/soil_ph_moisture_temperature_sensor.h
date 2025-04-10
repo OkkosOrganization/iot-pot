@@ -6,8 +6,8 @@
 ModbusMaster node;  // Create Modbus object
 HardwareSerial SensorSerial(1);  // Serial1 for RS485 communication
 
-const int txPin = 6; // TX (to RS485 RX)
-const int rxPin = 7; // RX (to RS485 TX)
+const int txPin = 0; // TX (to RS485 RX)
+const int rxPin = 1; // RX (to RS485 TX)
 
 void initSoilSensor();
 void getSoilSensorValues();
