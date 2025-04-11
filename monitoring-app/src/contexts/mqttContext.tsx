@@ -57,7 +57,7 @@ export const MqttContextProvider = ({
         clientId: `web-${deviceId}`,
         username: process.env.NEXT_PUBLIC_MQTT_USER,
         password: process.env.NEXT_PUBLIC_MQTT_PASSWORD,
-        clean: false,
+        clean: true,
       }
     );
 
