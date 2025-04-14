@@ -4,6 +4,7 @@ import { MonthCalendar } from "@mui/x-date-pickers";
 import { useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
 import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 import weekOfYear from "dayjs/plugin/weekOfYear";
 import styles from "./DeviceHistoryContent.module.css";
 import { LineChart } from "@mui/x-charts";
@@ -17,7 +18,7 @@ import {
 } from "@/types";
 import { NoteItem } from "./NoteItem";
 import updateLocale from "dayjs/plugin/updateLocale";
-import { zeroFill } from "@/utils";
+
 dayjs.extend(utc);
 dayjs.extend(weekOfYear);
 dayjs.extend(updateLocale);
@@ -149,10 +150,8 @@ export const DeviceHistoryContent = ({ device }: DeviceHistoryContentProps) => {
           data.soilPh.push(row.data.soilPh);
           data.soilTemperature.push(row.data.soilTemperature);
           data.luminosity.push(row.data.luminosity);
-          const d = new Date(row.timestamp).toLocaleTimeString();
-          const split = d.split(":");
-          const hoursMinutes = split[0] + ":" + split[1];
-          data.dates.push(hoursMinutes);
+          const d = dayjs.utc(row.timestamp).format("HH:mm");
+          data.dates.push(d);
         }
       }
       break;
@@ -165,11 +164,8 @@ export const DeviceHistoryContent = ({ device }: DeviceHistoryContentProps) => {
           data.soilPh.push(row.data.soilPh);
           data.soilTemperature.push(row.data.soilTemperature);
           data.luminosity.push(row.data.luminosity);
-          const d = dayjs(new Date(row.timestamp));
-          const dStr = `${d.day() + 1}.${d.month() + 1}. ${zeroFill(
-            d.hour()
-          )}:${zeroFill(d.minute())}`;
-          data.dates.push(dStr);
+          const d = dayjs.utc(row.timestamp).format("D.M. H:m");
+          data.dates.push(d);
         }
       }
       break;
@@ -182,11 +178,8 @@ export const DeviceHistoryContent = ({ device }: DeviceHistoryContentProps) => {
           data.soilPh.push(row.data.soilPh);
           data.soilTemperature.push(row.data.soilTemperature);
           data.luminosity.push(row.data.luminosity);
-          const d = dayjs(new Date(row.timestamp));
-          const dStr = `${d.day() + 1}.${d.month() + 1}. ${zeroFill(
-            d.hour()
-          )}:${zeroFill(d.minute())}`;
-          data.dates.push(dStr);
+          const d = dayjs.utc(row.timestamp).format("D.M. H:m");
+          data.dates.push(d);
         }
       }
       break;

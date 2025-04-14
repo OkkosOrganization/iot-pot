@@ -12,7 +12,7 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
 }
 .title {
   width: 100%;
@@ -25,4 +25,7 @@
   color: var(--darkGrey);
   text-align: right;
   text-transform: uppercase;
+}
+.date span {
+  display: block;
 }
