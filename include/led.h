@@ -46,8 +46,9 @@ class LED {
           break;
         case RED_BLINK:
           digitalWrite(greenPin, HIGH); // Green OFF
+          digitalWrite(redPin, LOW);    // Red on
           blink = true;
-          redState = false;
+          redState = true;
           lastToggleTime = millis();
           break;
         case OFF:
@@ -59,22 +60,22 @@ class LED {
       }
     }
 
-    void update() {
+    void update() {      
       if (blink && currentState == RED_BLINK) {
         unsigned long now = millis();
         if (now - lastToggleTime >= BLINK_INTERVAL) {
-          redState = !redState;
-          digitalWrite(redPin, redState ? LOW : HIGH);
           lastToggleTime = now;
+          redState = !redState;
+          digitalWrite(redPin, redState ? LOW : HIGH);          
         }
       }
     }
 };
 
-LED led1(LED_PIN_1, LED_PIN_2);
-LED led2(LED_PIN_3, LED_PIN_4);
-LED led3(LED_PIN_6, LED_PIN_5);
-LED led4(LED_PIN_7, LED_PIN_8);
+LED led1(LED_PIN_2, LED_PIN_1); // POWER LED
+LED led2(LED_PIN_4, LED_PIN_3); // WIFI LED
+LED led3(LED_PIN_5, LED_PIN_6); // WATER LEVEL LED
+LED led4(LED_PIN_8, LED_PIN_7); // OVERFLOW LED
 void initLeds();
 void initLeds(){
   led1.begin();
