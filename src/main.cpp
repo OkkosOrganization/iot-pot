@@ -65,9 +65,7 @@ PubSubClient mqttClient;
 // SETUP
 void setup() {
   Serial.begin(115200);  
-  while (!Serial){ 
-    Serial.println("..."); 
-  }  
+  while (!Serial){ Serial.println("...");}  
 
   if (!preferences.begin("iot-pot", false)) {
     Serial.println("Failed to initialize preferences");
@@ -107,8 +105,8 @@ void setup() {
 
   // LEDS
   initLeds();
-  led1.setState(OFF);
-  led2.setState(OFF);
+  led1.setState(GREEN);
+  led2.setState(YELLOW);
   led3.setState(OFF);
   led4.setState(OFF);
 
@@ -466,7 +464,7 @@ void initWebServer(){
 
 // WIFI CLIENT
 void initWifiClient(){
-  Serial.println("Trying to connect to router");
+  Serial.println("WIFI INIT");
   if (preferences.isKey("ssid") && preferences.isKey("pwd"))
   {
     String ssid = preferences.getString("ssid");
@@ -489,8 +487,7 @@ void initWifiClient(){
         led2.setState(RED);     
         break;
       }
-    }
-      
+    }      
     if (WiFi.status() == WL_CONNECTED)
     {
       Serial.print("ESP32 IP on the WiFi network: ");
