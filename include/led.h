@@ -1,16 +1,15 @@
 #pragma once
 #include <Arduino.h>
 
-enum LEDState {
-  OFF,
-  RED,
-  GREEN,
-  YELLOW
-};
 class LED {
   private:
     int redPin;
     int greenPin;
+    bool blink = false;
+    unsigned long lastToggleTime = 0;
+    bool redState = false;
+    LED_STATE currentState = OFF;
+    const int BLINK_INTERVAL = 200;
 
   public:
     // Constructor
@@ -27,34 +26,56 @@ class LED {
     }
 
     // Set LED state
-    void setState(LEDState state) {
+    void setState(LED_STATE state) {
+      currentState = state;
       switch (state) {
         case RED:
-          digitalWrite(redPin, LOW);   // Red ON
+          digitalWrite(redPin, LOW);    // Red ON
           digitalWrite(greenPin, HIGH); // Green OFF
+          blink = false;
           break;
         case GREEN:
-          digitalWrite(redPin, HIGH);  // Red OFF
-          digitalWrite(greenPin, LOW); // Green ON
+          digitalWrite(redPin, HIGH);   // Red OFF
+          digitalWrite(greenPin, LOW);  // Green ON
+          blink = false;
           break;
         case YELLOW:
-          digitalWrite(redPin, LOW);   // Red ON
-          digitalWrite(greenPin, LOW); // Green ON
+          digitalWrite(redPin, LOW);    // Red ON
+          digitalWrite(greenPin, LOW);  // Green ON
+          blink = false;
+          break;
+        case RED_BLINK:
+          digitalWrite(greenPin, HIGH); // Green OFF
+          digitalWrite(redPin, LOW);    // Red on
+          blink = true;
+          redState = true;
+          lastToggleTime = millis();
           break;
         case OFF:
         default:
-          digitalWrite(redPin, HIGH);  // Red OFF
+          digitalWrite(redPin, HIGH);   // Red OFF
           digitalWrite(greenPin, HIGH); // Green OFF
+          blink = false;
           break;
+      }
+    }
+
+    void update() {      
+      if (blink && currentState == RED_BLINK) {
+        unsigned long now = millis();
+        if (now - lastToggleTime >= BLINK_INTERVAL) {
+          lastToggleTime = now;
+          redState = !redState;
+          digitalWrite(redPin, redState ? LOW : HIGH);          
+        }
       }
     }
 };
 
-LED led1(LED_PIN_1, LED_PIN_2); // INTERNET STATUS
-LED led2(LED_PIN_3, LED_PIN_4); // TANK LEVEL
-LED led3(LED_PIN_6, LED_PIN_5); // OVERFLOW
-LED led4(LED_PIN_7, LED_PIN_8); // PUMP ?
-
+LED led1(LED_PIN_2, LED_PIN_1); // POWER LED
+LED led2(LED_PIN_4, LED_PIN_3); // WIFI LED
+LED led3(LED_PIN_5, LED_PIN_6); // WATER LEVEL LED
+LED led4(LED_PIN_8, LED_PIN_7); // OVERFLOW LED
 void initLeds();
 void initLeds(){
   led1.begin();

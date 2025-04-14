@@ -1,5 +1,14 @@
 #include <Arduino.h>
+#include <Wire.h>
 #include <inttypes.h>
+#include <WebServer.h>
+#include <WiFi.h>
+#include <PubSubClient.h>
+#include <WiFiClientSecure.h>
+#include <ArduinoJson.h>
+#include <Preferences.h>
+#include <HTTPClient.h>
+
 #include "secrets.h"
 #include "globals.h"
 #include "led.h"
@@ -9,14 +18,7 @@
 #include "soil_moisture_sensor.h"
 #include "dht22_sensor.h"
 #include "LDR_sensor.h"
-#include <WebServer.h>
-#include <WiFi.h>
-#include <PubSubClient.h>
-#include <WiFiClientSecure.h>
-#include <ArduinoJson.h>
 #include "html/index.h"
-#include <Preferences.h>
-#include <HTTPClient.h>
 
 // FUNCTION PROTOTYPES
 void initWiFiAp();
@@ -41,6 +43,8 @@ void connectMqtt();
 void initMqtt();
 void convertValues();
 void sendNotifications();
+void updateLedStates();
+void updateMqttConnectionState();
 
 // PREFERENCES
 Preferences preferences;
@@ -48,6 +52,7 @@ Preferences preferences;
 // UNIQUE DEVICE ID
 uint64_t deviceId;
 String deviceIdHex;
+char deviceIdHexCstring[17];
 
 // WIFI ACCESS POINT AND LOCAL WEB SERVER IP
 IPAddress local_IP(192,168,0,1);
@@ -61,9 +66,7 @@ PubSubClient mqttClient;
 // SETUP
 void setup() {
   Serial.begin(115200);  
-  while (!Serial){ 
-    Serial.println("..."); 
-  }  
+  while (!Serial){ Serial.println("...");}  
 
   if (!preferences.begin("iot-pot", false)) {
     Serial.println("Failed to initialize preferences");
@@ -74,16 +77,17 @@ void setup() {
   deviceId = ESP.getEfuseMac();
   deviceIdHex = String((uint32_t)(deviceId >> 32), HEX) + String((uint32_t)deviceId, HEX);
   deviceIdHex.toUpperCase();
+  deviceIdHex.toCharArray(deviceIdHexCstring, sizeof(deviceIdHexCstring));  
 
   // CREATE MQTT TOPICS: /device/<deviceId>/<sensorValueName>
-  sprintf(soilTemperatureTopic, "/device/%s/soilTemperature/",deviceIdHex.c_str());
-  sprintf(soilPhTopic, "/device/%s/soilPh/",deviceIdHex.c_str());
-  sprintf(soilMoistureTopic, "/device/%s/soilMoisture/",deviceIdHex.c_str());
-  sprintf(airTemperatureTopic, "/device/%s/airTemperature/",deviceIdHex.c_str());
-  sprintf(airHumidityTopic, "/device/%s/airHumidity/",deviceIdHex.c_str());
-  sprintf(waterOverflowTopic, "/device/%s/waterOverflow/",deviceIdHex.c_str());
-  sprintf(waterLevelTopic, "/device/%s/waterLevel/",deviceIdHex.c_str());
-  sprintf(luminosityTopic, "/device/%s/luminosity/",deviceIdHex.c_str());
+  sprintf(soilTemperatureTopic, "/device/%s/soilTemperature/", deviceIdHexCstring);
+  sprintf(soilPhTopic, "/device/%s/soilPh/", deviceIdHexCstring);
+  sprintf(soilMoistureTopic, "/device/%s/soilMoisture/", deviceIdHexCstring);
+  sprintf(airTemperatureTopic, "/device/%s/airTemperature/", deviceIdHexCstring);
+  sprintf(airHumidityTopic, "/device/%s/airHumidity/", deviceIdHexCstring);
+  sprintf(waterOverflowTopic, "/device/%s/waterOverflow/", deviceIdHexCstring);
+  sprintf(waterLevelTopic, "/device/%s/waterLevel/",deviceIdHexCstring);
+  sprintf(luminosityTopic, "/device/%s/luminosity/",deviceIdHexCstring);
 
   // INIT ANALOG SENSORS
   analogSetAttenuation(ADC_11db);
@@ -102,8 +106,8 @@ void setup() {
 
   // LEDS
   initLeds();
-  led1.setState(OFF);
-  led2.setState(OFF);
+  led1.setState(GREEN);
+  led2.setState(YELLOW);
   led3.setState(OFF);
   led4.setState(OFF);
 
@@ -114,13 +118,23 @@ void setup() {
   initWebServer();
 }
 
-// LOOP
+// THE LOOP
 void loop() {
   server->handleClient();   
   getSensorValues();
   publishValuesMqtt();
   publishValuesHttps();
   sendNotifications();
+  updateLedStates();
+  updateMqttConnectionState();
+}
+
+// UPDATES THE LED STATES
+void updateLedStates(){
+  led1.update();
+  led2.update();
+  led3.update();
+  led4.update();  
 }
 
 // GETS VALUES FROM SENSORS
@@ -155,26 +169,43 @@ void convertValues(){
   itoa(waterOverflow, waterOverflowStr, 10);
 }
 
-// CONNECT TO BROKER
+// INITIALIZE THE MQTT CONNECTION
 void initMqtt() {
   wifiClientSecure.setInsecure();
   mqttClient.setClient(wifiClientSecure);
   mqttClient.setServer(MQTT_BROKER_URL, MQTT_BROKER_PORT);
   connectMqtt();
 }
-void connectMqtt(){
-  while (!mqttClient.connected()) {
-    Serial.print("Connecting to MQTT...");
-    if (mqttClient.connect(MQTT_USER, MQTT_USER, MQTT_PASSWORD)) {
-      Serial.println(" connected!");      
-      //mqttClient.loop();
+
+// CONNECTS TO MQTT BROKER
+void connectMqtt() {
+  if (WiFi.status() == WL_CONNECTED) {
+    Serial.print("Connecting to MQTT broker: ");
+    Serial.println(MQTT_BROKER_URL);
+    if (mqttClient.connect(
+      deviceIdHexCstring,  // Client ID
+      MQTT_USER,            // Username
+      MQTT_PASSWORD,        // Password
+      NULL,                 // Will topic
+      0,                    // Will QoS
+      false,                // Will retain
+      NULL,                 // Will message
+      true                  // Clean session
+    )) {
+      Serial.println("MQTT connected!");      
     } else {
-      Serial.print(" failed, rc=");
-      Serial.print(mqttClient.state());
-      Serial.println(" trying again in 1 seconds...");
-      delay(1000);
-    }
+      Serial.print("MQTT connection failed, rc= ");
+      Serial.println(mqttClient.state());
+    } 
   }
+}
+
+// UPDATE THE MQTT CONNECTION
+void updateMqttConnectionState(){
+  if(mqttClient.connected())
+    mqttClient.loop();
+  else
+    connectMqtt();
 }
 
 // PUBLISH VALUES TO MQTT TOPICS
@@ -182,68 +213,65 @@ void publishValuesMqtt() {
   unsigned long currentMillis = millis();
   if (currentMillis - previousMqttMillis >= mqttPublishInterval) {
     previousMqttMillis = currentMillis;
+    if (mqttClient.connected())
+    {
+      // PUBLISH TO EACH TOPIC
+      if (mqttClient.publish(soilTemperatureTopic, soilTemperatureStr)) {
+        Serial.print(soilTemperatureTopic);
+        Serial.println(soilTemperatureStr);
+      } else {
+        Serial.println("MQTT publish failed");
+      }
 
-    bool publishFailed = false;
+      if (mqttClient.publish(soilPhTopic, soilPhStr)) {
+        Serial.print(soilPhTopic);
+        Serial.println(soilPhStr);
+      } else {
+        Serial.println("MQTT publish failed");
+      }  
+      
+      if (mqttClient.publish(soilMoistureTopic, soilMoistureStr)) {
+        Serial.print(soilMoistureTopic);
+        Serial.println(soilMoistureStr);
+      } else {
+        Serial.println("MQTT publish failed");
+      }      
 
-    // PUBLISH TO EACH TOPIC
-    if (mqttClient.publish(soilTemperatureTopic, soilTemperatureStr)) {
-      Serial.print(soilTemperatureTopic);
-      Serial.println(soilTemperatureStr);
-    } else {
-      publishFailed = true;
-    }
-
-    if (mqttClient.publish(soilPhTopic, soilPhStr)) {
-      Serial.print(soilPhTopic);
-      Serial.println(soilPhStr);
-    } else {
-      publishFailed = true;
-    }  
-    
-    if (mqttClient.publish(soilMoistureTopic, soilMoistureStr)) {
-      Serial.print(soilMoistureTopic);
-      Serial.println(soilMoistureStr);
-    } else {
-      publishFailed = true;
-    }      
-
-    if (mqttClient.publish(airTemperatureTopic, soilTemperatureStr)) {
-      Serial.print(airTemperatureTopic);
-      Serial.println(airTemperatureStr);
-    } else {
-      publishFailed = true;
-    } 
-    
-    if (mqttClient.publish(airHumidityTopic, airHumidityStr)) {
-      Serial.print(airHumidityTopic);
-      Serial.println(airHumidityStr);
-    } else {
-      publishFailed = true;
-    }  
-    
-    if (mqttClient.publish(luminosityTopic, luminosityStr)) {
-      Serial.print(luminosityTopic);
-      Serial.println(luminosityStr);
-    } else {
-      publishFailed = true;
-    }  
-    
-    if (mqttClient.publish(waterLevelTopic, waterLevelStr)) {
-      Serial.print(waterLevelTopic);
-      Serial.println(waterLevelStr);
-    } else {
-      publishFailed = true;
-    }  
-    
-    if (mqttClient.publish(waterOverflowTopic, waterOverflowStr)) {
-      Serial.print(waterOverflowTopic);
-      Serial.println(waterOverflowStr);
-    } else {
-      publishFailed = true;
-    }      
-
-    if(publishFailed)
-      connectMqtt();
+      if (mqttClient.publish(airTemperatureTopic, airTemperatureStr)) {
+        Serial.print(airTemperatureTopic);
+        Serial.println(airTemperatureStr);
+      } else {
+        Serial.println("MQTT publish failed");
+      } 
+      
+      if (mqttClient.publish(airHumidityTopic, airHumidityStr)) {
+        Serial.print(airHumidityTopic);
+        Serial.println(airHumidityStr);
+      } else {
+        Serial.println("MQTT publish failed");
+      }  
+      
+      if (mqttClient.publish(luminosityTopic, luminosityStr)) {
+        Serial.print(luminosityTopic);
+        Serial.println(luminosityStr);
+      } else {
+        Serial.println("MQTT publish failed");
+      }  
+      
+      if (mqttClient.publish(waterLevelTopic, waterLevelStr)) {
+        Serial.print(waterLevelTopic);
+        Serial.println(waterLevelStr);
+      } else {
+        Serial.println("MQTT publish failed");
+      }  
+      
+      if (mqttClient.publish(waterOverflowTopic, waterOverflowStr)) {
+        Serial.print(waterOverflowTopic);
+        Serial.println(waterOverflowStr);
+      } else {
+        Serial.println("MQTT publish failed");
+      } 
+    }    
   }
 }
 
@@ -272,7 +300,6 @@ void publishValuesHttps() {
 
     WiFiClientSecure client;
     client.setInsecure();
-    //client.setCACert(root_ca);  // CHECK SSL CERT
 
     HTTPClient https;
     if (https.begin(client, MEASUREMENTS_API_URL)) {
@@ -307,33 +334,106 @@ void sendNotifications() {
     
     Serial.println("Check notifications:");
     Serial.println(NOTIFICATION_API_URL);
-    // TODO: 
-    /*
-      1.CHECK NOTIFICATION TRIGGERS
-        preferences.isKey("soil-moisture")
-        smt = preferences.getBool("soil-moisture");
+    
+    // CHECK IF EMAIL IS SET
+    String email = preferences.getString("email", "");
+    if (sizeof(email) == 0)
+      return;
+    
+    // GET NOTIFICATION SETTINGS, DEFAULT VALUE = FALSE
+    bool smt = preferences.getBool("soil-moisture", false);
+    bool wte = preferences.getBool("tank-empty", false);
+    bool wo = preferences.getBool("overflow", false);
+  
+    WiFiClientSecure client;
+    client.setInsecure();
+
+    // NOTIFICATION FOR SOIL-MOISTURE
+    if (smt == true && soilMoisture < preferences.getInt("threshold") && WiFi.status() == WL_CONNECTED) {
+
+      HTTPClient http;
+      http.begin(client, NOTIFICATION_API_URL);
+      http.addHeader("Content-Type", "application/json");
+
+      JsonDocument jsonDoc;
+      jsonDoc["deviceId"] = deviceIdHex;           
+      jsonDoc["email"] = email;                
+      jsonDoc["type"] = "soil-moisture";
+
+      String jsonData;
+      serializeJson(jsonDoc, jsonData);
+
+      int httpResponseCode = http.POST(jsonData);
+      if (httpResponseCode > 0) {
+        Serial.print("HTTP Response code: ");
+        Serial.println(httpResponseCode);
+      }
+      else {
+        Serial.print("Error code: ");
+        Serial.println(httpResponseCode);
+      }
+      http.end(); 
+    }
+    
+    // NOTIFICATION FOR WATER TANK LEVEL
+    int waterTankThreshold = 50;
+    // TODO:
+    // DEFINE THIS IN GLOBALS?? OR PREFERENCES??
+    if(wte == true && waterLevel < waterTankThreshold && WiFi.status() == WL_CONNECTED) {
+      HTTPClient http;
+      http.begin(client, NOTIFICATION_API_URL);
+      http.addHeader("Content-Type", "application/json");
+
+      JsonDocument jsonDoc;
+      jsonDoc["deviceId"] = deviceIdHex;           
+      jsonDoc["email"] = email;                
+      jsonDoc["type"] = "soil-moisture";
+
+      String jsonData;
+      serializeJson(jsonDoc, jsonData);
+
+      int httpResponseCode = http.POST(jsonData);
+      if (httpResponseCode > 0) {
+        Serial.print("HTTP Response code: ");
+        Serial.println(httpResponseCode);
+      } 
+      else {
+        Serial.print("Error code: ");
+        Serial.println(httpResponseCode);
+      }
+      http.end(); 
+    }
       
-      2.CHECK SENSOR VALUES
-        if (soilMoisture > preferences.getInt("threshold"))
+    // NOTIFICATION FOR WATER OVERFLOW
+    if(wo == true && waterOverflow > 50 && WiFi.status() == WL_CONNECTED) {
+      HTTPClient http;
+      http.begin(client, NOTIFICATION_API_URL);
+      http.addHeader("Content-Type", "application/json");
 
-      3.SEND HTTPS POST REQUEST, POST REQUEST BODY SHOULD BE IN JSON FORMAT LIKE:
-        {
-          "deviceId": <deviceId>,
-          "email": <userEmail>,
-          "type": <"tank-empty" | "soil-moisture" | "overflow">
-        }
+      JsonDocument jsonDoc;
+      jsonDoc["deviceId"] = deviceIdHex;           
+      jsonDoc["email"] = email;                
+      jsonDoc["type"] = "soil-moisture";
 
-      TÄMÄ ON UUTTA SISÄLTÖÄ!!
+      String jsonData;
+      serializeJson(jsonDoc, jsonData);
 
-      TAAS UUSI KOMMENTTI, JEE
-
-      Testing, Testing.. Kokeillaan saanko gitlabiin asti tuotua :)
-    */
+      int httpResponseCode = http.POST(jsonData);
+      if (httpResponseCode > 0) {
+        Serial.print("HTTP Response code: ");
+        Serial.println(httpResponseCode);
+      } 
+      else {
+        Serial.print("Error code: ");
+        Serial.println(httpResponseCode);
+      }
+      http.end(); 
+    }      
   }
 }
 
 // INITIALIZES WIFI AP
-void initWiFiAp(){
+void initWiFiAp() {
   WiFi.softAPConfig(local_IP, gateway, subnet);
   WiFi.softAP(soft_ap_ssid, soft_ap_password);
 
@@ -371,7 +471,7 @@ void initWebServer(){
 
 // WIFI CLIENT
 void initWifiClient(){
-  Serial.println("Trying to connect to router");
+  Serial.println("WIFI INIT");
   if (preferences.isKey("ssid") && preferences.isKey("pwd"))
   {
     String ssid = preferences.getString("ssid");
@@ -381,6 +481,7 @@ void initWifiClient(){
     int maxReconnectTries = 10;    
     while (WiFi.status() != WL_CONNECTED)
     {
+      led2.setState(YELLOW);     
       if(reconnectTries < maxReconnectTries)
       {      
         Serial.println("Connecting to WiFi..");
@@ -389,16 +490,16 @@ void initWifiClient(){
       }
       else
       {
-        Serial.println("Could not connect to WiFi");
-        led1.setState(RED);        
+        Serial.println("Could not connect to WiFi");   
+        led2.setState(RED);     
         break;
       }
-    }
-      
+    }      
     if (WiFi.status() == WL_CONNECTED)
     {
       Serial.print("ESP32 IP on the WiFi network: ");
       Serial.println(WiFi.localIP());
+      led2.setState(GREEN);
       initMqtt();
       led1.setState(GREEN);
     }
@@ -406,7 +507,7 @@ void initWifiClient(){
   else
   {
     Serial.println("No SSID or password");
-    led1.setState(RED);
+    led2.setState(RED);     
   }
 }
 

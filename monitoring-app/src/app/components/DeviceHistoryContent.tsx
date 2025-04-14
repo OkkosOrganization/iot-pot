@@ -4,6 +4,7 @@ import { MonthCalendar } from "@mui/x-date-pickers";
 import { useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
 import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 import weekOfYear from "dayjs/plugin/weekOfYear";
 import styles from "./DeviceHistoryContent.module.css";
 import { LineChart } from "@mui/x-charts";
@@ -17,6 +18,7 @@ import {
 } from "@/types";
 import { NoteItem } from "./NoteItem";
 import updateLocale from "dayjs/plugin/updateLocale";
+
 dayjs.extend(utc);
 dayjs.extend(weekOfYear);
 dayjs.extend(updateLocale);
@@ -147,10 +149,9 @@ export const DeviceHistoryContent = ({ device }: DeviceHistoryContentProps) => {
           data.soilMoisture.push(row.data.soilMoisture);
           data.soilPh.push(row.data.soilPh);
           data.soilTemperature.push(row.data.soilTemperature);
-          const d = new Date(row.timestamp).toLocaleTimeString();
-          const split = d.split(":");
-          const hoursMinutes = split[0] + ":" + split[1];
-          data.dates.push(hoursMinutes);
+          data.luminosity.push(row.data.luminosity);
+          const d = dayjs.utc(row.timestamp).format("HH:mm");
+          data.dates.push(d);
         }
       }
       break;
@@ -162,7 +163,8 @@ export const DeviceHistoryContent = ({ device }: DeviceHistoryContentProps) => {
           data.soilMoisture.push(row.data.soilMoisture);
           data.soilPh.push(row.data.soilPh);
           data.soilTemperature.push(row.data.soilTemperature);
-          const d = new Date(row.timestamp).toLocaleString();
+          data.luminosity.push(row.data.luminosity);
+          const d = dayjs.utc(row.timestamp).format("D.M. H:m");
           data.dates.push(d);
         }
       }
@@ -175,7 +177,8 @@ export const DeviceHistoryContent = ({ device }: DeviceHistoryContentProps) => {
           data.soilMoisture.push(row.data.soilMoisture);
           data.soilPh.push(row.data.soilPh);
           data.soilTemperature.push(row.data.soilTemperature);
-          const d = new Date(row.timestamp).toLocaleDateString();
+          data.luminosity.push(row.data.luminosity);
+          const d = dayjs.utc(row.timestamp).format("D.M. H:m");
           data.dates.push(d);
         }
       }

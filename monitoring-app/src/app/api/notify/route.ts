@@ -74,12 +74,12 @@ export async function POST(request: NextRequest) {
             "There is water below the pot, please check and drain the water.";
           break;
         case "tank-empty":
-          subject = "IoT-pot notification: tank overflow";
+          subject = "IoT-pot notification: tank empty";
           msg = "The water tank is almost empty, please fill it.";
           break;
       }
 
-      const msgHtml = `<p>${msg}</p>`;
+      const msgHtml = `<p style="text-align:center;"><img src="https://iot-pot.com/LOGO.png" width="81" height="80" alt="Logo" align="center" style="margin: 0 auto;" /></p><p style="text-align:center">${msg}</p>`;
       const res = await mg.messages.create("mail.iot-pot.com", {
         from: "No-Reply <noreply@mail.iot-pot.com>",
         to: [email],
