@@ -43,10 +43,10 @@ export const SensorInfoDialog = ({
             <h3>Soil moisture (0-100%)</h3>
             <h4>What is soil moisture?</h4>
             <p>
-              This term refers to the entire quantity of water in the soil's
-              pores or on its surface. Soil moisture is affected by the texture,
-              structure, density, salinity, organic matter content and depth of
-              the soil, as well as the temperature.
+              This term refers to the entire quantity of water in the
+              soil&apos;s pores or on its surface. Soil moisture is affected by
+              the texture, structure, density, salinity, organic matter content
+              and depth of the soil, as well as the temperature.
             </p>
             <h4>Where can it be measured best?</h4>
             <p>
@@ -105,12 +105,13 @@ export const SensorInfoDialog = ({
 
             <p>
               If the temperature is off, it can cause some serious problems and
-              limit the plant's growth potential. If the soil temperature drops
-              too low, it can slow down the plant's metabolic, resulting in
-              stunted growth for both roots and leaves, delayed flowering, and
-              reduced fruit or seed production. High temperatures can cause
-              plants to lose too much water through transpiration, leading to
-              wilting, hindering nutrient absorption and a risk for root rot.
+              limit the plant&acute;s growth potential. If the soil temperature
+              drops too low, it can slow down the plant&acute;s metabolic,
+              resulting in stunted growth for both roots and leaves, delayed
+              flowering, and reduced fruit or seed production. High temperatures
+              can cause plants to lose too much water through transpiration,
+              leading to wilting, hindering nutrient absorption and a risk for
+              root rot.
             </p>
             <h4>What is the ideal soil temperature?</h4>
             <p>Most houseplants prefer a soil temperature between 15-24°C.</p>
@@ -120,7 +121,7 @@ export const SensorInfoDialog = ({
               soil temperature, but repotting (smaller containers tend to heat
               up more quickly than larger ones) or adjusting the watering
               frequency (watering less frequently if the soil temperature is too
-              low and more often is it's too high) can help as well.
+              low and more often is it&acute;s too high) can help as well.
             </p>
           </div>
           <div className={styles.sensorInfoItem}>
@@ -142,7 +143,7 @@ export const SensorInfoDialog = ({
             <p>
               Plants need light to photosynthesize, certain plants only start
               flowering with the right amount of light, and others burn if they
-              are in direct sunlight. In general, if your plants don't get
+              are in direct sunlight. In general, if your plants don&acute;t get
               adequate lighting they shrivel and die. Quality of light can be
               measured in intensity (how strong the light is) and amount (how
               many hours). Light intensity is measured in units called Lux.
@@ -160,7 +161,7 @@ export const SensorInfoDialog = ({
             </p>
             <p>
               Most plants will survive at 10x lower values than specified but
-              they won't thrive.
+              they won&acute;t thrive.
             </p>
             <h4>Where should I place my plant for optimum light?</h4>
             <p>
@@ -170,8 +171,8 @@ export const SensorInfoDialog = ({
               will get a few hours of sun during the day but not the whole day;
               medium light/partly shaded (e.g. Philodendrons, Rubber plant): the
               plant gets some morning sun or some afternoon sun; low light /
-              shady (e.g. Bamboo palm, Monstera): the plant doesn't get direct
-              sun, usually north facing windows.
+              shady (e.g. Bamboo palm, Monstera): the plant doesn&acute;t get
+              direct sun, usually north facing windows.
             </p>
             <p>
               Check your plants ideal light conditions from a reliable source.
@@ -204,7 +205,7 @@ export const SensorInfoDialog = ({
             <p>
               Excessive heat can cause dehydration, leaf burn and abnormal
               growth. On the other hand, intense cold (under 7°C) can slow down
-              their metabolism, causing them to go 'dormant'.
+              their metabolism, causing them to go &quot;dormant&quot;.
             </p>
             <p>
               {" "}
@@ -220,7 +221,7 @@ export const SensorInfoDialog = ({
             </div>
             <h3>AIR HUMIDITY (%) </h3>
 
-            <h4>What is air humidity and why is it important? </h4>
+            <h4>What is air humidity and why is it important?</h4>
             <p>
               Humidity, simply put, is the measure of moisture in the air. If
               the air is too dry, the plant might get parched and droopy, while
