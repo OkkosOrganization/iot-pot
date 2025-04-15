@@ -151,7 +151,7 @@ void getSensorValues(){
     if(soilSensorAvailable())
       getSoilSensorValues();
     else
-      getAnalogSoilMoistureValue();
+      getSoilMoistureValue();
 
     convertValues();
   }  
