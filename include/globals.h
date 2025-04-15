@@ -34,9 +34,9 @@ uint8_t LED_PIN_2 = D12;
 uint8_t LED_PIN_3 = D10;
 uint8_t LED_PIN_4 = D9;
 uint8_t LED_PIN_5 = D8;
-uint8_t LED_PIN_6 = D5;
-uint8_t LED_PIN_7 = D4;
-uint8_t LED_PIN_8 = D3;
+uint8_t LED_PIN_6 = D7;
+uint8_t LED_PIN_7 = D6;
+uint8_t LED_PIN_8 = D5;
 
 // LED STATES
 enum LED_STATE {
@@ -73,8 +73,8 @@ const unsigned long mqttPublishInterval = 20000; // 20 SECONDS
 
 // INTERVAL FOR HTTPS PUBLISH
 unsigned long previousHttpsMillis = 0;
-const unsigned long httpsPublishInterval = 1 * 60 * 1000; // 60 SECONDS
+const unsigned long httpsPublishInterval = 1 * 60 * 60 * 1000; // 1 HOUR
 
 // INTERVAL FOR NOTIFICATIONS
 unsigned long previousNotificationMillis = 0;
-const unsigned long notificationSendInterval = 1 * 60 * 1000; // 60 SECONDS
+const unsigned long notificationSendInterval = 2 * 60 * 60 * 1000; // 2 HOURS

@@ -15,6 +15,7 @@
 #include "overflow_sensor.h"
 #include "water_level_sensor.h"
 #include "soil_ph_moisture_temperature_sensor.h"
+#include "soil_moisture_sensor.h"
 #include "dht22_sensor.h"
 #include "LDR_sensor.h"
 #include "html/index.h"
@@ -65,9 +66,7 @@ PubSubClient mqttClient;
 // SETUP
 void setup() {
   Serial.begin(115200);  
-  while (!Serial){ 
-    Serial.println("..."); 
-  }  
+  while (!Serial){ Serial.println("...");}  
 
   if (!preferences.begin("iot-pot", false)) {
     Serial.println("Failed to initialize preferences");
@@ -90,6 +89,9 @@ void setup() {
   sprintf(waterLevelTopic, "/device/%s/waterLevel/",deviceIdHexCstring);
   sprintf(luminosityTopic, "/device/%s/luminosity/",deviceIdHexCstring);
 
+  // INIT ANALOG SENSORS
+  analogSetAttenuation(ADC_11db);
+
   // WATER LEVEL
   initWaterLevelSensor();
 
@@ -99,16 +101,13 @@ void setup() {
   // DHT22
   dht_sensor.begin(); 
 
-  // LDR
-  initLdrSensor();
-
   // OVERFLOW
   initOverFlowSensor();
 
   // LEDS
   initLeds();
-  led1.setState(OFF);
-  led2.setState(OFF);
+  led1.setState(GREEN);
+  led2.setState(YELLOW);
   led3.setState(OFF);
   led4.setState(OFF);
 
@@ -146,8 +145,14 @@ void getSensorValues(){
     getWaterLevel(); 
     getAirTemperatureAndHumidity();
     getLdrSensorValue();
-    getSoilSensorValues();
     getOverFlowSensorValue();   
+
+    // USE MODBUS SENSOR IF AVAILABLE
+    if(soilSensorAvailable())
+      getSoilSensorValues();
+    else
+      getSoilMoistureValue();
+
     convertValues();
   }  
 }
@@ -466,7 +471,7 @@ void initWebServer(){
 
 // WIFI CLIENT
 void initWifiClient(){
-  Serial.println("Trying to connect to router");
+  Serial.println("WIFI INIT");
   if (preferences.isKey("ssid") && preferences.isKey("pwd"))
   {
     String ssid = preferences.getString("ssid");
@@ -489,14 +494,14 @@ void initWifiClient(){
         led2.setState(RED);     
         break;
       }
-    }
-      
+    }      
     if (WiFi.status() == WL_CONNECTED)
     {
       Serial.print("ESP32 IP on the WiFi network: ");
       Serial.println(WiFi.localIP());
       led2.setState(GREEN);
       initMqtt();
+      led1.setState(GREEN);
     }
   }  
   else
