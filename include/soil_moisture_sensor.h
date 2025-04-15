@@ -11,5 +11,5 @@ int wetReferenceValue = 30;   // SENSOR VALUE WHEN IN WATER
 
 void getSoilMoistureValue(){
   float value = analogRead(AOUT_PIN);
-  soilMoisture=value;
+  soilMoisture = map(value, wetReferenceValue, airReferenceValue, 0, 100);
 }
