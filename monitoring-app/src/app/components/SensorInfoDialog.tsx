@@ -43,16 +43,16 @@ export const SensorInfoDialog = ({
             <h3>Soil moisture (0-100%)</h3>
             <h4>What is soil moisture?</h4>
             <p>
-              This term refers to the entire quantity of water in the soil’s
-              pores or on its surface. Soil moisture is affected by the texture,
+              This term refers to the entire quantity of water in the soil's
+              pores or on its surface. Soil moisture is affected by the texture,
               structure, density, salinity, organic matter content and depth of
               the soil, as well as the temperature.
             </p>
             <h4>Where can it be measured best?</h4>
             <p>
-              Soil moisture changes with soil depth. The best depth for
-              measuring is 2,5 – 6 cm from the surface. Moisture data closer to
-              the roots is more informative.{" "}
+              Soil moisture changes with soil depth. The best depth for
+              measuring is 2,5-6 cm from the surface. Moisture data closer to
+              the roots is more informative.
             </p>
             <h4>What is an ideal % of soil moisture?</h4>
             <p>
@@ -120,7 +120,7 @@ export const SensorInfoDialog = ({
               soil temperature, but repotting (smaller containers tend to heat
               up more quickly than larger ones) or adjusting the watering
               frequency (watering less frequently if the soil temperature is too
-              low and more often is it’s too high) can help as well.
+              low and more often is it's too high) can help as well.
             </p>
           </div>
           <div className={styles.sensorInfoItem}>
@@ -204,7 +204,7 @@ export const SensorInfoDialog = ({
             <p>
               Excessive heat can cause dehydration, leaf burn and abnormal
               growth. On the other hand, intense cold (under 7°C) can slow down
-              their metabolism, causing them to go ‘dormant’.
+              their metabolism, causing them to go 'dormant'.
             </p>
             <p>
               {" "}
