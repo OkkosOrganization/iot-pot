@@ -20,6 +20,7 @@ import { NoteItem } from "./NoteItem";
 import updateLocale from "dayjs/plugin/updateLocale";
 
 dayjs.extend(utc);
+dayjs.extend(timezone);
 dayjs.extend(weekOfYear);
 dayjs.extend(updateLocale);
 dayjs.updateLocale("en", {
@@ -61,7 +62,7 @@ const notesFetcher = async (
 
 type DeviceHistoryContentProps = { device: Device };
 export const DeviceHistoryContent = ({ device }: DeviceHistoryContentProps) => {
-  const initialDate = dayjs(Date.now());
+  const initialDate = dayjs(Date.now()).tz("Europe/Helsinki");
   const [mode, setMode] = useState<"day" | "week" | "month">("day");
   const [chosenSensorLabel, setChosenSensorLabel] =
     useState<SensorLabels>("airTemperature");
@@ -150,7 +151,10 @@ export const DeviceHistoryContent = ({ device }: DeviceHistoryContentProps) => {
           data.soilPh.push(row.data.soilPh);
           data.soilTemperature.push(row.data.soilTemperature);
           data.luminosity.push(row.data.luminosity);
-          const d = dayjs.utc(row.timestamp).format("HH:mm");
+          const d = dayjs
+            .utc(row.timestamp)
+            .tz("Europe/Helsinki")
+            .format("HH:mm");
           data.dates.push(d);
         }
       }
@@ -164,7 +168,10 @@ export const DeviceHistoryContent = ({ device }: DeviceHistoryContentProps) => {
           data.soilPh.push(row.data.soilPh);
           data.soilTemperature.push(row.data.soilTemperature);
           data.luminosity.push(row.data.luminosity);
-          const d = dayjs.utc(row.timestamp).format("D.M. H:m");
+          const d = dayjs
+            .utc(row.timestamp)
+            .tz("Europe/Helsinki")
+            .format("D.M. H:m");
           data.dates.push(d);
         }
       }
@@ -178,7 +185,10 @@ export const DeviceHistoryContent = ({ device }: DeviceHistoryContentProps) => {
           data.soilPh.push(row.data.soilPh);
           data.soilTemperature.push(row.data.soilTemperature);
           data.luminosity.push(row.data.luminosity);
-          const d = dayjs.utc(row.timestamp).format("D.M. H:m");
+          const d = dayjs
+            .utc(row.timestamp)
+            .tz("Europe/Helsinki")
+            .format("D.M. H:m");
           data.dates.push(d);
         }
       }
