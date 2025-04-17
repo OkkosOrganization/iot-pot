@@ -57,6 +57,12 @@ enum WATER_LEVEL_STATE {
   WATER_LEVEL_LOW = 20
 };
 
+// PUMP STATES
+enum PUMPState {
+  PUMP_OFF,
+  PUMP_ON,
+};
+
 // API URLS
 char MEASUREMENTS_API_URL[60] = "https://iot-pot.com/api/measurements";
 char NOTIFICATION_API_URL[31] = "https://iot-pot.com/api/notify";
@@ -74,6 +80,10 @@ long latestPumpTimeStamp = 0;
 // INTERVAL FOR SENSOR READINGS
 unsigned long previousReadMillis = 0;
 const unsigned long sensorReadInterval = 10000; // 10 SECONDS
+
+// INTERVAL FOR WATER LEVEL SENSOR
+unsigned long previousWaterLevelMillis = 0;
+const unsigned long waterLevelInterval = 100; // .1 SECONDS
 
 // INTERVAL FOR MQTT PUBLISH
 unsigned long previousMqttMillis = 0;
