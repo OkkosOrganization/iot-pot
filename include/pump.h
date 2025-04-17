@@ -1,10 +1,6 @@
 #pragma once
 #include <Arduino.h>
-
-enum PUMPState {
-  PUMP_OFF,
-  PUMP_ON,
-};
+#include "globals.h"
 
 class PUMP {
   private:
@@ -12,9 +8,8 @@ class PUMP {
     PUMPState state;
 
   public:
-    // Constuctor
-    PUMP(int pumpPin) {
-      pin = pumpPin;
+    PUMP() {
+      pin = PUMP_PIN;
       state = PUMP_OFF;
     }
 
@@ -41,14 +36,18 @@ class PUMP {
       if (value > 100) value = 100;
 
       // MAX TIME: 1L = 15S = 15000MS
-      double max_time_ms = 15000;
+      // USE MAX: .3L      
+      double max_time_ms = (15 * 1000) / 3;
 
       return (value * max_time_ms) / 100;
     }
 };
 
-PUMP pump(PUMP_PIN);
 void initPump();
+
+// INTRODUCE GLOBAL VAR
+PUMP pump = PUMP();
+
 void initPump(){
   pump.begin();
   pump.setState(PUMP_OFF);
