@@ -48,7 +48,6 @@ void sendNotifications();
 void updateLedStates();
 void updateMqttConnectionState();
 
-
 // PREFERENCES
 Preferences preferences;
 
@@ -91,6 +90,9 @@ void setup() {
   sprintf(waterOverflowTopic, "/device/%s/waterOverflow/", deviceIdHexCstring);
   sprintf(waterLevelTopic, "/device/%s/waterLevel/",deviceIdHexCstring);
   sprintf(luminosityTopic, "/device/%s/luminosity/",deviceIdHexCstring);
+
+  // INIT PUMP
+  initPump();
 
   // INIT ANALOG SENSORS
   analogSetAttenuation(ADC_11db);
@@ -146,7 +148,6 @@ void getSensorValues(){
   unsigned long currentMillis = millis();
   if (currentMillis - previousReadMillis >= sensorReadInterval) {
     previousReadMillis = currentMillis;
-    getWaterLevel(); 
     getAirTemperatureAndHumidity();
     getLdrSensorValue();
     getOverFlowSensorValue();   
@@ -159,6 +160,9 @@ void getSensorValues(){
 
     convertValues();
   }  
+
+  // WATER LEVEL SENSOR NEEDS TO BE CHECKED OFTEN
+  getWaterLevel();
 }
 
 // CONVERTS SENSOR VALUES TO STRINGS
@@ -436,6 +440,7 @@ void sendNotifications() {
   }
 }
 
+// WATERS THE PLANT
 void waterPlant(){
 
   // MAKE SURE THRESHOLD AND WATER AMOUNT ARE SET
@@ -480,9 +485,11 @@ void waterPlant(){
 
   if(pump.getState() == PUMP_ON) {
     unsigned long currentMillis = millis();
+    /*
     Serial.print(currentMillis - pumpStartTime);
     Serial.print(" : ");
     Serial.println(wateringTime);
+    */
     if(currentMillis - pumpStartTime < wateringTime)    
     {
       //Serial.println("PUMPING");
@@ -496,7 +503,6 @@ void waterPlant(){
     }    
   }
 }
-
 
 // INITIALIZES WIFI AP
 void initWiFiAp() {
