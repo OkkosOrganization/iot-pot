@@ -14,23 +14,20 @@ void initOverFlowSensor();
 void getOverFlowSensorValue();
 
 void initOverFlowSensor(){
-  analogSetAttenuation(ADC_11db);
-  pinMode(POWER_PIN, OUTPUT);   // Configure pin as an OUTPUT
-  digitalWrite(POWER_PIN, LOW); // turn the sensor OFF
+  pinMode(POWER_PIN, OUTPUT);
+  digitalWrite(POWER_PIN, HIGH);
 }
 
 void getOverFlowSensorValue(){
-  digitalWrite(POWER_PIN, HIGH);  // turn the sensor ON
-  waterOverflow = analogRead(SIGNAL_PIN); // read the analog value from sensor
-  digitalWrite(POWER_PIN, LOW);    // turn the sensor OFF
+  int waterOverflowValue = analogRead(SIGNAL_PIN);
 
-  if (waterOverflow > WATER_OVERFLOW_THRESHOLD) { 
+  if (waterOverflowValue >= WATER_OVERFLOW_THRESHOLD) { 
     Serial.print("OVERFLOW");
     waterOverflow = 1;
     led4.setState(RED);
   }  
-  else{
+  else {
     waterOverflow = 0;
-    led4.setState(OFF);
+    led4.setState(GREEN);
   }
 }
