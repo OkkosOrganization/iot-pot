@@ -12,6 +12,7 @@
 #include "secrets.h"
 #include "globals.h"
 #include "led.h"
+#include "pump.h"
 #include "overflow_sensor.h"
 #include "water_level_sensor.h"
 #include "soil_ph_moisture_temperature_sensor.h"
@@ -37,6 +38,7 @@ void handlePostWateringThreshold();
 void handleGetNotificationTriggers();
 void handlePostNotificationTriggers();
 void getSensorValues();
+void waterPlant();
 void publishValuesMqtt();
 void publishValuesHttps();
 void connectMqtt();
@@ -89,6 +91,9 @@ void setup() {
   sprintf(waterLevelTopic, "/device/%s/waterLevel/",deviceIdHexCstring);
   sprintf(luminosityTopic, "/device/%s/luminosity/",deviceIdHexCstring);
 
+  // INIT PUMP
+  initPump();
+
   // INIT ANALOG SENSORS
   analogSetAttenuation(ADC_11db);
 
@@ -122,6 +127,7 @@ void setup() {
 void loop() {
   server->handleClient();   
   getSensorValues();
+  waterPlant();
   publishValuesMqtt();
   publishValuesHttps();
   sendNotifications();
@@ -142,7 +148,6 @@ void getSensorValues(){
   unsigned long currentMillis = millis();
   if (currentMillis - previousReadMillis >= sensorReadInterval) {
     previousReadMillis = currentMillis;
-    getWaterLevel(); 
     getAirTemperatureAndHumidity();
     getLdrSensorValue();
     getOverFlowSensorValue();   
@@ -155,6 +160,9 @@ void getSensorValues(){
 
     convertValues();
   }  
+
+  // WATER LEVEL SENSOR NEEDS TO BE CHECKED OFTEN
+  getWaterLevel();
 }
 
 // CONVERTS SENSOR VALUES TO STRINGS
@@ -429,6 +437,70 @@ void sendNotifications() {
       }
       http.end(); 
     }      
+  }
+}
+
+// WATERS THE PLANT
+void waterPlant(){
+
+  // MAKE SURE THRESHOLD AND WATER AMOUNT ARE SET
+  float wateringThreshold = 0;
+  float wateringAmount = 0;
+  unsigned int wateringTime = 0;
+
+  if(preferences.isKey("watering-amount"))
+    wateringAmount = preferences.getInt("watering-amount");
+  else
+    return;
+
+  if(preferences.isKey("threshold"))
+    wateringThreshold = preferences.getInt("threshold");
+  else
+    return;    
+
+  // TRANSFORM WATER AMOUNT TO WATERING TIME
+  wateringTime = pump.getWateringTime(wateringAmount);   
+
+  // CHECK THAT TIME ELAPSED FROM LAST WATERING IS LARGER THAN WATERING INTERVAL
+  unsigned long currentMillis = millis();
+  if (currentMillis - previousWateringMillis >= wateringInterval) {
+    previousWateringMillis = currentMillis;
+
+    Serial.print("Watering time:");
+    Serial.println(wateringTime);
+    Serial.print("Watering amount:");
+    Serial.println(wateringAmount);  
+    Serial.print("Watering threshold:");
+    Serial.println(wateringThreshold);    
+    Serial.print("Soil moisture:");
+    Serial.println(soilMoisture);   
+    
+    // CHECK SOIL MOISTURE
+    if (soilMoisture <= wateringThreshold)
+    {
+      pump.setState(PUMP_ON);
+      pumpStartTime = currentMillis;
+    } 
+  }
+
+  if(pump.getState() == PUMP_ON) {
+    unsigned long currentMillis = millis();
+    /*
+    Serial.print(currentMillis - pumpStartTime);
+    Serial.print(" : ");
+    Serial.println(wateringTime);
+    */
+    if(currentMillis - pumpStartTime < wateringTime)    
+    {
+      //Serial.println("PUMPING");
+      //Serial.println(currentMillis);
+    }
+    else {
+      //Serial.println("PUMP OFF");
+      //Serial.println(currentMillis);
+      pumpStartTime = 0;
+      pump.setState(PUMP_OFF);
+    }    
   }
 }
 
