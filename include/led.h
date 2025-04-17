@@ -81,5 +81,5 @@ void initLeds(){
   led1.begin();
   led2.begin();
   led3.begin();
-  //led4.begin();
+  led4.begin();
 }
