@@ -5,9 +5,12 @@ import { WaterOverFlowIcon } from "./icons/WaterOverFlowIcon";
 import { SoilMoistureIcon } from "./icons/SoilMoistureIcon";
 import { WaterLevelIcon } from "./icons/WaterLevelIcon";
 import styles from "./SensorCard.module.css";
+import { SoilPhIcon } from "./icons/SoilPhIcon";
+import { SoilTemperatureIcon } from "./icons/SoilTemperatureIcon";
 type SensorTypes =
   | "soilMoisture"
   | "soilTemperature"
+  | "soilPh"
   | "airTemperature"
   | "airHumidity"
   | "luminosity"
@@ -29,6 +32,10 @@ export const SensorCard = ({ type, title, value, unit }: SensorCardProps) => {
             switch (type) {
               case "soilMoisture":
                 return <SoilMoistureIcon />;
+              case "soilPh":
+                return <SoilPhIcon />;
+              case "soilTemperature":
+                return <SoilTemperatureIcon />;
               case "waterLevel":
                 return <WaterLevelIcon />;
               case "luminosity":

@@ -6,56 +6,75 @@
 ModbusMaster node;  // Create Modbus object
 HardwareSerial SensorSerial(1);  // Serial1 for RS485 communication
 
-const int txPin = 6; // TX (to RS485 RX)
-const int rxPin = 7; // RX (to RS485 TX)
+const int txPin = D0; // TX (to RS485 RX)
+const int rxPin = D1; // RX (to RS485 TX)
+uint8_t modbusResult;
+uint8_t modbusAvailableResult;
+
+// CALIBRATION VALUES
+int airValue = 0;         // SENSOR VALUE WHEN IN AIR
+int waterValue = 1000;    // SENSOR VALUE WHEN IN WATER
+int wetSoilValue = 500;   // SENSOR VALUE WHEN IN WET SOIL
 
 void initSoilSensor();
+bool soilSensorAvailable();
 void getSoilSensorValues();
 
+float digitalSoilMoistureValue = 0;
+float digitalSoilPhValue = 0;
 
 void initSoilSensor() {
-    Serial.begin(115200);  // Serial Monitor
-    SensorSerial.begin(9600, SERIAL_8N1, rxPin, txPin); // Sensor default baud rate = 4800
+  SensorSerial.begin(9600, SERIAL_8N1, rxPin, txPin); // Sensor default baud rate = 4800
+  node.begin(1, SensorSerial); // Slave ID = 1
+  Serial.println("Modbus communication initialized");
+}
 
-    node.begin(1, SensorSerial); // Slave ID = 1
-    // Serial.println("Modbus communication initialized...");
+bool soilSensorAvailable(){
+  modbusAvailableResult = node.readHoldingRegisters(0x0000, 1);
+  return modbusAvailableResult == node.ku8MBSuccess;
 }
 
 void getSoilSensorValues() {
 
-    uint8_t result;
-
-    // Read Soil pH (Register 0x0003)
-    result = node.readHoldingRegisters(0x0003, 1);
-    if (result == node.ku8MBSuccess) {
-        soilPh = node.getResponseBuffer(0);
-        // Serial.print("Soil pH: ");
-        // Serial.println(soilPh, 2);
+  if(soilSensorAvailable())
+  {  
+    // Read Soil pH (0x0003)
+    modbusResult = node.readHoldingRegisters(0x0003, 1);
+    if (modbusResult == node.ku8MBSuccess) {
+      digitalSoilPhValue = node.getResponseBuffer(0) / 10;      
+      soilPh = digitalSoilPhValue;
     } else {
-        Serial.print("Error reading pH, Code: ");
-        Serial.println(result);
+      Serial.print("Error reading pH, Code: ");
+      Serial.println(modbusResult);
     }
 
-    // Read Soil Moisture (Register 0x0000)
-    result = node.readHoldingRegisters(0x0000, 1);
-    if (result == node.ku8MBSuccess) {
-        soilMoisture = node.getResponseBuffer(0); // 10.0; // Convert to %
-        // Serial.print("Soil Moisture: ");
-        // Serial.println(soilMoisture, 1);
+    // Read Soil Moisture (0x0000)
+    modbusResult = node.readHoldingRegisters(0x0000, 1);
+    if (modbusResult == node.ku8MBSuccess) {
+      digitalSoilMoistureValue = node.getResponseBuffer(0); // 10.0; // Convert to %
+
+      // CONSTRAIN
+      digitalSoilMoistureValue = constrain(digitalSoilMoistureValue, airValue, wetSoilValue);
+
+      // MAP VALUE TO 0–100
+      digitalSoilMoistureValue = map(digitalSoilMoistureValue, airValue, wetSoilValue, 0, 100);
+
+      //Serial.print("DIGITAL SOIL SENSOR VALUE: ");
+      //Serial.println(digitalSoilMoistureValue);
+      soilMoisture = digitalSoilMoistureValue;
+
     } else {
-        Serial.print("Error reading Moisture, Code: ");
-        Serial.println(result);
+      Serial.print("Error reading Moisture, Code: ");
+      Serial.println(modbusResult);
     }
 
-    // Read Soil Temperature (Register 0x0001)
-    result = node.readHoldingRegisters(0x0001, 1);
-    if (result == node.ku8MBSuccess) {
-        soilTemperature = node.getResponseBuffer(0) / 10.0; // Convert to °C
-        // Serial.print("Soil Temperature: ");
-        // Serial.println(soilTemperature, 1);
+    // Read Soil Temperature (0x0001)
+    modbusResult = node.readHoldingRegisters(0x0001, 1);
+    if (modbusResult == node.ku8MBSuccess) {
+      soilTemperature = node.getResponseBuffer(0) / 10.0; // Convert to °C        
     } else {
-        Serial.print("Error reading Temperature, Code: ");
-        Serial.println(result);
-    }
-  
+      Serial.print("Error reading Temperature, Code: ");
+      Serial.println(modbusResult);
+    }  
+  }
 }

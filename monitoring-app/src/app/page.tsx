@@ -14,7 +14,6 @@ export default async function Home({ searchParams }: PageProps) {
     <div className={styles.page}>
       <Logo />
       <LoginButton />
-
       {emailNotVerified ? (
         <p style={{ textAlign: "center" }}>
           Email address not verified:

@@ -4,8 +4,10 @@
   flex-direction: column;
 }
 .pageContainer {
+  max-width: 100%;
   width: 100%;
-  padding: 1rem;
+  padding: 0 0 0.25rem 0;
+  overflow: hidden;
 }
 
 /******************/
@@ -13,10 +15,17 @@
 /****************/
 @media screen and (min-width: 37.5rem) {
   .dashboard {
+    width: 100%;
     flex-direction: row;
     flex-grow: 1;
   }
   .pageContainer {
-    padding: 5rem;
+    padding: 2rem;
+  }
+}
+
+@media screen and (min-width: 80em) {
+  .pageContainer {
+    padding: 4rem;
   }
 }

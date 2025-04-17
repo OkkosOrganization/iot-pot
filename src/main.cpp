@@ -1,5 +1,14 @@
 #include <Arduino.h>
+#include <Wire.h>
 #include <inttypes.h>
+#include <WebServer.h>
+#include <WiFi.h>
+#include <PubSubClient.h>
+#include <WiFiClientSecure.h>
+#include <ArduinoJson.h>
+#include <Preferences.h>
+#include <HTTPClient.h>
+
 #include "secrets.h"
 #include "globals.h"
 #include "led.h"
@@ -7,13 +16,10 @@
 #include "overflow_sensor.h"
 #include "water_level_sensor.h"
 #include "soil_ph_moisture_temperature_sensor.h"
+#include "soil_moisture_sensor.h"
 #include "dht22_sensor.h"
 #include "LDR_sensor.h"
-#include <WebServer.h>
-#include <WiFi.h>
-#include <ArduinoJson.h>
 #include "html/index.h"
-#include <Preferences.h>
 
 // FUNCTION PROTOTYPES
 void initWiFiAp();
@@ -33,6 +39,15 @@ void handleGetNotificationTriggers();
 void handlePostNotificationTriggers();
 void getSensorValues();
 void waterPlant();
+void publishValuesMqtt();
+void publishValuesHttps();
+void connectMqtt();
+void initMqtt();
+void convertValues();
+void sendNotifications();
+void updateLedStates();
+void updateMqttConnectionState();
+
 
 // PREFERENCES
 Preferences preferences;
@@ -40,6 +55,7 @@ Preferences preferences;
 // UNIQUE DEVICE ID
 uint64_t deviceId;
 String deviceIdHex;
+char deviceIdHexCstring[17];
 
 // WIFI ACCESS POINT AND LOCAL WEB SERVER IP
 IPAddress local_IP(192,168,0,1);
@@ -47,31 +63,40 @@ IPAddress gateway(192,168,0,1);
 IPAddress subnet(255,255,255,0);
 WebServer* server;
 IPAddress apIP;
+WiFiClientSecure wifiClientSecure; 
+PubSubClient mqttClient;
 
 // SETUP
 void setup() {
   Serial.begin(115200);  
-  while (!Serial){ 
-    Serial.println("..."); 
-  }  
+  while (!Serial){ Serial.println("...");}  
 
   if (!preferences.begin("iot-pot", false)) {
     Serial.println("Failed to initialize preferences");
     return;
   }
-  
-  // INITIALIZES THE WIFI IN ACCESS POINT AND CLIENT MODE
-  WiFi.mode(WIFI_MODE_APSTA);
-  initWifiClient();
-  initWiFiAp();
-  initWebServer();
 
   // GET UNIQUE DEVICE ID
   deviceId = ESP.getEfuseMac();
   deviceIdHex = String((uint32_t)(deviceId >> 32), HEX) + String((uint32_t)deviceId, HEX);
+  deviceIdHex.toUpperCase();
+  deviceIdHex.toCharArray(deviceIdHexCstring, sizeof(deviceIdHexCstring));  
 
-  // I2C
-  Wire.begin();
+  // CREATE MQTT TOPICS: /device/<deviceId>/<sensorValueName>
+  sprintf(soilTemperatureTopic, "/device/%s/soilTemperature/", deviceIdHexCstring);
+  sprintf(soilPhTopic, "/device/%s/soilPh/", deviceIdHexCstring);
+  sprintf(soilMoistureTopic, "/device/%s/soilMoisture/", deviceIdHexCstring);
+  sprintf(airTemperatureTopic, "/device/%s/airTemperature/", deviceIdHexCstring);
+  sprintf(airHumidityTopic, "/device/%s/airHumidity/", deviceIdHexCstring);
+  sprintf(waterOverflowTopic, "/device/%s/waterOverflow/", deviceIdHexCstring);
+  sprintf(waterLevelTopic, "/device/%s/waterLevel/",deviceIdHexCstring);
+  sprintf(luminosityTopic, "/device/%s/luminosity/",deviceIdHexCstring);
+
+  // INIT ANALOG SENSORS
+  analogSetAttenuation(ADC_11db);
+
+  // WATER LEVEL
+  initWaterLevelSensor();
 
   // SOIL SENSOR
   initSoilSensor();
@@ -79,29 +104,44 @@ void setup() {
   // DHT22
   dht_sensor.begin(); 
 
-  // LDR
-  initLdrSensor();
-
   // OVERFLOW
   initOverFlowSensor();
 
   // LEDS
   initLeds();
-  led1.setState(OFF);
-  led2.setState(OFF);
+  led1.setState(GREEN);
+  led2.setState(YELLOW);
   led3.setState(OFF);
-  
-  // PUMP
-  initPump();
+  led4.setState(OFF);
+
+  // INITIALIZES THE WIFI IN ACCESS POINT AND CLIENT MODE
+  WiFi.mode(WIFI_MODE_APSTA);
+  initWifiClient();
+  initWiFiAp();
+  initWebServer();
 }
 
-// LOOP
+// THE LOOP
 void loop() {
   server->handleClient();   
   getSensorValues();
   waterPlant();
+  publishValuesMqtt();
+  publishValuesHttps();
+  sendNotifications();
+  updateLedStates();
+  updateMqttConnectionState();
 }
 
+// UPDATES THE LED STATES
+void updateLedStates(){
+  led1.update();
+  led2.update();
+  led3.update();
+  led4.update();  
+}
+
+// GETS VALUES FROM SENSORS
 void getSensorValues(){
   unsigned long currentMillis = millis();
   if (currentMillis - previousReadMillis >= sensorReadInterval) {
@@ -109,21 +149,291 @@ void getSensorValues(){
     getWaterLevel(); 
     getAirTemperatureAndHumidity();
     getLdrSensorValue();
-    getSoilSensorValues();
-    getOverFlowSensorValue();
-    /*
-    Serial.print("WATER LEVEL:");
-    Serial.println(waterLevel);
-    Serial.print("AIR TEMPERATURE:");
-    Serial.println(airTemperature);  
-    Serial.print("AIR HUMIDITY:");
-    Serial.println(airHumidity); 
-    Serial.print("LUMINOSITY:");
-    Serial.println(lightSensorValue);     
-    Serial.print("OVERFLOW:");
-    Serial.println(overflowValue);      
-    */
+    getOverFlowSensorValue();   
+
+    // USE MODBUS SENSOR IF AVAILABLE
+    if(soilSensorAvailable())
+      getSoilSensorValues();
+    else
+      getSoilMoistureValue();
+
+    convertValues();
   }  
+}
+
+// CONVERTS SENSOR VALUES TO STRINGS
+void convertValues(){
+  itoa(soilTemperature, soilTemperatureStr, 10);   
+  itoa(soilMoisture, soilMoistureStr, 10);
+  itoa(soilPh, soilPhStr, 10);
+  itoa(luminosity, luminosityStr, 10);
+  itoa(airTemperature, airTemperatureStr, 10);
+  itoa(airHumidity, airHumidityStr, 10);
+  itoa(waterLevel, waterLevelStr, 10);
+  itoa(waterOverflow, waterOverflowStr, 10);
+}
+
+// INITIALIZE THE MQTT CONNECTION
+void initMqtt() {
+  wifiClientSecure.setInsecure();
+  mqttClient.setClient(wifiClientSecure);
+  mqttClient.setServer(MQTT_BROKER_URL, MQTT_BROKER_PORT);
+  connectMqtt();
+}
+
+// CONNECTS TO MQTT BROKER
+void connectMqtt() {
+  if (WiFi.status() == WL_CONNECTED) {
+    Serial.print("Connecting to MQTT broker: ");
+    Serial.println(MQTT_BROKER_URL);
+    if (mqttClient.connect(
+      deviceIdHexCstring,  // Client ID
+      MQTT_USER,            // Username
+      MQTT_PASSWORD,        // Password
+      NULL,                 // Will topic
+      0,                    // Will QoS
+      false,                // Will retain
+      NULL,                 // Will message
+      true                  // Clean session
+    )) {
+      Serial.println("MQTT connected!");      
+    } else {
+      Serial.print("MQTT connection failed, rc= ");
+      Serial.println(mqttClient.state());
+    } 
+  }
+}
+
+// UPDATE THE MQTT CONNECTION
+void updateMqttConnectionState(){
+  if(mqttClient.connected())
+    mqttClient.loop();
+  else
+    connectMqtt();
+}
+
+// PUBLISH VALUES TO MQTT TOPICS
+void publishValuesMqtt() {
+  unsigned long currentMillis = millis();
+  if (currentMillis - previousMqttMillis >= mqttPublishInterval) {
+    previousMqttMillis = currentMillis;
+    if (mqttClient.connected())
+    {
+      // PUBLISH TO EACH TOPIC
+      if (mqttClient.publish(soilTemperatureTopic, soilTemperatureStr)) {
+        Serial.print(soilTemperatureTopic);
+        Serial.println(soilTemperatureStr);
+      } else {
+        Serial.println("MQTT publish failed");
+      }
+
+      if (mqttClient.publish(soilPhTopic, soilPhStr)) {
+        Serial.print(soilPhTopic);
+        Serial.println(soilPhStr);
+      } else {
+        Serial.println("MQTT publish failed");
+      }  
+      
+      if (mqttClient.publish(soilMoistureTopic, soilMoistureStr)) {
+        Serial.print(soilMoistureTopic);
+        Serial.println(soilMoistureStr);
+      } else {
+        Serial.println("MQTT publish failed");
+      }      
+
+      if (mqttClient.publish(airTemperatureTopic, airTemperatureStr)) {
+        Serial.print(airTemperatureTopic);
+        Serial.println(airTemperatureStr);
+      } else {
+        Serial.println("MQTT publish failed");
+      } 
+      
+      if (mqttClient.publish(airHumidityTopic, airHumidityStr)) {
+        Serial.print(airHumidityTopic);
+        Serial.println(airHumidityStr);
+      } else {
+        Serial.println("MQTT publish failed");
+      }  
+      
+      if (mqttClient.publish(luminosityTopic, luminosityStr)) {
+        Serial.print(luminosityTopic);
+        Serial.println(luminosityStr);
+      } else {
+        Serial.println("MQTT publish failed");
+      }  
+      
+      if (mqttClient.publish(waterLevelTopic, waterLevelStr)) {
+        Serial.print(waterLevelTopic);
+        Serial.println(waterLevelStr);
+      } else {
+        Serial.println("MQTT publish failed");
+      }  
+      
+      if (mqttClient.publish(waterOverflowTopic, waterOverflowStr)) {
+        Serial.print(waterOverflowTopic);
+        Serial.println(waterOverflowStr);
+      } else {
+        Serial.println("MQTT publish failed");
+      } 
+    }    
+  }
+}
+
+// SEND VALUES AS HTTPS POST
+void publishValuesHttps() {
+
+  unsigned long currentMillis = millis();
+  if (currentMillis - previousHttpsMillis >= httpsPublishInterval) {
+    previousHttpsMillis = currentMillis;
+
+    JsonDocument doc;
+    doc["deviceId"] = deviceIdHex;
+
+    JsonObject data = doc["sensorValues"].to<JsonObject>();
+    data["airTemperature"] = airTemperature;
+    data["airHumidity"] = airHumidity;
+    data["soilTemperature"] = soilTemperature;
+    data["soilMoisture"] = soilMoisture;
+    data["soilPh"] = soilPh;
+    data["luminosity"] = luminosity;
+    data["waterLevel"] = waterLevel;
+    data["waterOverflow"] = waterOverflow;
+
+    String jsonString;
+    serializeJson(doc, jsonString);
+
+    WiFiClientSecure client;
+    client.setInsecure();
+
+    HTTPClient https;
+    if (https.begin(client, MEASUREMENTS_API_URL)) {
+      https.addHeader("Content-Type", "application/json");
+
+      int httpResponseCode = https.POST(jsonString);
+
+      Serial.print("HTTP Response code: ");
+      Serial.println(httpResponseCode);
+
+      if (httpResponseCode > 0) {
+        String response = https.getString();
+        Serial.println("Response:");
+        Serial.println(response);
+      } else {
+        Serial.print("POST error: ");
+        Serial.println(https.errorToString(httpResponseCode));
+      }
+
+      https.end();
+    } else {
+      Serial.println("Connection to API failed.");
+    }
+  }
+}
+
+// SEND NOTIFICATIONS
+void sendNotifications() {
+  unsigned long currentMillis = millis();
+  if (currentMillis - previousNotificationMillis >= notificationSendInterval) {
+    previousNotificationMillis = currentMillis;
+    
+    Serial.println("Check notifications:");
+    Serial.println(NOTIFICATION_API_URL);
+    
+    // CHECK IF EMAIL IS SET
+    String email = preferences.getString("email", "");
+    if (sizeof(email) == 0)
+      return;
+    
+    // GET NOTIFICATION SETTINGS, DEFAULT VALUE = FALSE
+    bool smt = preferences.getBool("soil-moisture", false);
+    bool wte = preferences.getBool("tank-empty", false);
+    bool wo = preferences.getBool("overflow", false);
+  
+    WiFiClientSecure client;
+    client.setInsecure();
+
+    // NOTIFICATION FOR SOIL-MOISTURE
+    if (smt == true && soilMoisture < preferences.getInt("threshold") && WiFi.status() == WL_CONNECTED) {
+
+      HTTPClient http;
+      http.begin(client, NOTIFICATION_API_URL);
+      http.addHeader("Content-Type", "application/json");
+
+      JsonDocument jsonDoc;
+      jsonDoc["deviceId"] = deviceIdHex;           
+      jsonDoc["email"] = email;                
+      jsonDoc["type"] = "soil-moisture";
+
+      String jsonData;
+      serializeJson(jsonDoc, jsonData);
+
+      int httpResponseCode = http.POST(jsonData);
+      if (httpResponseCode > 0) {
+        Serial.print("HTTP Response code: ");
+        Serial.println(httpResponseCode);
+      }
+      else {
+        Serial.print("Error code: ");
+        Serial.println(httpResponseCode);
+      }
+      http.end(); 
+    }
+    
+    // NOTIFICATION FOR WATER TANK LEVEL
+    int waterTankThreshold = 50;
+    // TODO:
+    // DEFINE THIS IN GLOBALS?? OR PREFERENCES??
+    if(wte == true && waterLevel < waterTankThreshold && WiFi.status() == WL_CONNECTED) {
+      HTTPClient http;
+      http.begin(client, NOTIFICATION_API_URL);
+      http.addHeader("Content-Type", "application/json");
+
+      JsonDocument jsonDoc;
+      jsonDoc["deviceId"] = deviceIdHex;           
+      jsonDoc["email"] = email;                
+      jsonDoc["type"] = "soil-moisture";
+
+      String jsonData;
+      serializeJson(jsonDoc, jsonData);
+
+      int httpResponseCode = http.POST(jsonData);
+      if (httpResponseCode > 0) {
+        Serial.print("HTTP Response code: ");
+        Serial.println(httpResponseCode);
+      } 
+      else {
+        Serial.print("Error code: ");
+        Serial.println(httpResponseCode);
+      }
+      http.end(); 
+    }
+      
+    // NOTIFICATION FOR WATER OVERFLOW
+    if(wo == true && waterOverflow > 50 && WiFi.status() == WL_CONNECTED) {
+      HTTPClient http;
+      http.begin(client, NOTIFICATION_API_URL);
+      http.addHeader("Content-Type", "application/json");
+
+      JsonDocument jsonDoc;
+      jsonDoc["deviceId"] = deviceIdHex;           
+      jsonDoc["email"] = email;                
+      jsonDoc["type"] = "soil-moisture";
+
+      String jsonData;
+      serializeJson(jsonDoc, jsonData);
+
+      int httpResponseCode = http.POST(jsonData);
+      if (httpResponseCode > 0) {
+        Serial.print("HTTP Response code: ");
+        Serial.println(httpResponseCode);
+      } 
+      else {
+        Serial.print("Error code: ");
+        Serial.println(httpResponseCode);
+      }
+      http.end(); 
+    }      
+  }
 }
 
 void waterPlant(){
@@ -189,7 +499,7 @@ void waterPlant(){
 
 
 // INITIALIZES WIFI AP
-void initWiFiAp(){
+void initWiFiAp() {
   WiFi.softAPConfig(local_IP, gateway, subnet);
   WiFi.softAP(soft_ap_ssid, soft_ap_password);
 
@@ -227,10 +537,9 @@ void initWebServer(){
 
 // WIFI CLIENT
 void initWifiClient(){
-  Serial.println("Trying to connect to router");
+  Serial.println("WIFI INIT");
   if (preferences.isKey("ssid") && preferences.isKey("pwd"))
   {
-    
     String ssid = preferences.getString("ssid");
     String pwd = preferences.getString("pwd");
     WiFi.begin(ssid, pwd);  
@@ -238,28 +547,33 @@ void initWifiClient(){
     int maxReconnectTries = 10;    
     while (WiFi.status() != WL_CONNECTED)
     {
+      led2.setState(YELLOW);     
       if(reconnectTries < maxReconnectTries)
       {      
         Serial.println("Connecting to WiFi..");
         reconnectTries +=1;
-        delay(500);
+        delay(1000);
       }
       else
       {
-        Serial.println("Could not connect to WiFi");        
+        Serial.println("Could not connect to WiFi");   
+        led2.setState(RED);     
         break;
       }
-    }
-      
+    }      
     if (WiFi.status() == WL_CONNECTED)
     {
       Serial.print("ESP32 IP on the WiFi network: ");
       Serial.println(WiFi.localIP());
+      led2.setState(GREEN);
+      initMqtt();
+      led1.setState(GREEN);
     }
   }  
   else
   {
     Serial.println("No SSID or password");
+    led2.setState(RED);     
   }
 }
 

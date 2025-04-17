@@ -29,9 +29,11 @@ export default async function Page({
         airTemperature: 0,
         airHumidity: 0,
         soilMoisture: 0,
-        soilPH: 0,
+        soilPh: 0,
         soilTemperature: 0,
         luminosity: 0,
+        waterOverflow: 0,
+        waterLevel: 0,
       }}
     >
       <div className={styles.container}>
@@ -40,7 +42,7 @@ export default async function Page({
           <DeviceNavi deviceId={id} />
         </div>
         <div className={styles.content}>
-          <DevicePageContent />
+          <DevicePageContent deviceId={id} />
         </div>
       </div>
     </MqttContextProvider>

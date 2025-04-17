@@ -12,7 +12,7 @@
   width: max-content;
   height: 2rem;
   padding: 0.25rem 1rem;
-  color: var(--darkGrey);
+  color: var(--darkGrey) !important;
   font-size: 0.6875rem;
   font-family: var(--poppins);
   font-weight: 600;
@@ -22,6 +22,6 @@
 .active,
 .active:visited,
 .active:active {
-  background: var(--darkGrey);
-  color: var(--lime);
+  background: var(--darkGrey) !important;
+  color: var(--lime) !important;
 }
