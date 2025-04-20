@@ -20,6 +20,11 @@ export const NoteForm = ({ deviceId }: NoteFormProps) => {
   const [content, setContent] = useState<string>("");
   const postNote = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+
+    // SIMPLE VALIDATION
+    if (!title.trim().length || !content.trim().length)
+      return setError("Please fill in the note title and content ");
+
     try {
       const response = await fetch(`/api/note/`, {
         method: "POST",
@@ -27,8 +32,8 @@ export const NoteForm = ({ deviceId }: NoteFormProps) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          title: title,
-          content: content,
+          title: title.trim(),
+          content: content.trim(),
           deviceId: deviceId,
           date: date,
         }),
@@ -45,13 +50,13 @@ export const NoteForm = ({ deviceId }: NoteFormProps) => {
 
         if (body?.success === 0) {
           console.log(body);
-          setError(`${body.error}❌`);
+          setError(`${body.error}`);
           setSuccess("");
         }
       }
     } catch (error) {
       console.error("Error:", error);
-      setError("Error ❌");
+      setError("Error");
       setSuccess("");
     }
   };
@@ -66,6 +71,9 @@ export const NoteForm = ({ deviceId }: NoteFormProps) => {
               <input
                 onChange={(e) => setTitle(e.currentTarget.value)}
                 value={title}
+                type="text"
+                required
+                maxLength={256}
               />
             </div>
             <div className={styles.inputContainer}>
@@ -73,11 +81,12 @@ export const NoteForm = ({ deviceId }: NoteFormProps) => {
               <textarea
                 rows={3}
                 value={content}
+                required
                 onChange={(e) => setContent(e.currentTarget.value)}
               ></textarea>
             </div>
             <div className={styles.bottom}>
-              {error ? <p className={styles.error}>{error}</p> : null}
+              {error ? <p className={styles.error}>{`${error} ❌`}</p> : null}
               {success ? <p className={styles.success}>{success}</p> : null}
               <button className="btn" onClick={postNote}>
                 submit

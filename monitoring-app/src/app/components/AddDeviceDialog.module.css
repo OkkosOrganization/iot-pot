@@ -27,7 +27,6 @@
   width: 100%;
   padding: 2rem;
   max-width: 28rem;
-  min-height: 20rem;
   align-items: center;
   background: #fff;
   box-shadow: 1rem 1rem 1rem 1rem, rgba(0, 0, 0, 0.5);
@@ -46,6 +45,11 @@
   width: 2.25rem;
   height: 2.25rem;
   border-radius: 100%;
+  background-color: var(--purple);
+  color: white !important;
+}
+.closeDialogBtn * {
+  stroke: white;
 }
 
 .inputContainer {
@@ -109,4 +113,12 @@
 
 .error {
   color: red;
+}
+
+.bottom {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
 }

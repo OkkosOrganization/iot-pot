@@ -64,6 +64,7 @@ export const AddDeviceDialog = ({
               name="deviceId"
               className={styles.inputText}
               required
+              maxLength={128}
             />
           </div>
           <div className={styles.inputContainer}>
@@ -73,12 +74,15 @@ export const AddDeviceDialog = ({
               name="title"
               className={styles.inputText}
               required
+              maxLength={128}
             />
           </div>
-          <button type="submit" className={styles.submitBtn}>
-            ADD DEVICE
-          </button>
-          <p className={styles.error}>{state?.error as string}</p>
+          <div className={styles.bottom}>
+            <p className={styles.error}>{state?.error as string}</p>
+            <button type="submit" className={styles.submitBtn}>
+              ADD DEVICE
+            </button>
+          </div>
         </form>
         {isPending ? (
           <div className={styles.spinnerContainer}>
