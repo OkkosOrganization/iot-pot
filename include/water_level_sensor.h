@@ -83,8 +83,10 @@ void getWaterLevel()
     waterLevel = trig_section * 5;    
 
     // SET THE LED STATE
-    if (waterLevel < WATER_LEVEL_LOW)
-      led3.setState(RED);
+    if (waterLevel <= WATER_LEVEL_TOO_LOW)
+      led3.setState(RED_FAST_BLINK);
+    else if (waterLevel > WATER_LEVEL_TOO_LOW && waterLevel < WATER_LEVEL_LOW)
+    led3.setState(RED);      
     else if (waterLevel >= WATER_LEVEL_LOW && waterLevel < WATER_LEVEL_MEDIUM)
       led3.setState(YELLOW);
     else if (waterLevel >= WATER_LEVEL_MEDIUM && waterLevel < WATER_LEVEL_HIGH)
