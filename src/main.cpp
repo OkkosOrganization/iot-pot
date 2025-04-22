@@ -475,8 +475,8 @@ void waterPlant(){
     Serial.print("Soil moisture:");
     Serial.println(soilMoisture);   
     
-    // CHECK SOIL MOISTURE
-    if (soilMoisture <= wateringThreshold)
+    // CHECK SOIL MOISTURE AND TANK LEVEL
+    if (soilMoisture <= wateringThreshold && waterLevel >= WATER_LEVEL_TOO_LOW)
     {
       pump.setState(PUMP_ON);
       pumpStartTime = currentMillis;
