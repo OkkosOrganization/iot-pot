@@ -171,7 +171,7 @@ export const DeviceHistoryContent = ({ device }: DeviceHistoryContentProps) => {
           const d = dayjs
             .utc(row.timestamp)
             .tz("Europe/Helsinki")
-            .format("D.M. H:m");
+            .format("D.M. HH:mm");
           data.dates.push(d);
         }
       }
@@ -188,7 +188,7 @@ export const DeviceHistoryContent = ({ device }: DeviceHistoryContentProps) => {
           const d = dayjs
             .utc(row.timestamp)
             .tz("Europe/Helsinki")
-            .format("D.M. H:m");
+            .format("D.M. HH:mm");
           data.dates.push(d);
         }
       }
