@@ -133,7 +133,6 @@ export const NoteForm = ({ deviceId }: NoteFormProps) => {
             <div className={styles.inputContainer}>
               <label className={styles.inputLabel}>Note content</label>
               <textarea
-                rows={3}
                 value={content}
                 required
                 onChange={(e) => setContent(e.currentTarget.value)}
