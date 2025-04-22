@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { deviceId, title, content, date } = body;
+  const { deviceId, title, content, date, image } = body;
   if (!deviceId) {
     return NextResponse.json(
       { success: 0, error: "No deviceId" },
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     );
 
   try {
-    await addNote(title, content, deviceId, date);
+    await addNote(title, content, deviceId, date, image);
     return NextResponse.json({ success: 1 });
   } catch (e) {
     console.log(e);

@@ -29,3 +29,7 @@
 .date span {
   display: block;
 }
+
+.container:has(.image) .content {
+  margin-bottom: 1rem;
+}

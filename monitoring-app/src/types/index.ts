@@ -30,6 +30,7 @@ export type Note = {
   id: string;
   title: string;
   content: string;
+  image: string;
   date: string;
   deviceId: string;
   error: string;

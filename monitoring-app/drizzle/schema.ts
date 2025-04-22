@@ -43,6 +43,7 @@ export const notes = pgTable("notes", {
 	content: text(),
 	deviceId: varchar("device_id", { length: 255 }).notNull(),
 	title: varchar({ length: 512 }),
+	image: text(),
 }, (table) => [
 	foreignKey({
 			columns: [table.deviceId],

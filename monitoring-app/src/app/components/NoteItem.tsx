@@ -22,7 +22,12 @@ export const NoteItem = ({ note }: NoteItemProps) => {
         </div>
       </div>
 
-      <div>{note.content}</div>
+      <div className={styles.content}>{note.content}</div>
+      {note.image ? (
+        <div className={styles.image}>
+          <img src={note.image} />
+        </div>
+      ) : null}
     </div>
   );
 };
