@@ -9,7 +9,8 @@ class LED {
     unsigned long lastToggleTime = 0;
     bool redState = false;
     LED_STATE currentState = OFF;
-    const int BLINK_INTERVAL = 200;
+    const int BLINK_INTERVAL_SLOW = 500;
+    const int BLINK_INTERVAL_FAST = 200;
 
   public:
     // Constructor
@@ -45,8 +46,9 @@ class LED {
           blink = false;
           break;
         case RED_BLINK:
-          digitalWrite(greenPin, HIGH); // Green OFF
-          digitalWrite(redPin, LOW);    // Red on
+        case RED_FAST_BLINK:
+          digitalWrite(greenPin, HIGH);
+          digitalWrite(redPin, LOW);
           blink = true;
           redState = true;
           lastToggleTime = millis();
@@ -60,13 +62,14 @@ class LED {
       }
     }
 
-    void update() {      
-      if (blink && currentState == RED_BLINK) {
+    void update() {
+      if (blink && (currentState == RED_BLINK || currentState == RED_FAST_BLINK)) {
         unsigned long now = millis();
-        if (now - lastToggleTime >= BLINK_INTERVAL) {
+        int interval = (currentState == RED_FAST_BLINK) ? BLINK_INTERVAL_FAST : BLINK_INTERVAL_SLOW;
+        if (now - lastToggleTime >= interval) {
           lastToggleTime = now;
           redState = !redState;
-          digitalWrite(redPin, redState ? LOW : HIGH);          
+          digitalWrite(redPin, redState ? LOW : HIGH);
         }
       }
     }
