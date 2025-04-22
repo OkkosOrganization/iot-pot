@@ -127,7 +127,8 @@ export const addNote = (
   title: string,
   content: string,
   deviceId: string,
-  date: string
+  date: string,
+  image: string
 ) => {
   return db
     .insert(schema.notes)
@@ -136,8 +137,8 @@ export const addNote = (
       content: content,
       deviceId: deviceId,
       date: date,
+      image: image,
     })
-    .onConflictDoNothing()
     .returning();
 };
 
