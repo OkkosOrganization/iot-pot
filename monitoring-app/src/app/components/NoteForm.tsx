@@ -118,7 +118,12 @@ export const NoteForm = ({ deviceId }: NoteFormProps) => {
     <>
       <h2 className={styles.title}>Add note</h2>
       <div className={styles.notesContainer}>
-        <form className={styles.form}>
+        <form
+          className={styles.form}
+          onSubmit={(e) => {
+            e.preventDefault();
+          }}
+        >
           <div className={styles.side}>
             <div className={styles.inputContainer}>
               <label className={styles.inputLabel}>Title</label>
@@ -149,7 +154,10 @@ export const NoteForm = ({ deviceId }: NoteFormProps) => {
 
               <button
                 className={`btn ${styles.imageBtn}`}
-                onClick={() => imageRef?.current?.click()}
+                onClick={(e) => {
+                  e.preventDefault();
+                  imageRef?.current?.click();
+                }}
               >
                 <span className={styles.imageIcon}>
                   <ImageIcon />
