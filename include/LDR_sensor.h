@@ -10,7 +10,7 @@
 #define LIGHT_SENSOR_PIN A3 
 
 void getLdrSensorValue();
-float lookupLux();
+float lookupLux(uint16_t adcValue);
 
 struct LuxLookup {
   uint16_t adcMin;
@@ -52,7 +52,6 @@ float getFilteredReading() {
   // GET READINGS
   for (int i = 0; i < amountOfReadings; i++) {
     readings[i] = lookupLux(analogRead(LIGHT_SENSOR_PIN));
-    delay(5);
   }
 
   // FIND MIN MAX
