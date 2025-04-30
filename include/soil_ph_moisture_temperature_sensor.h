@@ -41,7 +41,7 @@ void getSoilSensorValues() {
     // Read Soil pH (0x0003)
     modbusResult = node.readHoldingRegisters(0x0003, 1);
     if (modbusResult == node.ku8MBSuccess) {
-      digitalSoilPhValue = node.getResponseBuffer(0) / 10;      
+      digitalSoilPhValue = node.getResponseBuffer(0);      
       soilPh = digitalSoilPhValue;
     } else {
       Serial.print("Error reading pH, Code: ");
