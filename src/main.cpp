@@ -111,8 +111,8 @@ void setup() {
 
   // LEDS
   initLeds();
-  led1.setState(GREEN);
-  led2.setState(YELLOW);
+  led1.setState(OFF);
+  led2.setState(OFF);
   led3.setState(OFF);
   led4.setState(OFF);
 
@@ -127,11 +127,11 @@ void setup() {
 void loop() {
   server->handleClient();   
   getSensorValues();
+  updateLedStates();
   waterPlant();
   publishValuesMqtt();
   publishValuesHttps();
   sendNotifications();
-  updateLedStates();
   updateMqttConnectionState();
 }
 
@@ -384,10 +384,7 @@ void sendNotifications() {
     }
     
     // NOTIFICATION FOR WATER TANK LEVEL
-    int waterTankThreshold = 50;
-    // TODO:
-    // DEFINE THIS IN GLOBALS?? OR PREFERENCES??
-    if(wte == true && waterLevel < waterTankThreshold && WiFi.status() == WL_CONNECTED) {
+    if(wte == true && waterLevel <= WATER_LEVEL_LOW && WiFi.status() == WL_CONNECTED) {
       HTTPClient http;
       http.begin(client, NOTIFICATION_API_URL);
       http.addHeader("Content-Type", "application/json");
@@ -413,7 +410,7 @@ void sendNotifications() {
     }
       
     // NOTIFICATION FOR WATER OVERFLOW
-    if(wo == true && waterOverflow > 50 && WiFi.status() == WL_CONNECTED) {
+    if(wo == true && waterOverflow == 1 && WiFi.status() == WL_CONNECTED) {
       HTTPClient http;
       http.begin(client, NOTIFICATION_API_URL);
       http.addHeader("Content-Type", "application/json");
@@ -474,10 +471,13 @@ void waterPlant(){
     Serial.println(wateringThreshold);    
     Serial.print("Soil moisture:");
     Serial.println(soilMoisture);   
+    Serial.print("Water level:");
+    Serial.println(waterLevel);       
     
     // CHECK SOIL MOISTURE AND TANK LEVEL
     if (soilMoisture <= wateringThreshold && waterLevel >= WATER_LEVEL_TOO_LOW)
     {
+      Serial.println("PUMP ON");
       pump.setState(PUMP_ON);
       pumpStartTime = currentMillis;
     } 
@@ -485,11 +485,7 @@ void waterPlant(){
 
   if(pump.getState() == PUMP_ON) {
     unsigned long currentMillis = millis();
-    /*
-    Serial.print(currentMillis - pumpStartTime);
-    Serial.print(" : ");
-    Serial.println(wateringTime);
-    */
+
     if(currentMillis - pumpStartTime < wateringTime)    
     {
       //Serial.println("PUMPING");
