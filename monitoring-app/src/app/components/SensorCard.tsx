@@ -19,7 +19,7 @@ type SensorTypes =
 type SensorCardProps = {
   type: SensorTypes;
   title: string;
-  value: number;
+  value: number | string;
   unit: string;
 };
 export const SensorCard = ({ type, title, value, unit }: SensorCardProps) => {
