@@ -41,7 +41,7 @@ export const DevicePageContent = ({ deviceId }: DevicePageContentProps) => {
         <SensorCard
           type="soilPh"
           title="Soil PH"
-          value={soilPh as number}
+          value={((soilPh as number) / 10).toFixed(1)}
           unit=""
         />
         <SensorCard

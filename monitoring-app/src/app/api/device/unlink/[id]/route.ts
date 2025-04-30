@@ -5,7 +5,7 @@ import { Device } from "@/types";
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> } // Note the Promise type
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getSession();
   const _params = await params;

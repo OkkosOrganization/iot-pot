@@ -20,14 +20,12 @@ void initOverFlowSensor(){
 
 void getOverFlowSensorValue(){
   int waterOverflowValue = analogRead(SIGNAL_PIN);
-
   if (waterOverflowValue >= WATER_OVERFLOW_THRESHOLD) { 
-    Serial.print("OVERFLOW");
     waterOverflow = 1;
     led4.setState(RED);
   }  
   else {
     waterOverflow = 0;
-    led4.setState(GREEN);
+    led4.setState(OFF);
   }
 }

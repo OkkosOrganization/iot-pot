@@ -9,7 +9,8 @@ class LED {
     unsigned long lastToggleTime = 0;
     bool redState = false;
     LED_STATE currentState = OFF;
-    const int BLINK_INTERVAL = 200;
+    const int BLINK_INTERVAL_SLOW = 500;
+    const int BLINK_INTERVAL_FAST = 200;
 
   public:
     // Constructor
@@ -24,6 +25,10 @@ class LED {
       pinMode(greenPin, OUTPUT);
       setState(OFF);
     }
+    
+    LED_STATE getState() {
+      return currentState;
+    }
 
     // Set LED state
     void setState(LED_STATE state) {
@@ -33,40 +38,58 @@ class LED {
           digitalWrite(redPin, LOW);    // Red ON
           digitalWrite(greenPin, HIGH); // Green OFF
           blink = false;
+          redState = false;
           break;
         case GREEN:
           digitalWrite(redPin, HIGH);   // Red OFF
           digitalWrite(greenPin, LOW);  // Green ON
           blink = false;
+          redState = false;
           break;
         case YELLOW:
           digitalWrite(redPin, LOW);    // Red ON
           digitalWrite(greenPin, LOW);  // Green ON
           blink = false;
+          redState = false;
           break;
         case RED_BLINK:
           digitalWrite(greenPin, HIGH); // Green OFF
-          digitalWrite(redPin, LOW);    // Red on
+          digitalWrite(redPin, LOW);    // Red ON
+          blink = true;
+          redState = true;
+          lastToggleTime = millis();
+          break;          
+        case RED_FAST_BLINK:
+          digitalWrite(greenPin, HIGH); // Green OFF
+          digitalWrite(redPin, LOW);    // Red ON
           blink = true;
           redState = true;
           lastToggleTime = millis();
           break;
         case OFF:
+          digitalWrite(redPin, HIGH);   // Red OFF
+          digitalWrite(greenPin, HIGH); // Green OFF
+          blink = false;
+          redState = false;     
+          break;     
         default:
           digitalWrite(redPin, HIGH);   // Red OFF
           digitalWrite(greenPin, HIGH); // Green OFF
           blink = false;
+          redState = false;
           break;
       }
+    
     }
 
-    void update() {      
-      if (blink && currentState == RED_BLINK) {
+    void update() {
+      if (blink && (currentState == RED_BLINK || currentState == RED_FAST_BLINK)) {
         unsigned long now = millis();
-        if (now - lastToggleTime >= BLINK_INTERVAL) {
+        int interval = (currentState == RED_FAST_BLINK) ? BLINK_INTERVAL_FAST : BLINK_INTERVAL_SLOW;
+        if (now - lastToggleTime >= interval) {       
           lastToggleTime = now;
           redState = !redState;
-          digitalWrite(redPin, redState ? LOW : HIGH);          
+          digitalWrite(redPin, redState ? LOW : HIGH);
         }
       }
     }
@@ -75,7 +98,7 @@ class LED {
 LED led1(LED_PIN_2, LED_PIN_1); // POWER LED
 LED led2(LED_PIN_4, LED_PIN_3); // WIFI LED
 LED led3(LED_PIN_5, LED_PIN_6); // WATER LEVEL LED
-LED led4(LED_PIN_8, LED_PIN_7); // OVERFLOW LED
+LED led4(LED_PIN_7, LED_PIN_8); // OVERFLOW LED
 void initLeds();
 void initLeds(){
   led1.begin();

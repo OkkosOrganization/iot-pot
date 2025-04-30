@@ -1,6 +1,5 @@
 #pragma once
 #include <Arduino.h>
-#include "globals.h"
 
 class PUMP {
   private:

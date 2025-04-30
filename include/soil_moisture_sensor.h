@@ -1,6 +1,5 @@
 #pragma once
 #include <Arduino.h>
-#include "globals.h"
 
 #define AOUT_PIN A2 
 void getSoilMoistureValue();

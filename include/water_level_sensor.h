@@ -16,31 +16,51 @@ void getLow8SectionValue(void);
 unsigned char low_data[8] = {0};
 unsigned char high_data[12] = {0};
 
-void initWaterLevelSensor(){
+void initWaterLevelSensor(){  
   Wire.begin();
 }
 void getHigh12SectionValue(void)
 {
   memset(high_data, 0, sizeof(high_data));
   Wire.requestFrom(ATTINY1_HIGH_ADDR, 12);
-  while (12 != Wire.available());
+  
+  unsigned long start = millis();
+  while (Wire.available() < 12) {
+    if (millis() - start > 100) {
+      Serial.println("Timeout waiting for high section data!");
+      return;
+    }
+  }
   for (int i = 0; i < 12; i++)
     high_data[i] = Wire.read();
+
 }
+
 void getLow8SectionValue(void)
 {
   memset(low_data, 0, sizeof(low_data));
   Wire.requestFrom(ATTINY2_LOW_ADDR, 8);
-  while (8 != Wire.available());
+  
+  unsigned long start = millis();
+  while (Wire.available() < 8) {
+    if (millis() - start > 100) {
+      Serial.println("Timeout waiting for low section data!");
+      return;
+    }
+  }
+
   for (int i = 0; i < 8 ; i++)
     low_data[i] = Wire.read();
+
 }
 void getWaterLevel()
 {
+  /*
   unsigned long currentMillis = millis();
   if (currentMillis - previousWaterLevelMillis >= waterLevelInterval) {
     previousWaterLevelMillis = currentMillis;
-
+  }
+  */
     int sensorvalue_min = 250;
     int sensorvalue_max = 255;
     int low_count = 0;
@@ -79,18 +99,35 @@ void getWaterLevel()
       touch_val >>= 1;
     }
 
+    /*
+    Serial.print("low_data: ");
+    for (int i = 0; i < 8; i++) {
+      Serial.print(low_data[i]);
+      Serial.print(" ");
+    }
+    Serial.println();
+
+    Serial.print("high_data: ");
+    for (int i = 0; i < 12; i++) {
+      Serial.print(high_data[i]);
+      Serial.print(" ");
+    }
+    Serial.println();
+    */
+
     // UPDATE THE GLOBAL VAR
     waterLevel = trig_section * 5;    
 
     // SET THE LED STATE
-    if (waterLevel < WATER_LEVEL_LOW)
-      led3.setState(RED);
+    if (waterLevel <= WATER_LEVEL_TOO_LOW && led3.getState() != RED_FAST_BLINK)
+      led3.setState(RED_FAST_BLINK);
+    else if (waterLevel > WATER_LEVEL_TOO_LOW && waterLevel < WATER_LEVEL_LOW)
+      led3.setState(RED);      
     else if (waterLevel >= WATER_LEVEL_LOW && waterLevel < WATER_LEVEL_MEDIUM)
       led3.setState(YELLOW);
     else if (waterLevel >= WATER_LEVEL_MEDIUM && waterLevel < WATER_LEVEL_HIGH)
       led3.setState(GREEN);
-    else
+    else if (waterLevel > WATER_LEVEL_TOO_HIGH && led3.getState() != RED_BLINK)
       led3.setState(RED_BLINK);
-  }
 }
 
