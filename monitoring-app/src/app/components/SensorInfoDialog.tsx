@@ -130,8 +130,27 @@ export const SensorInfoDialog = ({
             </div>
             <h3>Water level (0-100%)</h3>
             <p>
-              The water level of the IoT-pot water tank. Lorem ipsum dolor sit
-              amet. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet.
+              The water level of the IoT-pot water tank.
+              <ul style={{ marginTop: "3.5rem" }}>
+                <li>
+                  <b>&lt; 10%:</b> almost empty, pump won't start, device LED
+                  will flash red quickly.
+                </li>
+                <li>
+                  <b>&gt; 10% and &lt; 20%:</b> low level, device LED will shine
+                  red.
+                </li>
+                <li>
+                  <b>&gt; 20% and &lt; 40%:</b> ok, device LED will shine
+                  orange.
+                </li>
+                <li>
+                  <b>&gt; 40% and &lt; 60%:</b> ok, device LED will shine green.
+                </li>
+                <li>
+                  <b>&gt; 60%:</b> too much water, device LED will flash red.
+                </li>
+              </ul>
             </p>
           </div>
           <div className={styles.sensorInfoItem}>
