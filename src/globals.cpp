@@ -67,4 +67,4 @@ unsigned long previousHttpsMillis = 0;
 const unsigned long httpsPublishInterval = 1UL * 60 * 60 * 1000; // 1 HOUR
 
 unsigned long previousNotificationMillis = 0;
-const unsigned long notificationSendInterval = 2UL * 60 * 60 * 1000; // 1 HOUR
+const unsigned long notificationSendInterval = 2UL * 60 * 60 * 1000; // 2 HOUR
