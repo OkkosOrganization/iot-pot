@@ -33,3 +33,9 @@
 .container:has(.image) .content {
   margin-bottom: 1rem;
 }
+
+.image {
+  position: relative;
+  width: 100%;
+  height: auto;
+}
