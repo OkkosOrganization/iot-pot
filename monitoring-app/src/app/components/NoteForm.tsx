@@ -82,6 +82,7 @@ export const NoteForm = ({ deviceId }: NoteFormProps) => {
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.crossOrigin = "Anonymous";
+      img.alt = "Note image";
 
       img.onload = () => {
         const maxDim = 800;
@@ -167,7 +168,7 @@ export const NoteForm = ({ deviceId }: NoteFormProps) => {
             </div>
             {image ? (
               <div className={styles.imageContainer}>
-                <img src={`${image}`} />
+                <img src={`${image}`} alt="Note image" />
                 <button
                   className={styles.removeImageBtn}
                   onClick={() => setImage("")}

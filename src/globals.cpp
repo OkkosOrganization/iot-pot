@@ -49,22 +49,22 @@ const char *soft_ap_password = "TIES4571";
 
 // INTERVALS
 unsigned long previousWateringMillis = 0;
-const unsigned long wateringInterval = 60 * 1000;
+const unsigned long wateringInterval = 2UL * 60 * 60 * 1000; // 2 HOURS
 
 long pumpStartTime = 0;
 long latestPumpTimeStamp = 0;
 
 unsigned long previousReadMillis = 0;
-const unsigned long sensorReadInterval = 10000;
+const unsigned long sensorReadInterval = 10000; // 10 SECONDS
 
 unsigned long previousWaterLevelMillis = 0;
 const unsigned long waterLevelInterval = 100;
 
 unsigned long previousMqttMillis = 0;
-const unsigned long mqttPublishInterval = 20000;
+const unsigned long mqttPublishInterval = 10000; // 10 SECONDS
 
 unsigned long previousHttpsMillis = 0;
-const unsigned long httpsPublishInterval = 60UL * 60 * 1000;
+const unsigned long httpsPublishInterval = 1UL * 60 * 60 * 1000; // 1 HOUR
 
 unsigned long previousNotificationMillis = 0;
-const unsigned long notificationSendInterval = 2UL * 60 * 60 * 1000;
+const unsigned long notificationSendInterval = 2UL * 60 * 60 * 1000; // 2 HOUR

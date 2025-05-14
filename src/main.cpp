@@ -68,7 +68,7 @@ PubSubClient mqttClient;
 // SETUP
 void setup() {
   Serial.begin(115200);  
-  while (!Serial){ Serial.println("...");}  
+  //while (!Serial){ Serial.println("...");}
 
   if (!preferences.begin("iot-pot", false)) {
     Serial.println("Failed to initialize preferences");
@@ -298,7 +298,7 @@ void publishValuesHttps() {
     data["airHumidity"] = airHumidity;
     data["soilTemperature"] = soilTemperature;
     data["soilMoisture"] = soilMoisture;
-    data["soilPh"] = soilPh;
+    data["soilPh"] = soilPh / 10;
     data["luminosity"] = luminosity;
     data["waterLevel"] = waterLevel;
     data["waterOverflow"] = waterOverflow;
