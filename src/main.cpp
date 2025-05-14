@@ -68,7 +68,7 @@ PubSubClient mqttClient;
 // SETUP
 void setup() {
   Serial.begin(115200);  
-  //while (!Serial){ Serial.println("...");}  
+  //while (!Serial){ Serial.println("...");}
 
   if (!preferences.begin("iot-pot", false)) {
     Serial.println("Failed to initialize preferences");
