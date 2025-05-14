@@ -25,7 +25,7 @@ export const NoteItem = ({ note }: NoteItemProps) => {
       <div className={styles.content}>{note.content}</div>
       {note.image ? (
         <div className={styles.image}>
-          <img src={note.image} />
+          <img src={note.image} alt={`note_${note?.id}_image`} loading="lazy" />
         </div>
       ) : null}
     </div>
