@@ -125,9 +125,9 @@ void getWaterLevel()
       led3.setState(RED);      
     else if (waterLevel >= WATER_LEVEL_LOW && waterLevel < WATER_LEVEL_MEDIUM)
       led3.setState(YELLOW);
-    else if (waterLevel >= WATER_LEVEL_MEDIUM && waterLevel < WATER_LEVEL_HIGH)
+    else if (waterLevel >= WATER_LEVEL_MEDIUM && waterLevel <= WATER_LEVEL_HIGH)
       led3.setState(GREEN);
-    else if (waterLevel > WATER_LEVEL_TOO_HIGH && led3.getState() != RED_BLINK)
+    else if (waterLevel > WATER_LEVEL_HIGH && led3.getState() != RED_BLINK)
       led3.setState(RED_BLINK);
 }
 
