@@ -392,7 +392,7 @@ void sendNotifications() {
       JsonDocument jsonDoc;
       jsonDoc["deviceId"] = deviceIdHex;           
       jsonDoc["email"] = email;                
-      jsonDoc["type"] = "soil-moisture";
+      jsonDoc["type"] = "tank-empty";
 
       String jsonData;
       serializeJson(jsonDoc, jsonData);
@@ -418,7 +418,7 @@ void sendNotifications() {
       JsonDocument jsonDoc;
       jsonDoc["deviceId"] = deviceIdHex;           
       jsonDoc["email"] = email;                
-      jsonDoc["type"] = "soil-moisture";
+      jsonDoc["type"] = "overflow";
 
       String jsonData;
       serializeJson(jsonDoc, jsonData);
