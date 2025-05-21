@@ -345,7 +345,7 @@ void sendNotifications() {
     
     // CHECK IF EMAIL IS SET
     String email = preferences.getString("email", "");
-    if (sizeof(email) == 0)
+    if (email.length() == 0)
       return;
     
     // GET NOTIFICATION SETTINGS, DEFAULT VALUE = FALSE
