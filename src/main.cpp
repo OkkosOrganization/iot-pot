@@ -345,7 +345,7 @@ void sendNotifications() {
     
     // CHECK IF EMAIL IS SET
     String email = preferences.getString("email", "");
-    if (sizeof(email) == 0)
+    if (email.length() == 0)
       return;
     
     // GET NOTIFICATION SETTINGS, DEFAULT VALUE = FALSE
@@ -392,7 +392,7 @@ void sendNotifications() {
       JsonDocument jsonDoc;
       jsonDoc["deviceId"] = deviceIdHex;           
       jsonDoc["email"] = email;                
-      jsonDoc["type"] = "soil-moisture";
+      jsonDoc["type"] = "tank-empty";
 
       String jsonData;
       serializeJson(jsonDoc, jsonData);
@@ -418,7 +418,7 @@ void sendNotifications() {
       JsonDocument jsonDoc;
       jsonDoc["deviceId"] = deviceIdHex;           
       jsonDoc["email"] = email;                
-      jsonDoc["type"] = "soil-moisture";
+      jsonDoc["type"] = "overflow";
 
       String jsonData;
       serializeJson(jsonDoc, jsonData);
