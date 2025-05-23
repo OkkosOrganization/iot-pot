@@ -149,6 +149,13 @@ export const addMeasurements = (deviceId: string, data: SensorValues) => {
   });
 };
 
+export const addWateringEntry = (deviceId: string, amount: number) => {
+  return db.insert(schema.waterings).values({
+    deviceId: deviceId,
+    amount: amount,
+  });
+};
+
 export const getNotesByWeek = (
   deviceId: string,
   weekNumber: number,
