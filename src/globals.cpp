@@ -42,6 +42,7 @@ uint8_t PUMP_PIN = D3;
 // API
 char MEASUREMENTS_API_URL[60] = "https://iot-pot.com/api/measurements";
 char NOTIFICATION_API_URL[31] = "https://iot-pot.com/api/notify";
+char WATERINGS_API_URL[33] = "https://iot-pot.com/api/watering";
 
 // WIFI AP
 const char *soft_ap_ssid = "IoT-pot";

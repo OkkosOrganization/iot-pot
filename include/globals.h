@@ -57,6 +57,7 @@ enum PUMPState {
 // API
 extern char MEASUREMENTS_API_URL[60];
 extern char NOTIFICATION_API_URL[31];
+extern char WATERINGS_API_URL[33];
 
 // WIFI AP
 extern const char *soft_ap_ssid;
