@@ -334,6 +334,49 @@ void publishValuesHttps() {
   }
 }
 
+// SEND WATERING LOG ENTRY AS HTTPS POST
+void publishWateringLogEntry() {
+
+    int wateringAmount = 0;
+    if(preferences.isKey("watering-amount"))
+      wateringAmount = preferences.getInt("watering-amount");
+    else
+      return;
+
+    JsonDocument doc;
+    doc["deviceId"] = deviceIdHex;
+    doc["amount"] = wateringAmount;
+
+    String jsonString;
+    serializeJson(doc, jsonString);
+
+    WiFiClientSecure client;
+    client.setInsecure();
+
+    HTTPClient https;
+    if (https.begin(client, WATERINGS_API_URL)) {
+      https.addHeader("Content-Type", "application/json");
+
+      int httpResponseCode = https.POST(jsonString);
+
+      Serial.print("HTTP Response code: ");
+      Serial.println(httpResponseCode);
+
+      if (httpResponseCode > 0) {
+        String response = https.getString();
+        Serial.println("Response:");
+        Serial.println(response);
+      } else {
+        Serial.print("POST error: ");
+        Serial.println(https.errorToString(httpResponseCode));
+      }
+
+      https.end();
+    } else {
+      Serial.println("Connection to API failed.");
+    }
+}
+
 // SEND NOTIFICATIONS
 void sendNotifications() {
   unsigned long currentMillis = millis();
@@ -496,6 +539,7 @@ void waterPlant(){
       //Serial.println(currentMillis);
       pumpStartTime = 0;
       pump.setState(PUMP_OFF);
+      publishWateringLogEntry();
     }    
   }
 }
