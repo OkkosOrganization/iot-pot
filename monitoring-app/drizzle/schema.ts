@@ -1,4 +1,4 @@
-import { pgTable, unique, serial, varchar, foreignKey, integer, json, timestamp, text, smallint } from "drizzle-orm/pg-core"
+import { pgTable, unique, serial, varchar, foreignKey, integer, json, timestamp, text, numeric } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
 
@@ -56,7 +56,7 @@ export const waterings = pgTable("waterings", {
 	id: integer().primaryKey().generatedAlwaysAsIdentity({ name: "waterings_id_seq", startWith: 1, increment: 1, minValue: 1, maxValue: 2147483647, cache: 1 }),
 	deviceId: varchar({ length: 255 }),
 	timestamp: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`),
-	amount: smallint(),
+	amount: numeric({ precision: 5, scale:  2 }),
 }, (table) => [
 	foreignKey({
 			columns: [table.deviceId],
