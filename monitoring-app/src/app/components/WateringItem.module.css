@@ -1,0 +1,41 @@
+.container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  background-color: var(--grey);
+  padding: 1rem;
+  border-radius: 1rem;
+}
+.top {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.title {
+  width: 100%;
+  font-family: var(--poppins);
+  font-weight: 500;
+}
+.date {
+  width: 100%;
+  font-size: 0.875rem;
+  color: var(--darkGrey);
+  text-align: right;
+  text-transform: uppercase;
+}
+.date span {
+  display: block;
+}
+
+.container:has(.image) .content {
+  margin-bottom: 1rem;
+}
+
+.image {
+  position: relative;
+  width: 100%;
+  height: auto;
+}
