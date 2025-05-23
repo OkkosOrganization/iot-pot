@@ -149,6 +149,13 @@ export const addMeasurements = (deviceId: string, data: SensorValues) => {
   });
 };
 
+export const addWateringEntry = (deviceId: string, amount: number) => {
+  return db.insert(schema.waterings).values({
+    deviceId: deviceId,
+    amount: amount.toFixed(2),
+  });
+};
+
 export const getNotesByWeek = (
   deviceId: string,
   weekNumber: number,
@@ -189,4 +196,46 @@ export const getNotesByMonth = (
         AND EXTRACT(MONTH FROM ${schema.notes.date}) = ${month}`
     )
     .orderBy(desc(schema.notes.date));
+};
+
+export const getWateringsByDay = (deviceId: string, date: string) => {
+  return db
+    .select()
+    .from(schema.waterings)
+    .where(
+      sql`${schema.waterings.deviceId} = ${deviceId} AND DATE(${schema.waterings.timestamp}) = ${date}`
+    )
+    .orderBy(desc(schema.waterings.timestamp));
+};
+
+export const getWateringsByWeek = (
+  deviceId: string,
+  weekNumber: number,
+  year: number
+) => {
+  return db
+    .select()
+    .from(schema.waterings)
+    .where(
+      sql`${schema.waterings.deviceId} = ${deviceId} 
+      AND EXTRACT(YEAR FROM ${schema.waterings.timestamp}) = ${year} 
+      AND EXTRACT(WEEK FROM ${schema.waterings.timestamp}) = ${weekNumber}`
+    )
+    .orderBy(desc(schema.waterings.timestamp));
+};
+
+export const getWateringsByMonth = (
+  deviceId: string,
+  month: number,
+  year: number
+) => {
+  return db
+    .select()
+    .from(schema.waterings)
+    .where(
+      sql`${schema.waterings.deviceId} = ${deviceId} 
+        AND EXTRACT(YEAR FROM ${schema.waterings.timestamp}) = ${year} 
+        AND EXTRACT(MONTH FROM ${schema.waterings.timestamp}) = ${month}`
+    )
+    .orderBy(desc(schema.waterings.timestamp));
 };

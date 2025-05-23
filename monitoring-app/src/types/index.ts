@@ -36,6 +36,14 @@ export type Note = {
   error: string;
 };
 
+export type Watering = {
+  id: string;
+  title: string;
+  amount: number;
+  timestamp: string;
+  deviceId: string;
+};
+
 export type MeasurementItem = {
   id: number;
   deviceId: string;
@@ -47,6 +55,8 @@ export type MeasurementItem = {
     soilPh: number;
     soilTemperature: number;
     luminosity: number;
+    waterLevel: number;
+    waterOverflow: number;
   };
   error?: string;
 };
@@ -58,6 +68,10 @@ export type MeasurementsApiResponse = {
 export type NotesApiResponse = {
   status: 0 | 1;
   data: Note[];
+};
+export type WateringsApiResponse = {
+  status: 0 | 1;
+  data: Watering[];
 };
 
 export type SensorLabels =
