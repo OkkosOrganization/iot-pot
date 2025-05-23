@@ -54,7 +54,7 @@ export const notes = pgTable("notes", {
 
 export const waterings = pgTable("waterings", {
 	id: integer().primaryKey().generatedAlwaysAsIdentity({ name: "waterings_id_seq", startWith: 1, increment: 1, minValue: 1, maxValue: 2147483647, cache: 1 }),
-	deviceId: varchar({ length: 255 }),
+	deviceId: varchar("device_id", { length: 255 }),
 	timestamp: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`),
 	amount: numeric({ precision: 5, scale:  2 }),
 }, (table) => [
