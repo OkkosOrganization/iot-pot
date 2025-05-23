@@ -41,6 +41,7 @@ void getSensorValues();
 void waterPlant();
 void publishValuesMqtt();
 void publishValuesHttps();
+void publishWateringLogEntry();
 void connectMqtt();
 void initMqtt();
 void convertValues();
@@ -359,6 +360,7 @@ void publishWateringLogEntry() {
 
       int httpResponseCode = https.POST(jsonString);
 
+      Serial.print("Publish watering log entry, ");
       Serial.print("HTTP Response code: ");
       Serial.println(httpResponseCode);
 
