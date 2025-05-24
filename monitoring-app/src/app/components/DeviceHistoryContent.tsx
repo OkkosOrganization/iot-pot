@@ -447,44 +447,46 @@ const WateringsTable = ({
 }: WateringsTableProps) => {
   return (
     <table className={styles.waterings}>
-      {mode === "day" ? (
-        wateringsDayData?.data?.length ? (
-          <>
-            <WateringHeaderRow />
-            {wateringsDayData?.data?.map((n: Watering) => (
-              <WateringItem data={n} key={n.id} />
-            ))}
-          </>
-        ) : (
-          <NoWateringResults />
-        )
-      ) : null}
+      <tbody>
+        {mode === "day" ? (
+          wateringsDayData?.data?.length ? (
+            <>
+              <WateringHeaderRow />
+              {wateringsDayData?.data?.map((n: Watering) => (
+                <WateringItem data={n} key={n.id} />
+              ))}
+            </>
+          ) : (
+            <NoWateringResults />
+          )
+        ) : null}
 
-      {mode === "week" ? (
-        wateringsWeekData?.data?.length ? (
-          <>
-            <WateringHeaderRow />
-            {wateringsWeekData?.data?.map((n: Watering) => (
-              <WateringItem data={n} key={n.id} />
-            ))}
-          </>
-        ) : (
-          <NoWateringResults />
-        )
-      ) : null}
+        {mode === "week" ? (
+          wateringsWeekData?.data?.length ? (
+            <>
+              <WateringHeaderRow />
+              {wateringsWeekData?.data?.map((n: Watering) => (
+                <WateringItem data={n} key={n.id} />
+              ))}
+            </>
+          ) : (
+            <NoWateringResults />
+          )
+        ) : null}
 
-      {mode === "month" ? (
-        wateringsMonthData?.data?.length ? (
-          <>
-            <WateringHeaderRow />
-            {wateringsMonthData?.data?.map((n: Watering) => (
-              <WateringItem data={n} key={n.id} />
-            ))}
-          </>
-        ) : (
-          <NoWateringResults />
-        )
-      ) : null}
+        {mode === "month" ? (
+          wateringsMonthData?.data?.length ? (
+            <>
+              <WateringHeaderRow />
+              {wateringsMonthData?.data?.map((n: Watering) => (
+                <WateringItem data={n} key={n.id} />
+              ))}
+            </>
+          ) : (
+            <NoWateringResults />
+          )
+        ) : null}
+      </tbody>
     </table>
   );
 };
