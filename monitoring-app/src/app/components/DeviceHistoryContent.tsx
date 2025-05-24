@@ -409,86 +409,130 @@ export const DeviceHistoryContent = ({ device }: DeviceHistoryContentProps) => {
       <div className={styles.notesAndWateringsContainer}>
         <div className={styles.notesWrapper}>
           <h2 className={styles.notesTitle}>Notes</h2>
-          <div className={styles.notesContainer}>
-            <div className={styles.notes}>
-              {mode === "day" ? (
-                notesDayData?.data?.length ? (
-                  notesDayData?.data?.map((n: Note) => (
-                    <NoteItem note={n} key={n.id} />
-                  ))
-                ) : (
-                  <NoNotesResults />
-                )
-              ) : null}
-
-              {mode === "week" ? (
-                notesWeekData?.data?.length ? (
-                  notesWeekData?.data?.map((n: Note) => (
-                    <NoteItem note={n} key={n.id} />
-                  ))
-                ) : (
-                  <NoNotesResults />
-                )
-              ) : null}
-
-              {mode === "month" ? (
-                notesMonthData?.data?.length ? (
-                  notesMonthData?.data?.map((n: Note) => (
-                    <NoteItem note={n} key={n.id} />
-                  ))
-                ) : (
-                  <NoNotesResults />
-                )
-              ) : null}
-            </div>
-          </div>
+          <NotesList
+            mode={mode}
+            notesDayData={notesDayData}
+            notesWeekData={notesWeekData}
+            notesMonthData={notesMonthData}
+          />
         </div>
 
         <div className={styles.wateringsWrapper}>
           <h2 className={styles.wateringsTitle}>Watering log</h2>
           <div className={styles.wateringsContainer}>
-            <table className={styles.waterings}>
-              {mode === "day" ? (
-                wateringsDayData?.data?.length ? (
-                  <>
-                    <WateringHeaderRow />
-                    {wateringsDayData?.data?.map((n: Watering) => (
-                      <WateringItem data={n} key={n.id} />
-                    ))}
-                  </>
-                ) : (
-                  <NoWateringResults />
-                )
-              ) : null}
-
-              {mode === "week" ? (
-                wateringsWeekData?.data?.length ? (
-                  <>
-                    <WateringHeaderRow />
-                    {wateringsWeekData?.data?.map((n: Watering) => (
-                      <WateringItem data={n} key={n.id} />
-                    ))}
-                  </>
-                ) : (
-                  <NoWateringResults />
-                )
-              ) : null}
-
-              {mode === "month" ? (
-                wateringsMonthData?.data?.length ? (
-                  <>
-                    <WateringHeaderRow />
-                    {wateringsMonthData?.data?.map((n: Watering) => (
-                      <WateringItem data={n} key={n.id} />
-                    ))}
-                  </>
-                ) : (
-                  <NoWateringResults />
-                )
-              ) : null}
-            </table>
+            <WateringsTable
+              mode={mode}
+              wateringsDayData={wateringsDayData}
+              wateringsWeekData={wateringsWeekData}
+              wateringsMonthData={wateringsMonthData}
+            />
           </div>
         </div>
+      </div>
+    </div>
+  );
+};
+
+type WateringsTableProps = {
+  mode: string;
+  wateringsDayData: WateringsApiResponse | undefined;
+  wateringsWeekData: WateringsApiResponse | undefined;
+  wateringsMonthData: WateringsApiResponse | undefined;
+};
+const WateringsTable = ({
+  mode,
+  wateringsDayData,
+  wateringsWeekData,
+  wateringsMonthData,
+}: WateringsTableProps) => {
+  return (
+    <table className={styles.waterings}>
+      {mode === "day" ? (
+        wateringsDayData?.data?.length ? (
+          <>
+            <WateringHeaderRow />
+            {wateringsDayData?.data?.map((n: Watering) => (
+              <WateringItem data={n} key={n.id} />
+            ))}
+          </>
+        ) : (
+          <NoWateringResults />
+        )
+      ) : null}
+
+      {mode === "week" ? (
+        wateringsWeekData?.data?.length ? (
+          <>
+            <WateringHeaderRow />
+            {wateringsWeekData?.data?.map((n: Watering) => (
+              <WateringItem data={n} key={n.id} />
+            ))}
+          </>
+        ) : (
+          <NoWateringResults />
+        )
+      ) : null}
+
+      {mode === "month" ? (
+        wateringsMonthData?.data?.length ? (
+          <>
+            <WateringHeaderRow />
+            {wateringsMonthData?.data?.map((n: Watering) => (
+              <WateringItem data={n} key={n.id} />
+            ))}
+          </>
+        ) : (
+          <NoWateringResults />
+        )
+      ) : null}
+    </table>
+  );
+};
+
+type NotesListProps = {
+  mode: string;
+  notesDayData: NotesApiResponse | undefined;
+  notesWeekData: NotesApiResponse | undefined;
+  notesMonthData: NotesApiResponse | undefined;
+};
+const NotesList = ({
+  mode,
+  notesDayData,
+  notesMonthData,
+  notesWeekData,
+}: NotesListProps) => {
+  return (
+    <div className={styles.notesContainer}>
+      <div className={styles.notes}>
+        {mode === "day" ? (
+          notesDayData?.data?.length ? (
+            notesDayData?.data?.map((n: Note) => (
+              <NoteItem note={n} key={n.id} />
+            ))
+          ) : (
+            <NoNotesResults />
+          )
+        ) : null}
+
+        {mode === "week" ? (
+          notesWeekData?.data?.length ? (
+            notesWeekData?.data?.map((n: Note) => (
+              <NoteItem note={n} key={n.id} />
+            ))
+          ) : (
+            <NoNotesResults />
+          )
+        ) : null}
+
+        {mode === "month" ? (
+          notesMonthData?.data?.length ? (
+            notesMonthData?.data?.map((n: Note) => (
+              <NoteItem note={n} key={n.id} />
+            ))
+          ) : (
+            <NoNotesResults />
+          )
+        ) : null}
       </div>
     </div>
   );
