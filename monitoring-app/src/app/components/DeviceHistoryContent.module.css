@@ -173,7 +173,9 @@
   border-radius: 2rem;
   padding: 1rem;
 }
-
+.notesWrapper {
+  width: 100%;
+}
 .notesContainer {
   width: 100%;
   border-radius: 2rem;
@@ -244,15 +246,14 @@
     width: 50%;
   }
   .notesContainer {
-    margin: 0 auto 2rem auto;
+    margin: 0 auto;
     flex-direction: column;
-    padding: 1rem;
+    padding-top: 0;
   }
 
   .wateringsContainer {
     margin: 0 auto 2rem auto;
     flex-direction: column;
-    padding: 1rem;
   }
 
   .notesAndWateringsContainer {
