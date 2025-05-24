@@ -41,6 +41,18 @@ const SENSOR_LABELS_MAP: Record<SensorLabels, string> = {
   waterOverflow: "Water Overflow",
 };
 
+type dataType = {
+  airTemperature: number[];
+  airHumidity: number[];
+  soilMoisture: number[];
+  soilPh: number[];
+  soilTemperature: number[];
+  luminosity: number[];
+  waterLevel: number[];
+  waterOverflow: number[];
+  dates: string[];
+};
+
 const fetcher = async (
   url: string,
   options?: RequestInit
@@ -157,18 +169,6 @@ export const DeviceHistoryContent = ({ device }: DeviceHistoryContentProps) => {
       wateringsFetcher
     );
 
-  type dataType = {
-    airTemperature: number[];
-    airHumidity: number[];
-    soilMoisture: number[];
-    soilPh: number[];
-    soilTemperature: number[];
-    luminosity: number[];
-    waterLevel: number[];
-    waterOverflow: number[];
-    dates: string[];
-  };
-
   const data: dataType = {
     airTemperature: [],
     airHumidity: [],
@@ -240,33 +240,33 @@ export const DeviceHistoryContent = ({ device }: DeviceHistoryContentProps) => {
       break;
   }
 
-  console.log(wateringsDayData, wateringsMonthData, wateringsWeekData);
-
   return (
     <div className={styles.wrapper}>
       <div className={styles.container}>
         <div className={styles.visualizationContainer}>
-          {weekError ||
-          monthError ||
-          dayError ||
-          notesDayError ||
-          notesWeekError ||
-          notesMonthError ||
-          wateringsDayError ||
-          wateringsMonthError ||
-          wateringsWeekError ? (
-            <div>
-              {weekError && weekError}
-              {monthError && monthError}
-              {dayError && dayError}
-              {notesDayError && notesDayError}
-              {notesWeekError && notesWeekError}
-              {notesMonthError && notesMonthError}
-              {wateringsDayError && wateringsDayError}
-              {wateringsMonthError && wateringsMonthError}
-              {wateringsWeekError && wateringsWeekError}
-            </div>
-          ) : null}
+          <div className={styles.errorContainer}>
+            {weekError ||
+            monthError ||
+            dayError ||
+            notesDayError ||
+            notesWeekError ||
+            notesMonthError ||
+            wateringsDayError ||
+            wateringsMonthError ||
+            wateringsWeekError ? (
+              <div>
+                {weekError && weekError}
+                {monthError && monthError}
+                {dayError && dayError}
+                {notesDayError && notesDayError}
+                {notesWeekError && notesWeekError}
+                {notesMonthError && notesMonthError}
+                {wateringsDayError && wateringsDayError}
+                {wateringsMonthError && wateringsMonthError}
+                {wateringsWeekError && wateringsWeekError}
+              </div>
+            ) : null}
+          </div>
 
           <div className={styles.valueSelectorContainer}>
             <div className={styles.valueSelector}>
@@ -285,6 +285,7 @@ export const DeviceHistoryContent = ({ device }: DeviceHistoryContentProps) => {
               })}
             </div>
           </div>
+
           <div className={styles.chartContainer}>
             {data.dates.length && chosenSensorLabel ? (
               <LineChart
@@ -333,6 +334,7 @@ export const DeviceHistoryContent = ({ device }: DeviceHistoryContentProps) => {
             )}
           </div>
         </div>
+
         <div className={styles.toolsContainer}>
           <div className={`${styles.panel} ${styles.toolsPanel}`}>
             <div className={styles.modeSelectorContainer}>
@@ -404,69 +406,161 @@ export const DeviceHistoryContent = ({ device }: DeviceHistoryContentProps) => {
         </div>
       </div>
 
-      <div className={styles.notesAndWaterginsContainer}>
+      <div className={styles.notesAndWateringsContainer}>
         <div className={styles.notesWrapper}>
           <h2 className={styles.notesTitle}>Notes</h2>
-          <div className={styles.notesContainer}>
-            <div className={styles.notes}>
-              {mode === "day"
-                ? notesDayData?.data?.length
-                  ? notesDayData?.data?.map((n: Note) => (
-                      <NoteItem note={n} key={n.id} />
-                    ))
-                  : "No notes"
-                : null}
-
-              {mode === "week"
-                ? notesWeekData?.data?.length
-                  ? notesWeekData?.data?.map((n: Note) => (
-                      <NoteItem note={n} key={n.id} />
-                    ))
-                  : "No notes"
-                : null}
-
-              {mode === "month"
-                ? notesMonthData?.data?.length
-                  ? notesMonthData?.data?.map((n: Note) => (
-                      <NoteItem note={n} key={n.id} />
-                    ))
-                  : "No notes"
-                : null}
-            </div>
-          </div>
+          <NotesList
+            mode={mode}
+            notesDayData={notesDayData}
+            notesWeekData={notesWeekData}
+            notesMonthData={notesMonthData}
+          />
         </div>
 
         <div className={styles.wateringsWrapper}>
           <h2 className={styles.wateringsTitle}>Watering log</h2>
           <div className={styles.wateringsContainer}>
-            <div className={styles.waterings}>
-              {mode === "day"
-                ? wateringsDayData?.data?.length
-                  ? wateringsDayData?.data?.map((n: Watering) => (
-                      <WateringItem data={n} key={n.id} />
-                    ))
-                  : "No waterings"
-                : null}
-
-              {mode === "week"
-                ? wateringsWeekData?.data?.length
-                  ? wateringsWeekData?.data?.map((n: Watering) => (
-                      <WateringItem data={n} key={n.id} />
-                    ))
-                  : "No waterings"
-                : null}
-
-              {mode === "month"
-                ? wateringsMonthData?.data?.length
-                  ? wateringsMonthData?.data?.map((n: Watering) => (
-                      <WateringItem data={n} key={n.id} />
-                    ))
-                  : "No waterings"
-                : null}
-            </div>
+            <WateringsTable
+              mode={mode}
+              wateringsDayData={wateringsDayData}
+              wateringsWeekData={wateringsWeekData}
+              wateringsMonthData={wateringsMonthData}
+            />
           </div>
         </div>
       </div>
+    </div>
+  );
+};
+
+type WateringsTableProps = {
+  mode: string;
+  wateringsDayData: WateringsApiResponse | undefined;
+  wateringsWeekData: WateringsApiResponse | undefined;
+  wateringsMonthData: WateringsApiResponse | undefined;
+};
+const WateringsTable = ({
+  mode,
+  wateringsDayData,
+  wateringsWeekData,
+  wateringsMonthData,
+}: WateringsTableProps) => {
+  return (
+    <table className={styles.waterings}>
+      <tbody>
+        {mode === "day" ? (
+          wateringsDayData?.data?.length ? (
+            <>
+              <WateringHeaderRow />
+              {wateringsDayData?.data?.map((n: Watering) => (
+                <WateringItem data={n} key={n.id} />
+              ))}
+            </>
+          ) : (
+            <NoWateringResults />
+          )
+        ) : null}
+
+        {mode === "week" ? (
+          wateringsWeekData?.data?.length ? (
+            <>
+              <WateringHeaderRow />
+              {wateringsWeekData?.data?.map((n: Watering) => (
+                <WateringItem data={n} key={n.id} />
+              ))}
+            </>
+          ) : (
+            <NoWateringResults />
+          )
+        ) : null}
+
+        {mode === "month" ? (
+          wateringsMonthData?.data?.length ? (
+            <>
+              <WateringHeaderRow />
+              {wateringsMonthData?.data?.map((n: Watering) => (
+                <WateringItem data={n} key={n.id} />
+              ))}
+            </>
+          ) : (
+            <NoWateringResults />
+          )
+        ) : null}
+      </tbody>
+    </table>
+  );
+};
+
+type NotesListProps = {
+  mode: string;
+  notesDayData: NotesApiResponse | undefined;
+  notesWeekData: NotesApiResponse | undefined;
+  notesMonthData: NotesApiResponse | undefined;
+};
+const NotesList = ({
+  mode,
+  notesDayData,
+  notesMonthData,
+  notesWeekData,
+}: NotesListProps) => {
+  return (
+    <div className={styles.notesContainer}>
+      <div className={styles.notes}>
+        {mode === "day" ? (
+          notesDayData?.data?.length ? (
+            notesDayData?.data?.map((n: Note) => (
+              <NoteItem note={n} key={n.id} />
+            ))
+          ) : (
+            <NoNotesResults />
+          )
+        ) : null}
+
+        {mode === "week" ? (
+          notesWeekData?.data?.length ? (
+            notesWeekData?.data?.map((n: Note) => (
+              <NoteItem note={n} key={n.id} />
+            ))
+          ) : (
+            <NoNotesResults />
+          )
+        ) : null}
+
+        {mode === "month" ? (
+          notesMonthData?.data?.length ? (
+            notesMonthData?.data?.map((n: Note) => (
+              <NoteItem note={n} key={n.id} />
+            ))
+          ) : (
+            <NoNotesResults />
+          )
+        ) : null}
+      </div>
+    </div>
+  );
+};
+
+const WateringHeaderRow = () => {
+  return (
+    <tr className={styles.headerRow}>
+      <th>Watering amount</th>
+      <th>Date & time</th>
+    </tr>
+  );
+};
+
+const NoWateringResults = () => {
+  return (
+    <tr>
+      <td align="center">No waterings</td>
+    </tr>
+  );
+};
+
+const NoNotesResults = () => {
+  return (
+    <div>
+      <center>No notes</center>
     </div>
   );
 };

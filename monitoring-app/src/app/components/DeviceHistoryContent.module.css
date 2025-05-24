@@ -163,6 +163,19 @@
   width: 100%;
   border-radius: 2rem;
 }
+.notesAndWateringsContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+  border-radius: 2rem;
+  padding: 1rem;
+}
+.notesWrapper {
+  width: 100%;
+}
 .notesContainer {
   width: 100%;
   border-radius: 2rem;
@@ -190,6 +203,10 @@
   width: 100%;
 }
 
+.wateringsWrapper {
+  width: 100%;
+  text-align: left;
+}
 .wateringsTitle {
   width: 100%;
   text-align: center;
@@ -199,33 +216,19 @@
 .wateringsContainer {
   width: 100%;
   border-radius: 2rem;
-  padding: 2rem 0 0 0;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  gap: 1rem;
-  align-items: center;
-  justify-content: center;
+  padding: 0;
   margin: 0 0 2rem 0;
 }
 
 .waterings {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  gap: 1rem;
   width: 100%;
 }
-
-.notesAndWaterginsContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  width: 100%;
-  border-radius: 2rem;
-  padding: 1rem;
+.headerRow {
+  background: var(--grey);
+}
+.waterings th {
+  width: 50%;
+  padding: 0.25rem;
 }
 
 /******************/
@@ -243,22 +246,17 @@
     width: 50%;
   }
   .notesContainer {
-    margin: 0 auto 2rem auto;
+    margin: 0 auto;
     flex-direction: column;
-    padding: 1rem;
-    background: var(--lightGrey);
-    box-shadow: 0 0.25rem 0.25rem 0 rgba(0, 0, 0, 0.15);
+    padding-top: 0;
   }
 
   .wateringsContainer {
     margin: 0 auto 2rem auto;
     flex-direction: column;
-    padding: 1rem;
-    background: var(--lightGrey);
-    box-shadow: 0 0.25rem 0.25rem 0 rgba(0, 0, 0, 0.15);
   }
 
-  .notesAndWaterginsContainer {
+  .notesAndWateringsContainer {
     display: flex;
     flex-direction: row;
     justify-content: space-between;

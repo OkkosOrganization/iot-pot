@@ -13,14 +13,15 @@ export const WateringItem = ({ data }: WateringItemProps) => {
   const d = dayjs.utc(data.timestamp).tz("Europe/Helsinki");
 
   return (
-    <div key={data?.id} className={styles.container}>
-      <div className={styles.top}>
-        <h3 className={styles.title}>Watering amount: {data.amount}</h3>
-        <div className={styles.date}>
-          <span>{d.format("DD.MM.YYYY")}</span>
-          <span>{d.format("HH:mm")}</span>
-        </div>
-      </div>
-    </div>
+    <tr key={data?.id} className={styles.container}>
+      <td className={styles.amount}>
+        <span className={styles.title}>{data.amount}</span>
+      </td>
+      <td className={styles.date}>
+        <span>
+          {d.format("DD.MM.YYYY")} - {d.format("HH:mm")}
+        </span>
+      </td>
+    </tr>
   );
 };
