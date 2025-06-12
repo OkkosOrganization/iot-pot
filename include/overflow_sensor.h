@@ -10,22 +10,14 @@
 #define SIGNAL_PIN A0
 #define WATER_OVERFLOW_THRESHOLD 1000 
 
-void initOverFlowSensor();
-void getOverFlowSensorValue();
+class OverflowSensor {  
+  public:
+    OverflowSensor() {
+      pinMode(POWER_PIN, OUTPUT);
+      digitalWrite(POWER_PIN, HIGH);
+    };
 
-void initOverFlowSensor(){
-  pinMode(POWER_PIN, OUTPUT);
-  digitalWrite(POWER_PIN, HIGH);
-}
-
-void getOverFlowSensorValue(){
-  int waterOverflowValue = analogRead(SIGNAL_PIN);
-  if (waterOverflowValue >= WATER_OVERFLOW_THRESHOLD) { 
-    waterOverflow = 1;
-    led4.setState(RED);
-  }  
-  else {
-    waterOverflow = 0;
-    led4.setState(OFF);
-  }
-}
+    void getOverFlow(byte &waterOverflow) {
+      waterOverflow = analogRead(SIGNAL_PIN);
+    }
+};
