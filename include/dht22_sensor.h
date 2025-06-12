@@ -7,16 +7,26 @@
 #define DHT_SENSOR_PIN  D2
 #define DHT_SENSOR_TYPE DHT22
 
-DHT dht_sensor(DHT_SENSOR_PIN, DHT_SENSOR_TYPE);
+class DHTSensor {
+  private:
+    DHT* sensor;
+    float humidity;
+    float temperature;
 
-void getAirTemperatureAndHumidity();
-void getAirTemperatureAndHumidity() {
-  float humi  = dht_sensor.readHumidity();
-  float temperature_C = dht_sensor.readTemperature();
-  if ( isnan(temperature_C) || isnan(humi)) {
-    Serial.println("Failed to read from DHT sensor!");
-  } else {
-    airHumidity = humi;
-    airTemperature = temperature_C;
-  }
-}
+  public: 
+    DHTSensor() {   
+      sensor = new DHT(DHT_SENSOR_PIN, DHT_SENSOR_TYPE);   
+      sensor->begin();
+    }
+
+    void getAirTemperatureAndHumidity(float &airTemperature, float &airHumidity) {
+      humidity  = sensor->readHumidity();
+      temperature = sensor->readTemperature();
+      if ( isnan(temperature) || isnan(humidity)) {
+        Serial.println("Failed to read from DHT sensor!");
+      } else {
+        airHumidity = humidity;
+        airTemperature = temperature;
+      }
+    }
+};
