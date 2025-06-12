@@ -41,13 +41,3 @@ class PUMP {
       return (value * max_time_ms) / 100;
     }
 };
-
-void initPump();
-
-// INTRODUCE GLOBAL VAR
-PUMP pump = PUMP();
-
-void initPump(){
-  pump.begin();
-  pump.setState(PUMP_OFF);
-};
