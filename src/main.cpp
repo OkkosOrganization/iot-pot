@@ -167,7 +167,7 @@ void initLeds() {
   led2->begin();
   led3->begin();
   led4->begin();
-  led1->setState(OFF);
+  led1->setState(GREEN);
   led2->setState(OFF);
   led3->setState(OFF);
   led4->setState(OFF);  
@@ -673,7 +673,6 @@ void initWifiClient() {
       Serial.println(WiFi.localIP());
       led2->setState(GREEN);
       initMqtt();
-      led1->setState(GREEN);
     }
   }  
   else
