@@ -810,9 +810,9 @@ void handlePostWateringThreshold() {
     Serial.print("POST** watering-threshold:");
     Serial.println(wtInt);  
     if(wtInt >= 0 && wtInt <= 100)
-      preferences.putInt("watering-threshold", wtInt);
+      preferences.putInt("threshold", wtInt);
     else
-      preferences.putInt("watering-threshold", 50);
+      preferences.putInt("threshold", 50);
     Serial.print("POST** watering-threshold new:");
     Serial.println(wtInt);  
 
