@@ -48,6 +48,7 @@ void convertValues();
 void sendNotifications();
 void updateLedStates();
 void updateMqttConnectionState();
+void initLeds();
 
 // PREFERENCES
 Preferences preferences;
@@ -66,10 +67,26 @@ IPAddress apIP;
 WiFiClientSecure wifiClientSecure; 
 PubSubClient mqttClient;
 
+// PUMP
+PUMP* pump;
+
+// SENSOR OBJECTS
+WaterLevelSensor* waterLevelSensor;
+DHTSensor* dhtSensor;
+LDRSensor* ldrSensor;
+OverflowSensor* overflowSensor;
+ModbusSoilSensor* modbusSoilSensor;
+SoilMoistureSensor* soilMoistureSensor;
+
+// LEDS
+LED* led1;
+LED* led2;
+LED* led3;
+LED* led4;
+
 // SETUP
 void setup() {
   Serial.begin(115200);  
-  //while (!Serial){ Serial.println("...");}
 
   if (!preferences.begin("iot-pot", false)) {
     Serial.println("Failed to initialize preferences");
@@ -93,31 +110,39 @@ void setup() {
   sprintf(luminosityTopic, "/device/%s/luminosity/",deviceIdHexCstring);
 
   // INIT PUMP
-  initPump();
+  pump = new PUMP();
+  pump->begin();
+  pump->setState(PUMP_OFF);
 
   // INIT ANALOG SENSORS
   analogSetAttenuation(ADC_11db);
 
   // WATER LEVEL
-  initWaterLevelSensor();
+  waterLevelSensor = new WaterLevelSensor();
 
   // SOIL SENSOR
-  initSoilSensor();
+  modbusSoilSensor = new ModbusSoilSensor();
 
-  // DHT22
-  dht_sensor.begin(); 
+  // SOIL MOISTURE SENSOR
+  soilMoistureSensor = new SoilMoistureSensor();
 
-  // OVERFLOW
-  initOverFlowSensor();
+  // DHT22 SENSOR
+  dhtSensor = new DHTSensor();
+
+  // LUMINOSITY SENSOR
+  ldrSensor = new LDRSensor();
+
+  // OVERFLOW SENSOR
+  overflowSensor = new OverflowSensor();  
 
   // LEDS
+  led1 = new LED(LED_PIN_2, LED_PIN_1); // POWER LED
+  led2 = new LED(LED_PIN_4, LED_PIN_3); // WIFI LED
+  led3 = new LED(LED_PIN_5, LED_PIN_6); // WATER LEVEL LED
+  led4 = new LED(LED_PIN_7, LED_PIN_8); // OVERFLOW LED
   initLeds();
-  led1.setState(OFF);
-  led2.setState(OFF);
-  led3.setState(OFF);
-  led4.setState(OFF);
 
-  // INITIALIZES THE WIFI IN ACCESS POINT AND CLIENT MODE
+  // INITIALIZE THE WIFI IN ACCESS POINT & CLIENT MODE
   WiFi.mode(WIFI_MODE_APSTA);
   initWifiClient();
   initWiFiAp();
@@ -136,38 +161,71 @@ void loop() {
   updateMqttConnectionState();
 }
 
+// INIT LEDS
+void initLeds() {
+  led1->begin();
+  led2->begin();
+  led3->begin();
+  led4->begin();
+  led1->setState(GREEN);
+  led2->setState(OFF);
+  led3->setState(OFF);
+  led4->setState(OFF);  
+}  
+
 // UPDATES THE LED STATES
-void updateLedStates(){
-  led1.update();
-  led2.update();
-  led3.update();
-  led4.update();  
+void updateLedStates() {
+  led1->update();
+  led2->update();
+  led3->update();
+  led4->update();  
 }
 
 // GETS VALUES FROM SENSORS
-void getSensorValues(){
+void getSensorValues() {
   unsigned long currentMillis = millis();
   if (currentMillis - previousReadMillis >= sensorReadInterval) {
     previousReadMillis = currentMillis;
-    getAirTemperatureAndHumidity();
-    getLdrSensorValue();
-    getOverFlowSensorValue();   
 
-    // USE MODBUS SENSOR IF AVAILABLE
-    if(soilSensorAvailable())
-      getSoilSensorValues();
+    // EACH SENSOR OBJECT UPDATES GLOBAL VARIABLES
+    dhtSensor->getAirTemperatureAndHumidity(airTemperature, airHumidity);
+    ldrSensor->getLuminosity(luminosity);
+    overflowSensor->getOverFlow(waterOverflow);
+    if (waterOverflow >= WATER_OVERFLOW_THRESHOLD) { 
+      waterOverflow = 1;
+      led4->setState(RED);
+    }  
+    else {
+      waterOverflow = 0;
+      led4->setState(OFF);
+    }    
+
+    // USE MODBUS SENSOR IF AVAILABLE, FALLBACK TO SIMPLE SOIL MOISTURE SENSOR
+    if(modbusSoilSensor->soilSensorAvailable())
+      modbusSoilSensor->getSoilSensorValues(soilPh, soilMoisture, soilTemperature);
     else
-      getSoilMoistureValue();
+      soilMoistureSensor->getSoilMoistureValue(soilMoisture);
 
+    // CONVERT SENSOR VALUES TO STRINGS
     convertValues();
   }  
 
-  // WATER LEVEL SENSOR NEEDS TO BE CHECKED OFTEN
-  getWaterLevel();
+  // THE WATER LEVEL SENSOR NEEDS TO BE CHECKED MORE OFTEN
+  waterLevelSensor->getWaterLevel(waterLevel);    
+  if (waterLevel <= WATER_LEVEL_TOO_LOW && led3->getState() != RED_FAST_BLINK)
+    led3->setState(RED_FAST_BLINK);
+  else if (waterLevel > WATER_LEVEL_TOO_LOW && waterLevel < WATER_LEVEL_LOW)
+    led3->setState(RED);      
+  else if (waterLevel >= WATER_LEVEL_LOW && waterLevel < WATER_LEVEL_MEDIUM)
+    led3->setState(YELLOW);
+  else if (waterLevel >= WATER_LEVEL_MEDIUM && waterLevel <= WATER_LEVEL_HIGH)
+    led3->setState(GREEN);
+  else if (waterLevel > WATER_LEVEL_HIGH && led3->getState() != RED_BLINK)
+    led3->setState(RED_BLINK);  
 }
 
 // CONVERTS SENSOR VALUES TO STRINGS
-void convertValues(){
+void convertValues() {
   itoa(soilTemperature, soilTemperatureStr, 10);   
   itoa(soilMoisture, soilMoistureStr, 10);
   itoa(soilPh, soilPhStr, 10);
@@ -192,7 +250,7 @@ void connectMqtt() {
     Serial.print("Connecting to MQTT broker: ");
     Serial.println(MQTT_BROKER_URL);
     if (mqttClient.connect(
-      deviceIdHexCstring,  // Client ID
+      deviceIdHexCstring,   // Client ID
       MQTT_USER,            // Username
       MQTT_PASSWORD,        // Password
       NULL,                 // Will topic
@@ -210,7 +268,7 @@ void connectMqtt() {
 }
 
 // UPDATE THE MQTT CONNECTION
-void updateMqttConnectionState(){
+void updateMqttConnectionState() {
   if(mqttClient.connected())
     mqttClient.loop();
   else
@@ -490,18 +548,11 @@ void waterPlant(){
   float wateringAmount = 0;
   unsigned int wateringTime = 0;
 
-  if(preferences.isKey("watering-amount"))
-    wateringAmount = preferences.getInt("watering-amount");
-  else
-    return;
-
-  if(preferences.isKey("threshold"))
-    wateringThreshold = preferences.getInt("threshold");
-  else
-    return;    
+  wateringAmount = preferences.getInt("watering-amount", 50);
+  wateringThreshold = preferences.getInt("threshold", 50);
 
   // TRANSFORM WATER AMOUNT TO WATERING TIME
-  wateringTime = pump.getWateringTime(wateringAmount);   
+  wateringTime = pump->getWateringTime(wateringAmount);   
 
   // CHECK THAT TIME ELAPSED FROM LAST WATERING IS LARGER THAN WATERING INTERVAL
   unsigned long currentMillis = millis();
@@ -523,12 +574,12 @@ void waterPlant(){
     if (soilMoisture <= wateringThreshold && waterLevel >= WATER_LEVEL_TOO_LOW)
     {
       Serial.println("PUMP ON");
-      pump.setState(PUMP_ON);
+      pump->setState(PUMP_ON);
       pumpStartTime = currentMillis;
     } 
   }
 
-  if(pump.getState() == PUMP_ON) {
+  if(pump->getState() == PUMP_ON) {
     unsigned long currentMillis = millis();
 
     if(currentMillis - pumpStartTime < wateringTime)    
@@ -540,7 +591,7 @@ void waterPlant(){
       //Serial.println("PUMP OFF");
       //Serial.println(currentMillis);
       pumpStartTime = 0;
-      pump.setState(PUMP_OFF);
+      pump->setState(PUMP_OFF);
       publishWateringLogEntry();
     }    
   }
@@ -559,7 +610,7 @@ void initWiFiAp() {
 }
 
 // STARTS THE WEB SERVER
-void initWebServer(){
+void initWebServer() {
 
   // BIND SERVER TO AP-IP ONLY
   server = new WebServer(apIP);
@@ -584,7 +635,7 @@ void initWebServer(){
 }
 
 // WIFI CLIENT
-void initWifiClient(){
+void initWifiClient() {
   Serial.println("WIFI INIT");
   if (preferences.isKey("ssid") && preferences.isKey("pwd"))
   {
@@ -595,7 +646,7 @@ void initWifiClient(){
     int maxReconnectTries = 10;    
     while (WiFi.status() != WL_CONNECTED)
     {
-      led2.setState(YELLOW);     
+      led2->setState(YELLOW);     
       if(reconnectTries < maxReconnectTries)
       {      
         Serial.println("Connecting to WiFi..");
@@ -605,7 +656,7 @@ void initWifiClient(){
       else
       {
         Serial.println("Could not connect to WiFi");   
-        led2.setState(RED);     
+        led2->setState(RED);     
         break;
       }
     }      
@@ -613,15 +664,14 @@ void initWifiClient(){
     {
       Serial.print("ESP32 IP on the WiFi network: ");
       Serial.println(WiFi.localIP());
-      led2.setState(GREEN);
+      led2->setState(GREEN);
       initMqtt();
-      led1.setState(GREEN);
     }
   }  
   else
   {
     Serial.println("No SSID or password");
-    led2.setState(RED);     
+    led2->setState(RED);     
   }
 }
 
@@ -720,7 +770,14 @@ void handlePostWateringAmount() {
     int32_t waInt = atoi(wa);    
     Serial.print("POST** watering-amount:");
     Serial.println(wa);  
-    preferences.putInt("watering-amount", waInt);
+    if(waInt >= 0 && waInt <= 100)
+      preferences.putInt("watering-amount", waInt);
+    else
+      preferences.putInt("watering-amount", 50);
+
+    Serial.print("POST** watering-amount new:");
+    Serial.println(waInt);  
+
     jsonDoc["success"] = "1";
   }
   else {
@@ -735,8 +792,7 @@ void handleGetWateringAmount() {
   JsonDocument jsonDoc;
   String jsonString; 
   String wa = "";
-  if (preferences.isKey("watering-amount"))
-    wa = preferences.getInt("watering-amount");
+  wa = preferences.getInt("watering-amount", 50);
   jsonDoc["watering-amount"] = wa;  
   serializeJson(jsonDoc, jsonString);
   server->sendHeader("Content-Type", "application/json");
@@ -751,12 +807,14 @@ void handlePostWateringThreshold() {
     String wtString = server->arg("watering-threshold");
     wtString.toCharArray(wt, sizeof(wt));
     int32_t wtInt = atoi(wt);    
-    Serial.print("POST** watering-threshold current:");
-    Serial.println(preferences.getInt("threshold"));  
-    
+    Serial.print("POST** watering-threshold:");
+    Serial.println(wtInt);  
+    if(wtInt >= 0 && wtInt <= 100)
+      preferences.putInt("threshold", wtInt);
+    else
+      preferences.putInt("threshold", 50);
     Serial.print("POST** watering-threshold new:");
     Serial.println(wtInt);  
-    preferences.putInt("threshold", wtInt);
 
     jsonDoc["success"] = "1";
   }
@@ -772,8 +830,7 @@ void handleGetWateringThreshold() {
   JsonDocument jsonDoc;
   String jsonString; 
   String wt = "";
-  if (preferences.isKey("threshold"))
-    wt = preferences.getInt("threshold");
+  wt = preferences.getInt("threshold", 50);
   jsonDoc["watering-threshold"] = wt;  
   serializeJson(jsonDoc, jsonString);
   server->sendHeader("Content-Type", "application/json");
