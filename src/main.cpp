@@ -548,15 +548,8 @@ void waterPlant(){
   float wateringAmount = 0;
   unsigned int wateringTime = 0;
 
-  if(preferences.isKey("watering-amount"))
-    wateringAmount = preferences.getInt("watering-amount");
-  else
-    return;
-
-  if(preferences.isKey("threshold"))
-    wateringThreshold = preferences.getInt("threshold");
-  else
-    return;    
+  wateringAmount = preferences.getInt("watering-amount", 50);
+  wateringThreshold = preferences.getInt("threshold", 50);
 
   // TRANSFORM WATER AMOUNT TO WATERING TIME
   wateringTime = pump->getWateringTime(wateringAmount);   
@@ -777,7 +770,14 @@ void handlePostWateringAmount() {
     int32_t waInt = atoi(wa);    
     Serial.print("POST** watering-amount:");
     Serial.println(wa);  
-    preferences.putInt("watering-amount", waInt);
+    if(waInt >= 0 && waInt <= 100)
+      preferences.putInt("watering-amount", waInt);
+    else
+      preferences.putInt("watering-amount", 50);
+
+    Serial.print("POST** watering-amount new:");
+    Serial.println(waInt);  
+
     jsonDoc["success"] = "1";
   }
   else {
@@ -792,8 +792,7 @@ void handleGetWateringAmount() {
   JsonDocument jsonDoc;
   String jsonString; 
   String wa = "";
-  if (preferences.isKey("watering-amount"))
-    wa = preferences.getInt("watering-amount");
+  wa = preferences.getInt("watering-amount", 50);
   jsonDoc["watering-amount"] = wa;  
   serializeJson(jsonDoc, jsonString);
   server->sendHeader("Content-Type", "application/json");
@@ -808,12 +807,14 @@ void handlePostWateringThreshold() {
     String wtString = server->arg("watering-threshold");
     wtString.toCharArray(wt, sizeof(wt));
     int32_t wtInt = atoi(wt);    
-    Serial.print("POST** watering-threshold current:");
-    Serial.println(preferences.getInt("threshold"));  
-    
+    Serial.print("POST** watering-threshold:");
+    Serial.println(wtInt);  
+    if(wtInt >= 0 && wtInt <= 100)
+      preferences.putInt("watering-threshold", wtInt);
+    else
+      preferences.putInt("watering-threshold", 50);
     Serial.print("POST** watering-threshold new:");
     Serial.println(wtInt);  
-    preferences.putInt("threshold", wtInt);
 
     jsonDoc["success"] = "1";
   }
@@ -829,8 +830,7 @@ void handleGetWateringThreshold() {
   JsonDocument jsonDoc;
   String jsonString; 
   String wt = "";
-  if (preferences.isKey("threshold"))
-    wt = preferences.getInt("threshold");
+  wt = preferences.getInt("threshold", 50);
   jsonDoc["watering-threshold"] = wt;  
   serializeJson(jsonDoc, jsonString);
   server->sendHeader("Content-Type", "application/json");
