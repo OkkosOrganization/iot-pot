@@ -40,14 +40,22 @@ The device code is written in C++ using the Arduino framework, see [/src](./src/
 
 See [/src/html](./src/html)
 
+![IoT-pot configuration app](./monitoring-app/public/configuration-app.png)
+
 ## Monitoring app
 
 See [/monitoring-app](./monitoring-app)
 
+![IoT-pot monitoring app](./monitoring-app/public/monitoring-app.png)
+
 ## Authors
 
 Okko Ojala - Lead developer, system architecture, UX-UI design, hardware
+
 Susan Paloranta - Developer, testing
+
 Bella Lerch - Product owner, testing
+
 Antti Leppänen - Hardware, 3D-design and printing, testing
+
 Katja Hellsten - Project manager, testing
