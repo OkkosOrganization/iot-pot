@@ -1,6 +1,6 @@
 # Configuration web app
 
-The configuration app is served by the Arduino web server. The app is basically a single HTML-string with CSS, JS and fonts inlined. The file [index.h](./index.h) contains the HTML-string as a 'PROGMEM'-string, which means that the string is saved in the Arduino's Flash memory and saves RAM.
+The configuration app is served by the ESP32 web server. The app is basically a single HTML-string with CSS, JS and fonts inlined. The file [index.h](./index.h) contains the HTML-string as a 'PROGMEM'-string, which means that the string is saved in the Arduino's Flash memory and saves RAM.
 
 ## Requirements
 
