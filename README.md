@@ -14,7 +14,7 @@ IoT-pot was created by the authors for Chydenius (JYU) university course `TIES45
 
 Use Visual Studio Code and the [Platform IO extension](https://docs.platformio.org/en/stable/integration/ide/vscode.html).
 
-The code consists of the device code, configuration app code and the monitorgin app code, all in the same repo.
+The code consists of the firmware for the ESP32, configuration app code and the monitoring app code, all in the same repo.
 
 ## Git workflow
 
@@ -28,15 +28,17 @@ Let´s use feature branches: create a new branch for each new feature.
 3. When you are done, make sure everything works and compiles, then push the branch to Gitlab
 4. Log into the Gitlab web app and create a Merge Request to merge your branch `feature/my-new-feature` into the `main` branch
 
-## Secrets
+## ESP32 firmware
+
+The firmware is written in C++ using the Arduino framework, see [/src](./src/). Sensor specific header files can be found in [/include](./include/)
+
+### Secrets
 
 Do not commit secrets, passwords, API keys etc into Git. Create a file called `secrets.h` in [/include](./include), this file should contain all secrets and the file is ignored by Git. See the file [./include/secrets.h.template](./include/secrets.h.template) for a template.
 
-## Device code
-
-The device code is written in C++ using the Arduino framework, see [/src](./src/). Sensor specific header files can be found in [/include](./include/)
-
 ## Configuration app
+
+Simple web app for configuring the ESP32-device: the device acts as a Wifi access point and serves the configuration web app in the local network.
 
 See [/src/html](./src/html)
 
@@ -44,13 +46,15 @@ See [/src/html](./src/html)
 
 ## Monitoring app
 
+Next.js web application, hosted in Vercel.
+
 See [/monitoring-app](./monitoring-app)
 
 ![IoT-pot monitoring app](./monitoring-app/public/monitoring-app.png)
 
 ## Authors
 
-Okko Ojala - Lead developer, system architecture, UX-UI design, hardware
+Okko Ojala - Developer, system architecture, UX-UI design, hardware
 
 Susan Paloranta - Developer, testing
 
